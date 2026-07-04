@@ -1,0 +1,989 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "binance-compat",
+  "did": "did:web:etzhayyim.com:actor:binance-compat",
+  "kind": "compat",
+  "title": "binance clean-room actor",
+  "description": "Clean-room, API-compatible fintech / web3 actor (binance); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreiftr4klxcvyk5r3lqpybnvhwsnaxgtawvkpbylnep7mp6vrv22s7u",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreiftr4klxcvyk5r3lqpybnvhwsnaxgtawvkpbylnep7mp6vrv22s7u",
+  "schema": "schema/binance.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://github.com/binance/binance-spot-api-docs",
+    "verifiedAt": "2026-06-09",
+    "resources": [
+      "Order",
+      "Trade",
+      "Balance",
+      "Account",
+      "Ticker",
+      "Kline"
+    ],
+    "enums": {
+      "Order": {
+        "status": [
+          "NEW",
+          "PENDING_NEW",
+          "PARTIALLY_FILLED",
+          "FILLED",
+          "CANCELED",
+          "PENDING_CANCEL",
+          "REJECTED",
+          "EXPIRED",
+          "EXPIRED_IN_MATCH"
+        ],
+        "type": [
+          "LIMIT",
+          "MARKET",
+          "STOP_LOSS",
+          "STOP_LOSS_LIMIT",
+          "TAKE_PROFIT",
+          "TAKE_PROFIT_LIMIT",
+          "LIMIT_MAKER"
+        ],
+        "side": [
+          "BUY",
+          "SELL"
+        ],
+        "timeInForce": [
+          "GTC",
+          "IOC",
+          "FOK"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Order",
+    "Trade",
+    "Balance",
+    "Account",
+    "Ticker",
+    "Kline"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 30,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/orders",
+          "op": "create Order"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/orders",
+          "op": "list Order"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/orders/{id}",
+          "op": "get Order"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/orders/{id}",
+          "op": "update Order"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/orders/{id}",
+          "op": "delete Order"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/trades",
+          "op": "create Trade"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/trades",
+          "op": "list Trade"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/trades/{id}",
+          "op": "get Trade"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/trades/{id}",
+          "op": "update Trade"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/trades/{id}",
+          "op": "delete Trade"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/balances",
+          "op": "create Balance"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/balances",
+          "op": "list Balance"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/balances/{id}",
+          "op": "get Balance"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/balances/{id}",
+          "op": "update Balance"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/balances/{id}",
+          "op": "delete Balance"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/accounts",
+          "op": "create Account"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/accounts",
+          "op": "list Account"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/accounts/{id}",
+          "op": "get Account"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/accounts/{id}",
+          "op": "update Account"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/accounts/{id}",
+          "op": "delete Account"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/tickers",
+          "op": "create Ticker"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/tickers",
+          "op": "list Ticker"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/tickers/{id}",
+          "op": "get Ticker"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/tickers/{id}",
+          "op": "update Ticker"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/tickers/{id}",
+          "op": "delete Ticker"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/klines",
+          "op": "create Kline"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/klines",
+          "op": "list Kline"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/klines/{id}",
+          "op": "get Kline"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/klines/{id}",
+          "op": "update Kline"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/klines/{id}",
+          "op": "delete Kline"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "binance-compat",
+            "purl": "pkg:etzhayyim/binance-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "binance.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 30,
+      "tools": [
+        {
+          "name": "create_order",
+          "description": "Create a Order.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "orderId": {
+                "type": "integer"
+              },
+              "clientOrderId": {
+                "type": "string"
+              },
+              "price": {
+                "type": "string"
+              },
+              "origQty": {
+                "type": "string"
+              },
+              "executedQty": {
+                "type": "string"
+              },
+              "cummulativeQuoteQty": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "side": {
+                "type": "string"
+              },
+              "timeInForce": {
+                "type": "string"
+              },
+              "transactTime": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "symbol",
+              "price"
+            ]
+          }
+        },
+        {
+          "name": "list_orders",
+          "description": "List Orders.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_order",
+          "description": "Get a Order by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_order",
+          "description": "Update a Order.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "symbol": {
+                "type": "string"
+              },
+              "orderId": {
+                "type": "integer"
+              },
+              "clientOrderId": {
+                "type": "string"
+              },
+              "price": {
+                "type": "string"
+              },
+              "origQty": {
+                "type": "string"
+              },
+              "executedQty": {
+                "type": "string"
+              },
+              "cummulativeQuoteQty": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "side": {
+                "type": "string"
+              },
+              "timeInForce": {
+                "type": "string"
+              },
+              "transactTime": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_order",
+          "description": "Delete a Order.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_trade",
+          "description": "Create a Trade.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "symbol": {
+                "type": "string"
+              },
+              "orderId": {
+                "type": "integer"
+              },
+              "price": {
+                "type": "string"
+              },
+              "qty": {
+                "type": "string"
+              },
+              "quoteQty": {
+                "type": "string"
+              },
+              "commission": {
+                "type": "string"
+              },
+              "commissionAsset": {
+                "type": "string"
+              },
+              "time": {
+                "type": "integer"
+              },
+              "isBuyer": {
+                "type": "boolean"
+              },
+              "isMaker": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "symbol"
+            ]
+          }
+        },
+        {
+          "name": "list_trades",
+          "description": "List Trades.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_trade",
+          "description": "Get a Trade by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_trade",
+          "description": "Update a Trade.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "symbol": {
+                "type": "string"
+              },
+              "orderId": {
+                "type": "integer"
+              },
+              "price": {
+                "type": "string"
+              },
+              "qty": {
+                "type": "string"
+              },
+              "quoteQty": {
+                "type": "string"
+              },
+              "commission": {
+                "type": "string"
+              },
+              "commissionAsset": {
+                "type": "string"
+              },
+              "time": {
+                "type": "integer"
+              },
+              "isBuyer": {
+                "type": "boolean"
+              },
+              "isMaker": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_trade",
+          "description": "Delete a Trade.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_balance",
+          "description": "Create a Balance.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "asset": {
+                "type": "string"
+              },
+              "free": {
+                "type": "string"
+              },
+              "locked": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "asset",
+              "free"
+            ]
+          }
+        },
+        {
+          "name": "list_balances",
+          "description": "List Balances.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_balance",
+          "description": "Get a Balance by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_balance",
+          "description": "Update a Balance.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "asset": {
+                "type": "string"
+              },
+              "free": {
+                "type": "string"
+              },
+              "locked": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_balance",
+          "description": "Delete a Balance.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_account",
+          "description": "Create a Account.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "makerCommission": {
+                "type": "integer"
+              },
+              "takerCommission": {
+                "type": "integer"
+              },
+              "canTrade": {
+                "type": "boolean"
+              },
+              "canWithdraw": {
+                "type": "boolean"
+              },
+              "canDeposit": {
+                "type": "boolean"
+              },
+              "updateTime": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "makerCommission",
+              "takerCommission"
+            ]
+          }
+        },
+        {
+          "name": "list_accounts",
+          "description": "List Accounts.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_account",
+          "description": "Get a Account by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_account",
+          "description": "Update a Account.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "makerCommission": {
+                "type": "integer"
+              },
+              "takerCommission": {
+                "type": "integer"
+              },
+              "canTrade": {
+                "type": "boolean"
+              },
+              "canWithdraw": {
+                "type": "boolean"
+              },
+              "canDeposit": {
+                "type": "boolean"
+              },
+              "updateTime": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_account",
+          "description": "Delete a Account.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_ticker",
+          "description": "Create a Ticker.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "lastPrice": {
+                "type": "string"
+              },
+              "priceChange": {
+                "type": "string"
+              },
+              "priceChangePercent": {
+                "type": "string"
+              },
+              "highPrice": {
+                "type": "string"
+              },
+              "lowPrice": {
+                "type": "string"
+              },
+              "volume": {
+                "type": "string"
+              },
+              "quoteVolume": {
+                "type": "string"
+              },
+              "openTime": {
+                "type": "integer"
+              },
+              "closeTime": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "symbol",
+              "lastPrice"
+            ]
+          }
+        },
+        {
+          "name": "list_tickers",
+          "description": "List Tickers.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_ticker",
+          "description": "Get a Ticker by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_ticker",
+          "description": "Update a Ticker.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "symbol": {
+                "type": "string"
+              },
+              "lastPrice": {
+                "type": "string"
+              },
+              "priceChange": {
+                "type": "string"
+              },
+              "priceChangePercent": {
+                "type": "string"
+              },
+              "highPrice": {
+                "type": "string"
+              },
+              "lowPrice": {
+                "type": "string"
+              },
+              "volume": {
+                "type": "string"
+              },
+              "quoteVolume": {
+                "type": "string"
+              },
+              "openTime": {
+                "type": "integer"
+              },
+              "closeTime": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_ticker",
+          "description": "Delete a Ticker.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_kline",
+          "description": "Create a Kline.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "openTime": {
+                "type": "integer"
+              },
+              "open": {
+                "type": "string"
+              },
+              "high": {
+                "type": "string"
+              },
+              "low": {
+                "type": "string"
+              },
+              "close": {
+                "type": "string"
+              },
+              "volume": {
+                "type": "string"
+              },
+              "closeTime": {
+                "type": "integer"
+              },
+              "trades": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "openTime",
+              "open"
+            ]
+          }
+        },
+        {
+          "name": "list_klines",
+          "description": "List Klines.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_kline",
+          "description": "Get a Kline by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_kline",
+          "description": "Update a Kline.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "openTime": {
+                "type": "integer"
+              },
+              "open": {
+                "type": "string"
+              },
+              "high": {
+                "type": "string"
+              },
+              "low": {
+                "type": "string"
+              },
+              "close": {
+                "type": "string"
+              },
+              "volume": {
+                "type": "string"
+              },
+              "closeTime": {
+                "type": "integer"
+              },
+              "trades": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_kline",
+          "description": "Delete a Kline.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
