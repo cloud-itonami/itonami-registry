@@ -1,0 +1,724 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "adyen-compat",
+  "did": "did:web:etzhayyim.com:actor:adyen-compat",
+  "kind": "compat",
+  "title": "adyen clean-room actor",
+  "description": "Clean-room, API-compatible payments / money movement actor (adyen); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreieutibcsicaftwucezcyua6lrtk4h47k6jn7w2yfou2jm6g6o66qa",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreieutibcsicaftwucezcyua6lrtk4h47k6jn7w2yfou2jm6g6o66qa",
+  "schema": "schema/adyen.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://raw.githubusercontent.com/Adyen/adyen-openapi/main/json/CheckoutService-v71.json",
+    "verifiedAt": "2026-06-08",
+    "resources": [
+      "PaymentRequest",
+      "PaymentResponse",
+      "Amount",
+      "PaymentRefundRequest",
+      "PaymentRefundResponse",
+      "PaymentCaptureResponse"
+    ],
+    "enums": {
+      "PaymentRequest": {
+        "channel": [
+          "iOS",
+          "Android",
+          "Web"
+        ],
+        "recurringProcessingModel": [
+          "CardOnFile",
+          "Subscription",
+          "UnscheduledCardOnFile"
+        ]
+      },
+      "PaymentResponse": {
+        "resultCode": [
+          "AuthenticationFinished",
+          "AuthenticationNotRequired",
+          "Authorised",
+          "Cancelled",
+          "ChallengeShopper",
+          "Error",
+          "IdentifyShopper",
+          "PartiallyAuthorised",
+          "Pending",
+          "PresentToShopper",
+          "Received",
+          "RedirectShopper",
+          "Refused",
+          "Success"
+        ]
+      },
+      "PaymentRefundRequest": {
+        "merchantRefundReason": [
+          "FRAUD",
+          "CUSTOMER REQUEST",
+          "RETURN",
+          "DUPLICATE",
+          "OTHER"
+        ]
+      },
+      "PaymentRefundResponse": {
+        "merchantRefundReason": [
+          "FRAUD",
+          "CUSTOMER REQUEST",
+          "RETURN",
+          "DUPLICATE",
+          "OTHER"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Payment",
+    "Amount",
+    "ModificationResult",
+    "PaymentMethod",
+    "Notification"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 25,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/payments",
+          "op": "create Payment"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/payments",
+          "op": "list Payment"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/payments/{id}",
+          "op": "get Payment"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/payments/{id}",
+          "op": "update Payment"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/payments/{id}",
+          "op": "delete Payment"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/amounts",
+          "op": "create Amount"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/amounts",
+          "op": "list Amount"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/amounts/{id}",
+          "op": "get Amount"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/amounts/{id}",
+          "op": "update Amount"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/amounts/{id}",
+          "op": "delete Amount"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/modificationresults",
+          "op": "create ModificationResult"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/modificationresults",
+          "op": "list ModificationResult"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/modificationresults/{id}",
+          "op": "get ModificationResult"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/modificationresults/{id}",
+          "op": "update ModificationResult"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/modificationresults/{id}",
+          "op": "delete ModificationResult"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/paymentmethods",
+          "op": "create PaymentMethod"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/paymentmethods",
+          "op": "list PaymentMethod"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/paymentmethods/{id}",
+          "op": "get PaymentMethod"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/paymentmethods/{id}",
+          "op": "update PaymentMethod"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/paymentmethods/{id}",
+          "op": "delete PaymentMethod"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/notifications",
+          "op": "create Notification"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/notifications",
+          "op": "list Notification"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/notifications/{id}",
+          "op": "get Notification"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/notifications/{id}",
+          "op": "update Notification"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/notifications/{id}",
+          "op": "delete Notification"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "adyen-compat",
+            "purl": "pkg:etzhayyim/adyen-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "adyen.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 25,
+      "tools": [
+        {
+          "name": "create_payment",
+          "description": "Create a Payment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "pspReference": {
+                "type": "string"
+              },
+              "merchantReference": {
+                "type": "string"
+              },
+              "merchantAccount": {
+                "type": "string"
+              },
+              "reference": {
+                "type": "string"
+              },
+              "resultCode": {
+                "type": "string"
+              },
+              "shopperReference": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "pspReference",
+              "merchantReference"
+            ]
+          }
+        },
+        {
+          "name": "list_payments",
+          "description": "List Payments.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_payment",
+          "description": "Get a Payment by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_payment",
+          "description": "Update a Payment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "pspReference": {
+                "type": "string"
+              },
+              "merchantReference": {
+                "type": "string"
+              },
+              "merchantAccount": {
+                "type": "string"
+              },
+              "reference": {
+                "type": "string"
+              },
+              "resultCode": {
+                "type": "string"
+              },
+              "shopperReference": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_payment",
+          "description": "Delete a Payment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_amount",
+          "description": "Create a Amount.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "integer"
+              },
+              "currency": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "currency"
+            ]
+          }
+        },
+        {
+          "name": "list_amounts",
+          "description": "List Amounts.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_amount",
+          "description": "Get a Amount by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_amount",
+          "description": "Update a Amount.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "value": {
+                "type": "integer"
+              },
+              "currency": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_amount",
+          "description": "Delete a Amount.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_modification_result",
+          "description": "Create a ModificationResult.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "pspReference": {
+                "type": "string"
+              },
+              "resultCode": {
+                "type": "string"
+              },
+              "response": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "pspReference",
+              "resultCode"
+            ]
+          }
+        },
+        {
+          "name": "list_modification_results",
+          "description": "List ModificationResults.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_modification_result",
+          "description": "Get a ModificationResult by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_modification_result",
+          "description": "Update a ModificationResult.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "pspReference": {
+                "type": "string"
+              },
+              "resultCode": {
+                "type": "string"
+              },
+              "response": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_modification_result",
+          "description": "Delete a ModificationResult.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_payment_method",
+          "description": "Create a PaymentMethod.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "storedPaymentMethodId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          }
+        },
+        {
+          "name": "list_payment_methods",
+          "description": "List PaymentMethods.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_payment_method",
+          "description": "Get a PaymentMethod by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_payment_method",
+          "description": "Update a PaymentMethod.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "storedPaymentMethodId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_payment_method",
+          "description": "Delete a PaymentMethod.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_notification",
+          "description": "Create a Notification.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "eventCode": {
+                "type": "string"
+              },
+              "pspReference": {
+                "type": "string"
+              },
+              "merchantReference": {
+                "type": "string"
+              },
+              "eventDate": {
+                "type": "string"
+              },
+              "success": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "eventCode",
+              "pspReference"
+            ]
+          }
+        },
+        {
+          "name": "list_notifications",
+          "description": "List Notifications.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_notification",
+          "description": "Get a Notification by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_notification",
+          "description": "Update a Notification.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "eventCode": {
+                "type": "string"
+              },
+              "pspReference": {
+                "type": "string"
+              },
+              "merchantReference": {
+                "type": "string"
+              },
+              "eventDate": {
+                "type": "string"
+              },
+              "success": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_notification",
+          "description": "Delete a Notification.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
