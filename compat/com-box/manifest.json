@@ -1,0 +1,855 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "box-compat",
+  "did": "did:web:etzhayyim.com:actor:box-compat",
+  "kind": "compat",
+  "title": "box clean-room actor",
+  "description": "Clean-room, API-compatible office / productivity suite actor (box); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreiddmhozc2z45errrbbh3yh5vs4r4hlckluk46zzi4wzc2lotgxeyu",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreiddmhozc2z45errrbbh3yh5vs4r4hlckluk46zzi4wzc2lotgxeyu",
+  "schema": "schema/box.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://developer.box.com/reference",
+    "verifiedAt": "2026-06-08",
+    "resources": [
+      "File",
+      "Folder",
+      "User",
+      "Collaboration",
+      "SharedLink",
+      "Comment"
+    ],
+    "enums": {
+      "File": {
+        "itemStatus": [
+          "active",
+          "trashed",
+          "deleted"
+        ]
+      },
+      "Folder": {
+        "itemStatus": [
+          "active",
+          "trashed",
+          "deleted"
+        ],
+        "syncState": [
+          "synced",
+          "not_synced",
+          "partially_synced"
+        ]
+      },
+      "User": {
+        "status": [
+          "active",
+          "inactive",
+          "cannot_delete_edit",
+          "cannot_delete_edit_upload"
+        ],
+        "role": [
+          "admin",
+          "coadmin",
+          "user"
+        ]
+      },
+      "Collaboration": {
+        "role": [
+          "editor",
+          "viewer",
+          "previewer",
+          "uploader",
+          "previewer uploader",
+          "viewer uploader",
+          "co-owner",
+          "owner"
+        ],
+        "status": [
+          "accepted",
+          "pending",
+          "rejected"
+        ]
+      },
+      "SharedLink": {
+        "access": [
+          "open",
+          "company",
+          "collaborators"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "File",
+    "Folder",
+    "User",
+    "Collaboration",
+    "SharedLink",
+    "Comment"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 30,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/files",
+          "op": "create File"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/files",
+          "op": "list File"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/files/{id}",
+          "op": "get File"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/files/{id}",
+          "op": "update File"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/files/{id}",
+          "op": "delete File"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/folders",
+          "op": "create Folder"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/folders",
+          "op": "list Folder"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/folders/{id}",
+          "op": "get Folder"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/folders/{id}",
+          "op": "update Folder"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/folders/{id}",
+          "op": "delete Folder"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/users",
+          "op": "create User"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/users",
+          "op": "list User"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/users/{id}",
+          "op": "get User"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/users/{id}",
+          "op": "update User"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/users/{id}",
+          "op": "delete User"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/collaborations",
+          "op": "create Collaboration"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/collaborations",
+          "op": "list Collaboration"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/collaborations/{id}",
+          "op": "get Collaboration"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/collaborations/{id}",
+          "op": "update Collaboration"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/collaborations/{id}",
+          "op": "delete Collaboration"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/sharedlinks",
+          "op": "create SharedLink"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/sharedlinks",
+          "op": "list SharedLink"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/sharedlinks/{id}",
+          "op": "get SharedLink"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/sharedlinks/{id}",
+          "op": "update SharedLink"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/sharedlinks/{id}",
+          "op": "delete SharedLink"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/comments",
+          "op": "create Comment"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/comments",
+          "op": "list Comment"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/comments/{id}",
+          "op": "get Comment"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/comments/{id}",
+          "op": "update Comment"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/comments/{id}",
+          "op": "delete Comment"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "box-compat",
+            "purl": "pkg:etzhayyim/box-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "box.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 30,
+      "tools": [
+        {
+          "name": "create_file",
+          "description": "Create a File.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "size": {
+                "type": "integer"
+              },
+              "sha1": {
+                "type": "string"
+              },
+              "itemStatus": {
+                "type": "string"
+              },
+              "commentCount": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "name",
+              "description"
+            ]
+          }
+        },
+        {
+          "name": "list_files",
+          "description": "List Files.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_file",
+          "description": "Get a File by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_file",
+          "description": "Update a File.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "size": {
+                "type": "integer"
+              },
+              "sha1": {
+                "type": "string"
+              },
+              "itemStatus": {
+                "type": "string"
+              },
+              "commentCount": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_file",
+          "description": "Delete a File.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_folder",
+          "description": "Create a Folder.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "size": {
+                "type": "integer"
+              },
+              "itemStatus": {
+                "type": "string"
+              },
+              "syncState": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "description"
+            ]
+          }
+        },
+        {
+          "name": "list_folders",
+          "description": "List Folders.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_folder",
+          "description": "Get a Folder by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_folder",
+          "description": "Update a Folder.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "size": {
+                "type": "integer"
+              },
+              "itemStatus": {
+                "type": "string"
+              },
+              "syncState": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_folder",
+          "description": "Delete a Folder.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_user",
+          "description": "Create a User.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "login": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "login"
+            ]
+          }
+        },
+        {
+          "name": "list_users",
+          "description": "List Users.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_user",
+          "description": "Get a User by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_user",
+          "description": "Update a User.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "login": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_user",
+          "description": "Delete a User.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_collaboration",
+          "description": "Create a Collaboration.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "role": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "isAccessOnly": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "role",
+              "status"
+            ]
+          }
+        },
+        {
+          "name": "list_collaborations",
+          "description": "List Collaborations.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_collaboration",
+          "description": "Get a Collaboration by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_collaboration",
+          "description": "Update a Collaboration.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "isAccessOnly": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_collaboration",
+          "description": "Delete a Collaboration.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_shared_link",
+          "description": "Create a SharedLink.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "access": {
+                "type": "string"
+              },
+              "vanityName": {
+                "type": "string"
+              },
+              "canDownload": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "access",
+              "vanityName"
+            ]
+          }
+        },
+        {
+          "name": "list_shared_links",
+          "description": "List SharedLinks.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_shared_link",
+          "description": "Get a SharedLink by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_shared_link",
+          "description": "Update a SharedLink.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "access": {
+                "type": "string"
+              },
+              "vanityName": {
+                "type": "string"
+              },
+              "canDownload": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_shared_link",
+          "description": "Delete a SharedLink.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_comment",
+          "description": "Create a Comment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string"
+              },
+              "isReplyComment": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "message",
+              "isReplyComment"
+            ]
+          }
+        },
+        {
+          "name": "list_comments",
+          "description": "List Comments.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_comment",
+          "description": "Get a Comment by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_comment",
+          "description": "Update a Comment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "isReplyComment": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_comment",
+          "description": "Delete a Comment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
