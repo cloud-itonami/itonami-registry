@@ -1,0 +1,776 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "aftership-compat",
+  "did": "did:web:etzhayyim.com:actor:aftership-compat",
+  "kind": "compat",
+  "title": "aftership clean-room actor",
+  "description": "Clean-room, API-compatible headless commerce / logistics actor (aftership); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreibympf452g3krruallceo6fhg5gtk6ohdgm76cf6u66qbghwxsz7y",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreibympf452g3krruallceo6fhg5gtk6ohdgm76cf6u66qbghwxsz7y",
+  "schema": "schema/aftership.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://github.com/AfterShip/aftership-sdk-nodejs",
+    "verifiedAt": "2026-06-09",
+    "resources": [
+      "Tracking",
+      "Checkpoint",
+      "Courier",
+      "Notification",
+      "EstimatedDeliveryDate"
+    ],
+    "enums": {
+      "Tracking": {
+        "tag": [
+          "Pending",
+          "InfoReceived",
+          "InTransit",
+          "OutForDelivery",
+          "AttemptFail",
+          "Delivered",
+          "AvailableForPickup",
+          "Exception",
+          "Expired"
+        ],
+        "deliveryType": [
+          "pickup_at_store",
+          "pickup_at_courier",
+          "door_to_door"
+        ]
+      },
+      "Checkpoint": {
+        "tag": [
+          "Pending",
+          "InfoReceived",
+          "InTransit",
+          "OutForDelivery",
+          "AttemptFail",
+          "Delivered",
+          "AvailableForPickup",
+          "Exception",
+          "Expired"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Tracking",
+    "Checkpoint",
+    "Courier",
+    "Notification",
+    "EstimatedDeliveryDate"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 25,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/trackings",
+          "op": "create Tracking"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/trackings",
+          "op": "list Tracking"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/trackings/{id}",
+          "op": "get Tracking"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/trackings/{id}",
+          "op": "update Tracking"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/trackings/{id}",
+          "op": "delete Tracking"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/checkpoints",
+          "op": "create Checkpoint"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/checkpoints",
+          "op": "list Checkpoint"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/checkpoints/{id}",
+          "op": "get Checkpoint"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/checkpoints/{id}",
+          "op": "update Checkpoint"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/checkpoints/{id}",
+          "op": "delete Checkpoint"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/couriers",
+          "op": "create Courier"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/couriers",
+          "op": "list Courier"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/couriers/{id}",
+          "op": "get Courier"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/couriers/{id}",
+          "op": "update Courier"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/couriers/{id}",
+          "op": "delete Courier"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/notifications",
+          "op": "create Notification"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/notifications",
+          "op": "list Notification"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/notifications/{id}",
+          "op": "get Notification"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/notifications/{id}",
+          "op": "update Notification"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/notifications/{id}",
+          "op": "delete Notification"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/estimateddeliverydates",
+          "op": "create EstimatedDeliveryDate"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/estimateddeliverydates",
+          "op": "list EstimatedDeliveryDate"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/estimateddeliverydates/{id}",
+          "op": "get EstimatedDeliveryDate"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/estimateddeliverydates/{id}",
+          "op": "update EstimatedDeliveryDate"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/estimateddeliverydates/{id}",
+          "op": "delete EstimatedDeliveryDate"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "aftership-compat",
+            "purl": "pkg:etzhayyim/aftership-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "aftership.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 25,
+      "tools": [
+        {
+          "name": "create_tracking",
+          "description": "Create a Tracking.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "trackingNumber": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "tag": {
+                "type": "string"
+              },
+              "subtag": {
+                "type": "string"
+              },
+              "deliveryType": {
+                "type": "string"
+              },
+              "active": {
+                "type": "boolean"
+              },
+              "expectedDelivery": {
+                "type": "string"
+              },
+              "orderId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "trackingNumber"
+            ]
+          }
+        },
+        {
+          "name": "list_trackings",
+          "description": "List Trackings.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_tracking",
+          "description": "Get a Tracking by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_tracking",
+          "description": "Update a Tracking.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "trackingNumber": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "tag": {
+                "type": "string"
+              },
+              "subtag": {
+                "type": "string"
+              },
+              "deliveryType": {
+                "type": "string"
+              },
+              "active": {
+                "type": "boolean"
+              },
+              "expectedDelivery": {
+                "type": "string"
+              },
+              "orderId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_tracking",
+          "description": "Delete a Tracking.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_checkpoint",
+          "description": "Create a Checkpoint.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "checkpointTime": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "tag": {
+                "type": "string"
+              },
+              "subtag": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "countryIso3": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "checkpointTime",
+              "slug"
+            ]
+          }
+        },
+        {
+          "name": "list_checkpoints",
+          "description": "List Checkpoints.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_checkpoint",
+          "description": "Get a Checkpoint by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_checkpoint",
+          "description": "Update a Checkpoint.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "checkpointTime": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "tag": {
+                "type": "string"
+              },
+              "subtag": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "countryIso3": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_checkpoint",
+          "description": "Delete a Checkpoint.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_courier",
+          "description": "Create a Courier.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "webUrl": {
+                "type": "string"
+              },
+              "defaultLanguage": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "slug",
+              "name"
+            ]
+          }
+        },
+        {
+          "name": "list_couriers",
+          "description": "List Couriers.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_courier",
+          "description": "Get a Courier by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_courier",
+          "description": "Update a Courier.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "webUrl": {
+                "type": "string"
+              },
+              "defaultLanguage": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_courier",
+          "description": "Delete a Courier.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_notification",
+          "description": "Create a Notification.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "emails": {
+                "type": "string"
+              },
+              "smses": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "emails",
+              "smses"
+            ]
+          }
+        },
+        {
+          "name": "list_notifications",
+          "description": "List Notifications.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_notification",
+          "description": "Get a Notification by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_notification",
+          "description": "Update a Notification.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "emails": {
+                "type": "string"
+              },
+              "smses": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_notification",
+          "description": "Delete a Notification.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_estimated_delivery_date",
+          "description": "Create a EstimatedDeliveryDate.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "estimatedDeliveryDate": {
+                "type": "string"
+              },
+              "confidenceScore": {
+                "type": "number"
+              },
+              "estimatedDeliveryDateMin": {
+                "type": "string"
+              },
+              "estimatedDeliveryDateMax": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "estimatedDeliveryDate",
+              "confidenceScore"
+            ]
+          }
+        },
+        {
+          "name": "list_estimated_delivery_dates",
+          "description": "List EstimatedDeliveryDates.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_estimated_delivery_date",
+          "description": "Get a EstimatedDeliveryDate by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_estimated_delivery_date",
+          "description": "Update a EstimatedDeliveryDate.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "estimatedDeliveryDate": {
+                "type": "string"
+              },
+              "confidenceScore": {
+                "type": "number"
+              },
+              "estimatedDeliveryDateMin": {
+                "type": "string"
+              },
+              "estimatedDeliveryDateMax": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_estimated_delivery_date",
+          "description": "Delete a EstimatedDeliveryDate.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
