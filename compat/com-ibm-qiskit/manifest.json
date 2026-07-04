@@ -1,0 +1,529 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "ibm_qiskit-compat",
+  "did": "did:web:etzhayyim.com:actor:ibm_qiskit-compat",
+  "kind": "compat",
+  "title": "ibm_qiskit clean-room actor",
+  "description": "Clean-room, API-compatible hardware ISA / quantum actor (ibm_qiskit); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreihjbk2ol5kndizde2ivahls6qddobjoye65yv57knxzleq7lyypwi",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreihjbk2ol5kndizde2ivahls6qddobjoye65yv57knxzleq7lyypwi",
+  "schema": "schema/ibm_qiskit.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://github.com/Qiskit/qiskit + https://github.com/Qiskit/qiskit-ibm-runtime (official sources)",
+    "verifiedAt": "2026-06-11",
+    "resources": [
+      "Job",
+      "RuntimeJob",
+      "Backend"
+    ],
+    "enums": {
+      "Job": {
+        "status": [
+          "INITIALIZING",
+          "QUEUED",
+          "VALIDATING",
+          "RUNNING",
+          "CANCELLED",
+          "DONE",
+          "ERROR"
+        ]
+      },
+      "RuntimeJob": {
+        "status": [
+          "INITIALIZING",
+          "QUEUED",
+          "RUNNING",
+          "CANCELLED",
+          "DONE",
+          "ERROR"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Job",
+    "RuntimeJob",
+    "Backend"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 15,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/jobs",
+          "op": "create Job"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/jobs",
+          "op": "list Job"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/jobs/{id}",
+          "op": "get Job"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/jobs/{id}",
+          "op": "update Job"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/jobs/{id}",
+          "op": "delete Job"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/runtimejobs",
+          "op": "create RuntimeJob"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/runtimejobs",
+          "op": "list RuntimeJob"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/runtimejobs/{id}",
+          "op": "get RuntimeJob"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/runtimejobs/{id}",
+          "op": "update RuntimeJob"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/runtimejobs/{id}",
+          "op": "delete RuntimeJob"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/backends",
+          "op": "create Backend"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/backends",
+          "op": "list Backend"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/backends/{id}",
+          "op": "get Backend"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/backends/{id}",
+          "op": "update Backend"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/backends/{id}",
+          "op": "delete Backend"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "ibm_qiskit-compat",
+            "purl": "pkg:etzhayyim/ibm_qiskit-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "ibm_qiskit.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 15,
+      "tools": [
+        {
+          "name": "create_job",
+          "description": "Create a Job.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "jobId": {
+                "type": "string"
+              },
+              "backend": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "backend",
+              "status"
+            ]
+          }
+        },
+        {
+          "name": "list_jobs",
+          "description": "List Jobs.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_job",
+          "description": "Get a Job by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_job",
+          "description": "Update a Job.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "jobId": {
+                "type": "string"
+              },
+              "backend": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_job",
+          "description": "Delete a Job.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_runtime_job",
+          "description": "Create a RuntimeJob.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "jobId": {
+                "type": "string"
+              },
+              "programId": {
+                "type": "string"
+              },
+              "creationDate": {
+                "type": "string"
+              },
+              "image": {
+                "type": "string"
+              },
+              "sessionId": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              },
+              "private": {
+                "type": "boolean"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "creationDate",
+              "image"
+            ]
+          }
+        },
+        {
+          "name": "list_runtime_jobs",
+          "description": "List RuntimeJobs.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_runtime_job",
+          "description": "Get a RuntimeJob by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_runtime_job",
+          "description": "Update a RuntimeJob.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "jobId": {
+                "type": "string"
+              },
+              "programId": {
+                "type": "string"
+              },
+              "creationDate": {
+                "type": "string"
+              },
+              "image": {
+                "type": "string"
+              },
+              "sessionId": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              },
+              "private": {
+                "type": "boolean"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_runtime_job",
+          "description": "Delete a RuntimeJob.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_backend",
+          "description": "Create a Backend.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "backendVersion": {
+                "type": "string"
+              },
+              "numQubits": {
+                "type": "integer"
+              },
+              "simulator": {
+                "type": "boolean"
+              },
+              "local": {
+                "type": "boolean"
+              },
+              "conditional": {
+                "type": "boolean"
+              },
+              "openPulse": {
+                "type": "boolean"
+              },
+              "memory": {
+                "type": "boolean"
+              },
+              "dt": {
+                "type": "number"
+              },
+              "dtm": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "name",
+              "backendVersion"
+            ]
+          }
+        },
+        {
+          "name": "list_backends",
+          "description": "List Backends.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_backend",
+          "description": "Get a Backend by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_backend",
+          "description": "Update a Backend.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "backendVersion": {
+                "type": "string"
+              },
+              "numQubits": {
+                "type": "integer"
+              },
+              "simulator": {
+                "type": "boolean"
+              },
+              "local": {
+                "type": "boolean"
+              },
+              "conditional": {
+                "type": "boolean"
+              },
+              "openPulse": {
+                "type": "boolean"
+              },
+              "memory": {
+                "type": "boolean"
+              },
+              "dt": {
+                "type": "number"
+              },
+              "dtm": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_backend",
+          "description": "Delete a Backend.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
