@@ -1,0 +1,532 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "as2_protocol-compat",
+  "did": "did:web:etzhayyim.com:actor:as2_protocol-compat",
+  "kind": "compat",
+  "title": "as2_protocol clean-room actor",
+  "description": "Clean-room, API-compatible deep logistics / supply chain actor (as2_protocol); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreih64ia2wcfkmp3b4wfrg4bq2kn5nfs2cdzkdb3rg46p62orcfvlra",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreih64ia2wcfkmp3b4wfrg4bq2kn5nfs2cdzkdb3rg46p62orcfvlra",
+  "schema": "schema/as2_protocol.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://datatracker.ietf.org/doc/html/rfc4130",
+    "verifiedAt": "2026-06-10",
+    "resources": [
+      "As2Message",
+      "Mdn",
+      "DispositionNotification"
+    ],
+    "enums": {
+      "Mdn": {
+        "dispositionType": [
+          "processed",
+          "failed"
+        ],
+        "dispositionModifier": [
+          "error",
+          "warning"
+        ],
+        "actionMode": [
+          "manual-action",
+          "automatic-action"
+        ],
+        "sendingMode": [
+          "MDN-sent-manually",
+          "MDN-sent-automatically"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "As2Message",
+    "Mdn",
+    "DispositionNotification"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 15,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/as2messages",
+          "op": "create As2Message"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/as2messages",
+          "op": "list As2Message"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/as2messages/{id}",
+          "op": "get As2Message"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/as2messages/{id}",
+          "op": "update As2Message"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/as2messages/{id}",
+          "op": "delete As2Message"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/mdns",
+          "op": "create Mdn"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/mdns",
+          "op": "list Mdn"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/mdns/{id}",
+          "op": "get Mdn"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/mdns/{id}",
+          "op": "update Mdn"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/mdns/{id}",
+          "op": "delete Mdn"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/dispositionnotifications",
+          "op": "create DispositionNotification"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/dispositionnotifications",
+          "op": "list DispositionNotification"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/dispositionnotifications/{id}",
+          "op": "get DispositionNotification"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/dispositionnotifications/{id}",
+          "op": "update DispositionNotification"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/dispositionnotifications/{id}",
+          "op": "delete DispositionNotification"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "as2_protocol-compat",
+            "purl": "pkg:etzhayyim/as2_protocol-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "as2_protocol.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 15,
+      "tools": [
+        {
+          "name": "create_as2_message",
+          "description": "Create a As2Message.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "messageId": {
+                "type": "string"
+              },
+              "as2From": {
+                "type": "string"
+              },
+              "as2To": {
+                "type": "string"
+              },
+              "as2Version": {
+                "type": "string"
+              },
+              "contentType": {
+                "type": "string"
+              },
+              "micalg": {
+                "type": "string"
+              },
+              "contentTransferEncoding": {
+                "type": "string"
+              },
+              "dispositionNotificationTo": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "as2From",
+              "as2To"
+            ]
+          }
+        },
+        {
+          "name": "list_as2_messages",
+          "description": "List As2Messages.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_as2_message",
+          "description": "Get a As2Message by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_as2_message",
+          "description": "Update a As2Message.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "messageId": {
+                "type": "string"
+              },
+              "as2From": {
+                "type": "string"
+              },
+              "as2To": {
+                "type": "string"
+              },
+              "as2Version": {
+                "type": "string"
+              },
+              "contentType": {
+                "type": "string"
+              },
+              "micalg": {
+                "type": "string"
+              },
+              "contentTransferEncoding": {
+                "type": "string"
+              },
+              "dispositionNotificationTo": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_as2_message",
+          "description": "Delete a As2Message.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_mdn",
+          "description": "Create a Mdn.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "messageId": {
+                "type": "string"
+              },
+              "originalMessageId": {
+                "type": "string"
+              },
+              "finalRecipient": {
+                "type": "string"
+              },
+              "dispositionType": {
+                "type": "string"
+              },
+              "dispositionMode": {
+                "type": "string"
+              },
+              "actionMode": {
+                "type": "string"
+              },
+              "sendingMode": {
+                "type": "string"
+              },
+              "dispositionModifier": {
+                "type": "string"
+              },
+              "digestAlgorithm": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "finalRecipient",
+              "dispositionType"
+            ]
+          }
+        },
+        {
+          "name": "list_mdns",
+          "description": "List Mdns.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_mdn",
+          "description": "Get a Mdn by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_mdn",
+          "description": "Update a Mdn.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "messageId": {
+                "type": "string"
+              },
+              "originalMessageId": {
+                "type": "string"
+              },
+              "finalRecipient": {
+                "type": "string"
+              },
+              "dispositionType": {
+                "type": "string"
+              },
+              "dispositionMode": {
+                "type": "string"
+              },
+              "actionMode": {
+                "type": "string"
+              },
+              "sendingMode": {
+                "type": "string"
+              },
+              "dispositionModifier": {
+                "type": "string"
+              },
+              "digestAlgorithm": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_mdn",
+          "description": "Delete a Mdn.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_disposition_notification",
+          "description": "Create a DispositionNotification.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "reportingUa": {
+                "type": "string"
+              },
+              "finalRecipient": {
+                "type": "string"
+              },
+              "originalMessageId": {
+                "type": "string"
+              },
+              "disposition": {
+                "type": "string"
+              },
+              "receivedContentMic": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "reportingUa",
+              "finalRecipient"
+            ]
+          }
+        },
+        {
+          "name": "list_disposition_notifications",
+          "description": "List DispositionNotifications.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_disposition_notification",
+          "description": "Get a DispositionNotification by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_disposition_notification",
+          "description": "Update a DispositionNotification.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "reportingUa": {
+                "type": "string"
+              },
+              "finalRecipient": {
+                "type": "string"
+              },
+              "originalMessageId": {
+                "type": "string"
+              },
+              "disposition": {
+                "type": "string"
+              },
+              "receivedContentMic": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_disposition_notification",
+          "description": "Delete a DispositionNotification.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
