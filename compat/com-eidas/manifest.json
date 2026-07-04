@@ -1,0 +1,591 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "eidas-compat",
+  "did": "did:web:etzhayyim.com:actor:eidas-compat",
+  "kind": "compat",
+  "title": "eidas clean-room actor",
+  "description": "Clean-room, API-compatible UK / EU e-government actor (eidas); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreidfqgax5trw3itiypsnphpfcrvzbmhxdt3e7zddkdctznjw7fd4mm",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreidfqgax5trw3itiypsnphpfcrvzbmhxdt3e7zddkdctznjw7fd4mm",
+  "schema": "schema/eidas.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=celex:32014R0910",
+    "verifiedAt": "2026-06-10",
+    "resources": [
+      "AuthenticationAssertion",
+      "EidasAttribute",
+      "TrustService",
+      "Subject"
+    ],
+    "enums": {
+      "AuthenticationAssertion": {
+        "levelOfAssurance": [
+          "low",
+          "substantial",
+          "high"
+        ]
+      },
+      "EidasAttribute": {
+        "nameFormat": [
+          "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified",
+          "urn:oasis:names:tc:SAML:2.0:attrname-format:uri",
+          "urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "AuthenticationAssertion",
+    "EidasAttribute",
+    "TrustService",
+    "Subject"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 20,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/authenticationassertions",
+          "op": "create AuthenticationAssertion"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/authenticationassertions",
+          "op": "list AuthenticationAssertion"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/authenticationassertions/{id}",
+          "op": "get AuthenticationAssertion"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/authenticationassertions/{id}",
+          "op": "update AuthenticationAssertion"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/authenticationassertions/{id}",
+          "op": "delete AuthenticationAssertion"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/eidasattributes",
+          "op": "create EidasAttribute"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/eidasattributes",
+          "op": "list EidasAttribute"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/eidasattributes/{id}",
+          "op": "get EidasAttribute"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/eidasattributes/{id}",
+          "op": "update EidasAttribute"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/eidasattributes/{id}",
+          "op": "delete EidasAttribute"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/trustservices",
+          "op": "create TrustService"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/trustservices",
+          "op": "list TrustService"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/trustservices/{id}",
+          "op": "get TrustService"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/trustservices/{id}",
+          "op": "update TrustService"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/trustservices/{id}",
+          "op": "delete TrustService"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/subjects",
+          "op": "create Subject"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/subjects",
+          "op": "list Subject"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/subjects/{id}",
+          "op": "get Subject"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/subjects/{id}",
+          "op": "update Subject"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/subjects/{id}",
+          "op": "delete Subject"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "eidas-compat",
+            "purl": "pkg:etzhayyim/eidas-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "eidas.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 20,
+      "tools": [
+        {
+          "name": "create_authentication_assertion",
+          "description": "Create a AuthenticationAssertion.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "levelOfAssurance": {
+                "type": "string"
+              },
+              "issueInstant": {
+                "type": "string"
+              },
+              "sessionIndex": {
+                "type": "string"
+              },
+              "issuer": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "levelOfAssurance"
+            ]
+          }
+        },
+        {
+          "name": "list_authentication_assertions",
+          "description": "List AuthenticationAssertions.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_authentication_assertion",
+          "description": "Get a AuthenticationAssertion by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_authentication_assertion",
+          "description": "Update a AuthenticationAssertion.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "levelOfAssurance": {
+                "type": "string"
+              },
+              "issueInstant": {
+                "type": "string"
+              },
+              "sessionIndex": {
+                "type": "string"
+              },
+              "issuer": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_authentication_assertion",
+          "description": "Delete a AuthenticationAssertion.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_eidas_attribute",
+          "description": "Create a EidasAttribute.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "friendlyName": {
+                "type": "string"
+              },
+              "nameFormat": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "friendlyName"
+            ]
+          }
+        },
+        {
+          "name": "list_eidas_attributes",
+          "description": "List EidasAttributes.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_eidas_attribute",
+          "description": "Get a EidasAttribute by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_eidas_attribute",
+          "description": "Update a EidasAttribute.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "friendlyName": {
+                "type": "string"
+              },
+              "nameFormat": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_eidas_attribute",
+          "description": "Delete a EidasAttribute.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_trust_service",
+          "description": "Create a TrustService.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "serviceProvider": {
+                "type": "string"
+              },
+              "serviceName": {
+                "type": "string"
+              },
+              "serviceType": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "statusStartingTime": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "serviceProvider"
+            ]
+          }
+        },
+        {
+          "name": "list_trust_services",
+          "description": "List TrustServices.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_trust_service",
+          "description": "Get a TrustService by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_trust_service",
+          "description": "Update a TrustService.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "serviceProvider": {
+                "type": "string"
+              },
+              "serviceName": {
+                "type": "string"
+              },
+              "serviceType": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "statusStartingTime": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_trust_service",
+          "description": "Delete a TrustService.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_subject",
+          "description": "Create a Subject.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "nameID": {
+                "type": "string"
+              },
+              "format": {
+                "type": "string"
+              },
+              "spNameQualifier": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "nameID",
+              "format"
+            ]
+          }
+        },
+        {
+          "name": "list_subjects",
+          "description": "List Subjects.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_subject",
+          "description": "Get a Subject by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_subject",
+          "description": "Update a Subject.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "nameID": {
+                "type": "string"
+              },
+              "format": {
+                "type": "string"
+              },
+              "spNameQualifier": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_subject",
+          "description": "Delete a Subject.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
