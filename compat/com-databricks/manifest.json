@@ -1,0 +1,738 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "databricks-compat",
+  "did": "did:web:etzhayyim.com:actor:databricks-compat",
+  "kind": "compat",
+  "title": "databricks clean-room actor",
+  "description": "Clean-room, API-compatible data / analytics actor (databricks); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreic7cqk3x5zndnxpo3cwjqaljjk5i4nqhgsbttu3j4l6nvjrrth2bi",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreic7cqk3x5zndnxpo3cwjqaljjk5i4nqhgsbttu3j4l6nvjrrth2bi",
+  "schema": "schema/databricks.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://docs.databricks.com/api",
+    "verifiedAt": "2026-06-08",
+    "resources": [
+      "Cluster",
+      "Job",
+      "Run",
+      "Warehouse",
+      "ObjectInfo"
+    ],
+    "enums": {
+      "Cluster": {
+        "state": [
+          "PENDING",
+          "RUNNING",
+          "RESTARTING",
+          "RESIZING",
+          "TERMINATING",
+          "TERMINATED",
+          "ERROR",
+          "UNKNOWN"
+        ]
+      },
+      "Run": {
+        "state": [
+          "PENDING",
+          "RUNNING",
+          "TERMINATING",
+          "TERMINATED"
+        ]
+      },
+      "Warehouse": {
+        "warehouseType": [
+          "CLASSIC",
+          "SERVERLESS"
+        ],
+        "state": [
+          "STARTING",
+          "RUNNING",
+          "STOPPING",
+          "STOPPED",
+          "DELETING",
+          "DELETED"
+        ]
+      },
+      "ObjectInfo": {
+        "objectType": [
+          "NOTEBOOK",
+          "DIRECTORY",
+          "FILE",
+          "LIBRARY",
+          "REPO",
+          "DASHBOARD"
+        ],
+        "language": [
+          "PYTHON",
+          "R",
+          "SCALA",
+          "SQL"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Cluster",
+    "Job",
+    "Run",
+    "Warehouse",
+    "ObjectInfo"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 25,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/clusters",
+          "op": "create Cluster"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/clusters",
+          "op": "list Cluster"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/clusters/{id}",
+          "op": "get Cluster"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/clusters/{id}",
+          "op": "update Cluster"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/clusters/{id}",
+          "op": "delete Cluster"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/jobs",
+          "op": "create Job"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/jobs",
+          "op": "list Job"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/jobs/{id}",
+          "op": "get Job"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/jobs/{id}",
+          "op": "update Job"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/jobs/{id}",
+          "op": "delete Job"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/runs",
+          "op": "create Run"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/runs",
+          "op": "list Run"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/runs/{id}",
+          "op": "get Run"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/runs/{id}",
+          "op": "update Run"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/runs/{id}",
+          "op": "delete Run"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/warehouses",
+          "op": "create Warehouse"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/warehouses",
+          "op": "list Warehouse"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/warehouses/{id}",
+          "op": "get Warehouse"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/warehouses/{id}",
+          "op": "update Warehouse"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/warehouses/{id}",
+          "op": "delete Warehouse"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/objectinfos",
+          "op": "create ObjectInfo"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/objectinfos",
+          "op": "list ObjectInfo"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/objectinfos/{id}",
+          "op": "get ObjectInfo"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/objectinfos/{id}",
+          "op": "update ObjectInfo"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/objectinfos/{id}",
+          "op": "delete ObjectInfo"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "databricks-compat",
+            "purl": "pkg:etzhayyim/databricks-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "databricks.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 25,
+      "tools": [
+        {
+          "name": "create_cluster",
+          "description": "Create a Cluster.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "clusterName": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "sparkVersion": {
+                "type": "string"
+              },
+              "numWorkers": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "clusterName",
+              "state"
+            ]
+          }
+        },
+        {
+          "name": "list_clusters",
+          "description": "List Clusters.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_cluster",
+          "description": "Get a Cluster by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_cluster",
+          "description": "Update a Cluster.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "clusterName": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "sparkVersion": {
+                "type": "string"
+              },
+              "numWorkers": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_cluster",
+          "description": "Delete a Cluster.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_job",
+          "description": "Create a Job.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "jobId": {
+                "type": "integer"
+              },
+              "creatorUserName": {
+                "type": "string"
+              },
+              "createdTime": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "creatorUserName",
+              "createdTime"
+            ]
+          }
+        },
+        {
+          "name": "list_jobs",
+          "description": "List Jobs.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_job",
+          "description": "Get a Job by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_job",
+          "description": "Update a Job.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "jobId": {
+                "type": "integer"
+              },
+              "creatorUserName": {
+                "type": "string"
+              },
+              "createdTime": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_job",
+          "description": "Delete a Job.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_run",
+          "description": "Create a Run.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "runId": {
+                "type": "integer"
+              },
+              "jobId": {
+                "type": "integer"
+              },
+              "state": {
+                "type": "string"
+              },
+              "runName": {
+                "type": "string"
+              },
+              "startTime": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "state",
+              "runName"
+            ]
+          }
+        },
+        {
+          "name": "list_runs",
+          "description": "List Runs.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_run",
+          "description": "Get a Run by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_run",
+          "description": "Update a Run.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "runId": {
+                "type": "integer"
+              },
+              "jobId": {
+                "type": "integer"
+              },
+              "state": {
+                "type": "string"
+              },
+              "runName": {
+                "type": "string"
+              },
+              "startTime": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_run",
+          "description": "Delete a Run.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_warehouse",
+          "description": "Create a Warehouse.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "warehouseType": {
+                "type": "string"
+              },
+              "clusterSize": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "state"
+            ]
+          }
+        },
+        {
+          "name": "list_warehouses",
+          "description": "List Warehouses.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_warehouse",
+          "description": "Get a Warehouse by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_warehouse",
+          "description": "Update a Warehouse.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "warehouseType": {
+                "type": "string"
+              },
+              "clusterSize": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_warehouse",
+          "description": "Delete a Warehouse.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_object_info",
+          "description": "Create a ObjectInfo.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "objectType": {
+                "type": "string"
+              },
+              "language": {
+                "type": "string"
+              },
+              "size": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "path",
+              "objectType"
+            ]
+          }
+        },
+        {
+          "name": "list_object_infos",
+          "description": "List ObjectInfos.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_object_info",
+          "description": "Get a ObjectInfo by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_object_info",
+          "description": "Update a ObjectInfo.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              },
+              "objectType": {
+                "type": "string"
+              },
+              "language": {
+                "type": "string"
+              },
+              "size": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_object_info",
+          "description": "Delete a ObjectInfo.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

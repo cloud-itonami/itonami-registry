@@ -1,0 +1,1291 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "databricks clean-room API",
+    "version": "1.0.0",
+    "description": "Clean-room, API-compatible data / analytics actor (databricks); runs browser-local on IPFS + kotoba-WASM.",
+    "x-etzhayyim-did": "did:web:etzhayyim.com:actor:databricks-compat",
+    "x-wasm-cid": "bafkreic7cqk3x5zndnxpo3cwjqaljjk5i4nqhgsbttu3j4l6nvjrrth2bi",
+    "x-runtime": "kotoba-wasm",
+    "x-exec": "browser-local|donated-mesh",
+    "x-tier": "L5"
+  },
+  "servers": [
+    {
+      "url": "ipfs://bafkreic7cqk3x5zndnxpo3cwjqaljjk5i4nqhgsbttu3j4l6nvjrrth2bi",
+      "description": "browser-local kotoba-wasm component"
+    }
+  ],
+  "paths": {
+    "/v1/clusters": {
+      "get": {
+        "summary": "List Clusters",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Cluster"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a Cluster",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClusterCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cluster"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/clusters/{id}": {
+      "get": {
+        "summary": "Get a Cluster",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cluster"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a Cluster",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClusterCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cluster"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a Cluster",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/v1/jobs": {
+      "get": {
+        "summary": "List Jobs",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Job"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a Job",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/jobs/{id}": {
+      "get": {
+        "summary": "Get a Job",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a Job",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a Job",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/v1/runs": {
+      "get": {
+        "summary": "List Runs",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Run"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a Run",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Run"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/runs/{id}": {
+      "get": {
+        "summary": "Get a Run",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Run"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a Run",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Run"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a Run",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/v1/warehouses": {
+      "get": {
+        "summary": "List Warehouses",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Warehouse"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a Warehouse",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WarehouseCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Warehouse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/warehouses/{id}": {
+      "get": {
+        "summary": "Get a Warehouse",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Warehouse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a Warehouse",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WarehouseCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Warehouse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a Warehouse",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/v1/objectinfos": {
+      "get": {
+        "summary": "List ObjectInfos",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ObjectInfo"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a ObjectInfo",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectInfoCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectInfo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/objectinfos/{id}": {
+      "get": {
+        "summary": "Get a ObjectInfo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectInfo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a ObjectInfo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectInfoCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectInfo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a ObjectInfo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/healthz": {
+      "get": {
+        "summary": "Health probe",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Cluster": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "clusterName": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "RUNNING",
+              "RESTARTING",
+              "RESIZING",
+              "TERMINATING",
+              "TERMINATED",
+              "ERROR",
+              "UNKNOWN"
+            ]
+          },
+          "sparkVersion": {
+            "type": "string"
+          },
+          "numWorkers": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ClusterCreate": {
+        "type": "object",
+        "properties": {
+          "clusterName": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "RUNNING",
+              "RESTARTING",
+              "RESIZING",
+              "TERMINATING",
+              "TERMINATED",
+              "ERROR",
+              "UNKNOWN"
+            ]
+          },
+          "sparkVersion": {
+            "type": "string"
+          },
+          "numWorkers": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "clusterName",
+          "state"
+        ]
+      },
+      "Job": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "jobId": {
+            "type": "integer"
+          },
+          "creatorUserName": {
+            "type": "string"
+          },
+          "createdTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "JobCreate": {
+        "type": "object",
+        "properties": {
+          "jobId": {
+            "type": "integer"
+          },
+          "creatorUserName": {
+            "type": "string"
+          },
+          "createdTime": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "creatorUserName",
+          "createdTime"
+        ]
+      },
+      "Run": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "runId": {
+            "type": "integer"
+          },
+          "jobId": {
+            "type": "integer"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "RUNNING",
+              "TERMINATING",
+              "TERMINATED"
+            ]
+          },
+          "runName": {
+            "type": "string"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RunCreate": {
+        "type": "object",
+        "properties": {
+          "runId": {
+            "type": "integer"
+          },
+          "jobId": {
+            "type": "integer"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "RUNNING",
+              "TERMINATING",
+              "TERMINATED"
+            ]
+          },
+          "runName": {
+            "type": "string"
+          },
+          "startTime": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "runName"
+        ]
+      },
+      "Warehouse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "STARTING",
+              "RUNNING",
+              "STOPPING",
+              "STOPPED",
+              "DELETING",
+              "DELETED"
+            ]
+          },
+          "warehouseType": {
+            "type": "string",
+            "enum": [
+              "CLASSIC",
+              "SERVERLESS"
+            ]
+          },
+          "clusterSize": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "WarehouseCreate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "STARTING",
+              "RUNNING",
+              "STOPPING",
+              "STOPPED",
+              "DELETING",
+              "DELETED"
+            ]
+          },
+          "warehouseType": {
+            "type": "string",
+            "enum": [
+              "CLASSIC",
+              "SERVERLESS"
+            ]
+          },
+          "clusterSize": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "state"
+        ]
+      },
+      "ObjectInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "objectType": {
+            "type": "string",
+            "enum": [
+              "NOTEBOOK",
+              "DIRECTORY",
+              "FILE",
+              "LIBRARY",
+              "REPO",
+              "DASHBOARD"
+            ]
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "PYTHON",
+              "R",
+              "SCALA",
+              "SQL"
+            ]
+          },
+          "size": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ObjectInfoCreate": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "objectType": {
+            "type": "string",
+            "enum": [
+              "NOTEBOOK",
+              "DIRECTORY",
+              "FILE",
+              "LIBRARY",
+              "REPO",
+              "DASHBOARD"
+            ]
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "PYTHON",
+              "R",
+              "SCALA",
+              "SQL"
+            ]
+          },
+          "size": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "objectType"
+        ]
+      }
+    }
+  }
+}
