@@ -1,0 +1,823 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "paypal-compat",
+  "did": "did:web:etzhayyim.com:actor:paypal-compat",
+  "kind": "compat",
+  "title": "paypal clean-room actor",
+  "description": "Clean-room, API-compatible payments / money movement actor (paypal); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreidp64ax25666dndvtpoipek5z3anpwh7aneap36doydkfk2zjpsny",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreidp64ax25666dndvtpoipek5z3anpwh7aneap36doydkfk2zjpsny",
+  "schema": "schema/paypal.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://raw.githubusercontent.com/paypal/paypal-rest-api-specifications/main/openapi",
+    "verifiedAt": "2026-06-08",
+    "resources": [
+      "Order",
+      "Authorization",
+      "Capture",
+      "Refund",
+      "Plan",
+      "Subscription"
+    ],
+    "enums": {
+      "Order": {
+        "status": [
+          "CREATED",
+          "SAVED",
+          "APPROVED",
+          "VOIDED",
+          "COMPLETED",
+          "PAYER_ACTION_REQUIRED"
+        ],
+        "intent": [
+          "CAPTURE",
+          "AUTHORIZE"
+        ]
+      },
+      "Authorization": {
+        "status": [
+          "CREATED",
+          "CAPTURED",
+          "DENIED",
+          "PARTIALLY_CAPTURED",
+          "VOIDED",
+          "PENDING"
+        ]
+      },
+      "Capture": {
+        "status": [
+          "COMPLETED",
+          "DECLINED",
+          "PARTIALLY_REFUNDED",
+          "PENDING",
+          "REFUNDED"
+        ]
+      },
+      "Plan": {
+        "status": [
+          "CREATED",
+          "INACTIVE",
+          "ACTIVE"
+        ]
+      },
+      "Subscription": {
+        "status": [
+          "APPROVAL_PENDING",
+          "APPROVED",
+          "ACTIVE",
+          "SUSPENDED",
+          "CANCELLED",
+          "EXPIRED"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Order",
+    "Authorization",
+    "Capture",
+    "Refund",
+    "Plan",
+    "Subscription"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 30,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/orders",
+          "op": "create Order"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/orders",
+          "op": "list Order"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/orders/{id}",
+          "op": "get Order"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/orders/{id}",
+          "op": "update Order"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/orders/{id}",
+          "op": "delete Order"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/authorizations",
+          "op": "create Authorization"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/authorizations",
+          "op": "list Authorization"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/authorizations/{id}",
+          "op": "get Authorization"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/authorizations/{id}",
+          "op": "update Authorization"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/authorizations/{id}",
+          "op": "delete Authorization"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/captures",
+          "op": "create Capture"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/captures",
+          "op": "list Capture"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/captures/{id}",
+          "op": "get Capture"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/captures/{id}",
+          "op": "update Capture"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/captures/{id}",
+          "op": "delete Capture"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/refunds",
+          "op": "create Refund"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/refunds",
+          "op": "list Refund"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/refunds/{id}",
+          "op": "get Refund"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/refunds/{id}",
+          "op": "update Refund"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/refunds/{id}",
+          "op": "delete Refund"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/plans",
+          "op": "create Plan"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/plans",
+          "op": "list Plan"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/plans/{id}",
+          "op": "get Plan"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/plans/{id}",
+          "op": "update Plan"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/plans/{id}",
+          "op": "delete Plan"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/subscriptions",
+          "op": "create Subscription"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/subscriptions",
+          "op": "list Subscription"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/subscriptions/{id}",
+          "op": "get Subscription"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/subscriptions/{id}",
+          "op": "update Subscription"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/subscriptions/{id}",
+          "op": "delete Subscription"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "paypal-compat",
+            "purl": "pkg:etzhayyim/paypal-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "paypal.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 30,
+      "tools": [
+        {
+          "name": "create_order",
+          "description": "Create a Order.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string"
+              },
+              "intent": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "status",
+              "intent"
+            ]
+          }
+        },
+        {
+          "name": "list_orders",
+          "description": "List Orders.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_order",
+          "description": "Get a Order by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_order",
+          "description": "Update a Order.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "intent": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_order",
+          "description": "Delete a Order.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_authorization",
+          "description": "Create a Authorization.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string"
+              },
+              "createTime": {
+                "type": "string"
+              },
+              "updateTime": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "status",
+              "createTime"
+            ]
+          }
+        },
+        {
+          "name": "list_authorizations",
+          "description": "List Authorizations.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_authorization",
+          "description": "Get a Authorization by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_authorization",
+          "description": "Update a Authorization.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "createTime": {
+                "type": "string"
+              },
+              "updateTime": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_authorization",
+          "description": "Delete a Authorization.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_capture",
+          "description": "Create a Capture.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string"
+              },
+              "invoiceId": {
+                "type": "string"
+              },
+              "customId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          }
+        },
+        {
+          "name": "list_captures",
+          "description": "List Captures.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_capture",
+          "description": "Get a Capture by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_capture",
+          "description": "Update a Capture.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "invoiceId": {
+                "type": "string"
+              },
+              "customId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_capture",
+          "description": "Delete a Capture.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_refund",
+          "description": "Create a Refund.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string"
+              },
+              "invoiceId": {
+                "type": "string"
+              },
+              "customId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          }
+        },
+        {
+          "name": "list_refunds",
+          "description": "List Refunds.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_refund",
+          "description": "Get a Refund by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_refund",
+          "description": "Update a Refund.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "invoiceId": {
+                "type": "string"
+              },
+              "customId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_refund",
+          "description": "Delete a Refund.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_plan",
+          "description": "Create a Plan.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "productId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "status",
+              "name"
+            ]
+          }
+        },
+        {
+          "name": "list_plans",
+          "description": "List Plans.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_plan",
+          "description": "Get a Plan by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_plan",
+          "description": "Update a Plan.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "productId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_plan",
+          "description": "Delete a Plan.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_subscription",
+          "description": "Create a Subscription.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string"
+              },
+              "planId": {
+                "type": "string"
+              },
+              "createTime": {
+                "type": "string"
+              },
+              "startTime": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "status",
+              "createTime"
+            ]
+          }
+        },
+        {
+          "name": "list_subscriptions",
+          "description": "List Subscriptions.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_subscription",
+          "description": "Get a Subscription by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_subscription",
+          "description": "Update a Subscription.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "planId": {
+                "type": "string"
+              },
+              "createTime": {
+                "type": "string"
+              },
+              "startTime": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_subscription",
+          "description": "Delete a Subscription.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
