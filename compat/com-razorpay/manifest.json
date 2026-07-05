@@ -1,0 +1,805 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "razorpay-compat",
+  "did": "did:web:etzhayyim.com:actor:razorpay-compat",
+  "kind": "compat",
+  "title": "razorpay clean-room actor",
+  "description": "Clean-room, API-compatible payments / money movement actor (razorpay); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreih6texjj4ksexuwbd4zyxutfcmdwoiln36tb3gxxkobe2szkd635e",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreih6texjj4ksexuwbd4zyxutfcmdwoiln36tb3gxxkobe2szkd635e",
+  "schema": "schema/razorpay.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://github.com/razorpay/razorpay-python",
+    "verifiedAt": "2026-06-09",
+    "resources": [
+      "Payment",
+      "Order",
+      "Refund",
+      "Customer",
+      "Settlement"
+    ],
+    "enums": {
+      "Payment": {
+        "status": [
+          "created",
+          "authorized",
+          "captured",
+          "refunded",
+          "failed"
+        ],
+        "method": [
+          "card",
+          "netbanking",
+          "wallet",
+          "upi",
+          "emi"
+        ]
+      },
+      "Order": {
+        "status": [
+          "created",
+          "attempted",
+          "paid"
+        ]
+      },
+      "Refund": {
+        "status": [
+          "pending",
+          "processed",
+          "failed"
+        ],
+        "speed": [
+          "normal",
+          "optimum",
+          "instant"
+        ]
+      },
+      "Settlement": {
+        "status": [
+          "processed",
+          "failed",
+          "initiated"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Payment",
+    "Order",
+    "Refund",
+    "Customer",
+    "Settlement"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 25,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/payments",
+          "op": "create Payment"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/payments",
+          "op": "list Payment"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/payments/{id}",
+          "op": "get Payment"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/payments/{id}",
+          "op": "update Payment"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/payments/{id}",
+          "op": "delete Payment"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/orders",
+          "op": "create Order"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/orders",
+          "op": "list Order"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/orders/{id}",
+          "op": "get Order"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/orders/{id}",
+          "op": "update Order"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/orders/{id}",
+          "op": "delete Order"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/refunds",
+          "op": "create Refund"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/refunds",
+          "op": "list Refund"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/refunds/{id}",
+          "op": "get Refund"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/refunds/{id}",
+          "op": "update Refund"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/refunds/{id}",
+          "op": "delete Refund"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/customers",
+          "op": "create Customer"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/customers",
+          "op": "list Customer"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/customers/{id}",
+          "op": "get Customer"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/customers/{id}",
+          "op": "update Customer"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/customers/{id}",
+          "op": "delete Customer"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/settlements",
+          "op": "create Settlement"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/settlements",
+          "op": "list Settlement"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/settlements/{id}",
+          "op": "get Settlement"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/settlements/{id}",
+          "op": "update Settlement"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/settlements/{id}",
+          "op": "delete Settlement"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "razorpay-compat",
+            "purl": "pkg:etzhayyim/razorpay-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "razorpay.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 25,
+      "tools": [
+        {
+          "name": "create_payment",
+          "description": "Create a Payment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "integer"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string"
+              },
+              "orderId": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "contact": {
+                "type": "string"
+              },
+              "captured": {
+                "type": "boolean"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "amount"
+            ]
+          }
+        },
+        {
+          "name": "list_payments",
+          "description": "List Payments.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_payment",
+          "description": "Get a Payment by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_payment",
+          "description": "Update a Payment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "integer"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string"
+              },
+              "orderId": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "contact": {
+                "type": "string"
+              },
+              "captured": {
+                "type": "boolean"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_payment",
+          "description": "Delete a Payment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_order",
+          "description": "Create a Order.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "integer"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "receipt": {
+                "type": "string"
+              },
+              "attempts": {
+                "type": "integer"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "amount"
+            ]
+          }
+        },
+        {
+          "name": "list_orders",
+          "description": "List Orders.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_order",
+          "description": "Get a Order by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_order",
+          "description": "Update a Order.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "integer"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "receipt": {
+                "type": "string"
+              },
+              "attempts": {
+                "type": "integer"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_order",
+          "description": "Delete a Order.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_refund",
+          "description": "Create a Refund.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "integer"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "speed": {
+                "type": "string"
+              },
+              "paymentId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "amount"
+            ]
+          }
+        },
+        {
+          "name": "list_refunds",
+          "description": "List Refunds.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_refund",
+          "description": "Get a Refund by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_refund",
+          "description": "Update a Refund.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "integer"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "speed": {
+                "type": "string"
+              },
+              "paymentId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_refund",
+          "description": "Delete a Refund.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_customer",
+          "description": "Create a Customer.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "contact": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          }
+        },
+        {
+          "name": "list_customers",
+          "description": "List Customers.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_customer",
+          "description": "Get a Customer by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_customer",
+          "description": "Update a Customer.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "contact": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_customer",
+          "description": "Delete a Customer.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_settlement",
+          "description": "Create a Settlement.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "fees": {
+                "type": "integer"
+              },
+              "tax": {
+                "type": "integer"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "amount"
+            ]
+          }
+        },
+        {
+          "name": "list_settlements",
+          "description": "List Settlements.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_settlement",
+          "description": "Get a Settlement by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_settlement",
+          "description": "Update a Settlement.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "fees": {
+                "type": "integer"
+              },
+              "tax": {
+                "type": "integer"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_settlement",
+          "description": "Delete a Settlement.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
