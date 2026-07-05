@@ -1,0 +1,752 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "mux-compat",
+  "did": "did:web:etzhayyim.com:actor:mux-compat",
+  "kind": "compat",
+  "title": "mux clean-room actor",
+  "description": "Clean-room, API-compatible communications / social actor (mux); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreibe5ex665hi4hnzsdy77eds63xco7nw5qp4p5y4htcfw3f7y2gpfy",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreibe5ex665hi4hnzsdy77eds63xco7nw5qp4p5y4htcfw3f7y2gpfy",
+  "schema": "schema/mux.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://www.mux.com/docs/api-reference",
+    "verifiedAt": "2026-06-09",
+    "resources": [
+      "Asset",
+      "PlaybackId",
+      "Track",
+      "Upload",
+      "LiveStream"
+    ],
+    "enums": {
+      "Asset": {
+        "status": [
+          "preparing",
+          "ready",
+          "errored"
+        ],
+        "resolutionTier": [
+          "audio-only",
+          "720p",
+          "1080p",
+          "1440p",
+          "2160p"
+        ],
+        "videoQuality": [
+          "basic",
+          "plus",
+          "premium"
+        ]
+      },
+      "PlaybackId": {
+        "policy": [
+          "public",
+          "signed",
+          "drm"
+        ]
+      },
+      "Track": {
+        "type": [
+          "video",
+          "audio",
+          "text"
+        ],
+        "status": [
+          "preparing",
+          "ready",
+          "errored",
+          "deleted"
+        ]
+      },
+      "Upload": {
+        "status": [
+          "waiting",
+          "asset_created",
+          "errored",
+          "cancelled",
+          "timed_out"
+        ]
+      },
+      "LiveStream": {
+        "status": [
+          "active",
+          "idle",
+          "disabled"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Asset",
+    "PlaybackId",
+    "Track",
+    "Upload",
+    "LiveStream"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 25,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/assets",
+          "op": "create Asset"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/assets",
+          "op": "list Asset"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/assets/{id}",
+          "op": "get Asset"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/assets/{id}",
+          "op": "update Asset"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/assets/{id}",
+          "op": "delete Asset"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/playbackids",
+          "op": "create PlaybackId"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/playbackids",
+          "op": "list PlaybackId"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/playbackids/{id}",
+          "op": "get PlaybackId"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/playbackids/{id}",
+          "op": "update PlaybackId"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/playbackids/{id}",
+          "op": "delete PlaybackId"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/tracks",
+          "op": "create Track"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/tracks",
+          "op": "list Track"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/tracks/{id}",
+          "op": "get Track"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/tracks/{id}",
+          "op": "update Track"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/tracks/{id}",
+          "op": "delete Track"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/uploads",
+          "op": "create Upload"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/uploads",
+          "op": "list Upload"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/uploads/{id}",
+          "op": "get Upload"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/uploads/{id}",
+          "op": "update Upload"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/uploads/{id}",
+          "op": "delete Upload"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/livestreams",
+          "op": "create LiveStream"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/livestreams",
+          "op": "list LiveStream"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/livestreams/{id}",
+          "op": "get LiveStream"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/livestreams/{id}",
+          "op": "update LiveStream"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/livestreams/{id}",
+          "op": "delete LiveStream"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "mux-compat",
+            "purl": "pkg:etzhayyim/mux-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "mux.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 25,
+      "tools": [
+        {
+          "name": "create_asset",
+          "description": "Create a Asset.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "duration": {
+                "type": "number"
+              },
+              "resolutionTier": {
+                "type": "string"
+              },
+              "videoQuality": {
+                "type": "string"
+              },
+              "aspectRatio": {
+                "type": "string"
+              },
+              "test": {
+                "type": "boolean"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "status"
+            ]
+          }
+        },
+        {
+          "name": "list_assets",
+          "description": "List Assets.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_asset",
+          "description": "Get a Asset by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_asset",
+          "description": "Update a Asset.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "duration": {
+                "type": "number"
+              },
+              "resolutionTier": {
+                "type": "string"
+              },
+              "videoQuality": {
+                "type": "string"
+              },
+              "aspectRatio": {
+                "type": "string"
+              },
+              "test": {
+                "type": "boolean"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_asset",
+          "description": "Delete a Asset.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_playback_id",
+          "description": "Create a PlaybackId.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "policy": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "policy"
+            ]
+          }
+        },
+        {
+          "name": "list_playback_ids",
+          "description": "List PlaybackIds.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_playback_id",
+          "description": "Get a PlaybackId by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_playback_id",
+          "description": "Update a PlaybackId.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "policy": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_playback_id",
+          "description": "Delete a PlaybackId.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_track",
+          "description": "Create a Track.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "duration": {
+                "type": "number"
+              },
+              "maxWidth": {
+                "type": "integer"
+              },
+              "maxHeight": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "primary": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "type"
+            ]
+          }
+        },
+        {
+          "name": "list_tracks",
+          "description": "List Tracks.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_track",
+          "description": "Get a Track by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_track",
+          "description": "Update a Track.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "duration": {
+                "type": "number"
+              },
+              "maxWidth": {
+                "type": "integer"
+              },
+              "maxHeight": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "primary": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_track",
+          "description": "Delete a Track.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_upload",
+          "description": "Create a Upload.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "timeout": {
+                "type": "integer"
+              },
+              "test": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "status"
+            ]
+          }
+        },
+        {
+          "name": "list_uploads",
+          "description": "List Uploads.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_upload",
+          "description": "Get a Upload by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_upload",
+          "description": "Update a Upload.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "timeout": {
+                "type": "integer"
+              },
+              "test": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_upload",
+          "description": "Delete a Upload.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_live_stream",
+          "description": "Create a LiveStream.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "latencyMode": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "status"
+            ]
+          }
+        },
+        {
+          "name": "list_live_streams",
+          "description": "List LiveStreams.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_live_stream",
+          "description": "Get a LiveStream by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_live_stream",
+          "description": "Update a LiveStream.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "latencyMode": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_live_stream",
+          "description": "Delete a LiveStream.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
