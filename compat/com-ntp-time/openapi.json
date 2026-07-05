@@ -1,0 +1,839 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ntp_time clean-room API",
+    "version": "1.0.0",
+    "description": "Clean-room, API-compatible deep internet / core routing actor (ntp_time); runs browser-local on IPFS + kotoba-WASM.",
+    "x-etzhayyim-did": "did:web:etzhayyim.com:actor:ntp_time-compat",
+    "x-wasm-cid": "bafkreiden5tcdmomr67ulrbnmuqwui6cf7rq6xy6lmzsie7fbrqpviqhoq",
+    "x-runtime": "kotoba-wasm",
+    "x-exec": "browser-local|donated-mesh",
+    "x-tier": "L5"
+  },
+  "servers": [
+    {
+      "url": "ipfs://bafkreiden5tcdmomr67ulrbnmuqwui6cf7rq6xy6lmzsie7fbrqpviqhoq",
+      "description": "browser-local kotoba-wasm component"
+    }
+  ],
+  "paths": {
+    "/v1/packets": {
+      "get": {
+        "summary": "List Packets",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Packet"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a Packet",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PacketCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Packet"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/packets/{id}": {
+      "get": {
+        "summary": "Get a Packet",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Packet"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a Packet",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PacketCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Packet"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a Packet",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/v1/headers": {
+      "get": {
+        "summary": "List Headers",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Header"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a Header",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HeaderCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Header"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/headers/{id}": {
+      "get": {
+        "summary": "Get a Header",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Header"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a Header",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HeaderCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Header"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a Header",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/v1/kisscodes": {
+      "get": {
+        "summary": "List KissCodes",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/KissCode"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a KissCode",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KissCodeCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KissCode"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/kisscodes/{id}": {
+      "get": {
+        "summary": "Get a KissCode",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KissCode"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a KissCode",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KissCodeCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KissCode"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a KissCode",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/healthz": {
+      "get": {
+        "summary": "Health probe",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Packet": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "leapIndicator": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              3
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          "mode": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ]
+          },
+          "stratum": {
+            "type": "integer"
+          },
+          "poll": {
+            "type": "integer"
+          },
+          "precision": {
+            "type": "integer"
+          },
+          "rootDelay": {
+            "type": "number"
+          },
+          "rootDispersion": {
+            "type": "number"
+          },
+          "referenceId": {
+            "type": "string"
+          },
+          "referenceTimestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "originTimestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "receiveTimestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "transmitTimestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PacketCreate": {
+        "type": "object",
+        "properties": {
+          "leapIndicator": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              3
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          "mode": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ]
+          },
+          "stratum": {
+            "type": "integer"
+          },
+          "poll": {
+            "type": "integer"
+          },
+          "precision": {
+            "type": "integer"
+          },
+          "rootDelay": {
+            "type": "number"
+          },
+          "rootDispersion": {
+            "type": "number"
+          },
+          "referenceId": {
+            "type": "string"
+          },
+          "referenceTimestamp": {
+            "type": "string"
+          },
+          "originTimestamp": {
+            "type": "string"
+          },
+          "receiveTimestamp": {
+            "type": "string"
+          },
+          "transmitTimestamp": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "leapIndicator",
+          "version"
+        ]
+      },
+      "Header": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "leapIndicator": {
+            "type": "integer"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "mode": {
+            "type": "integer"
+          },
+          "stratum": {
+            "type": "integer"
+          },
+          "poll": {
+            "type": "integer"
+          },
+          "precision": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "HeaderCreate": {
+        "type": "object",
+        "properties": {
+          "leapIndicator": {
+            "type": "integer"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "mode": {
+            "type": "integer"
+          },
+          "stratum": {
+            "type": "integer"
+          },
+          "poll": {
+            "type": "integer"
+          },
+          "precision": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "leapIndicator",
+          "version"
+        ]
+      },
+      "KissCode": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "meaning": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "KissCodeCreate": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "meaning": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "meaning"
+        ]
+      }
+    }
+  }
+}
