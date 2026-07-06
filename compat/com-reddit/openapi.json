@@ -17,9 +17,9 @@
     }
   ],
   "paths": {
-    "/v1/channels": {
+    "/v1/subreddits": {
       "get": {
-        "summary": "List Channels",
+        "summary": "List Subreddits",
         "parameters": [
           {
             "name": "limit",
@@ -59,7 +59,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/Channel"
+                        "$ref": "#/components/schemas/Subreddit"
                       }
                     },
                     "has_more": {
@@ -79,13 +79,13 @@
         }
       },
       "post": {
-        "summary": "Create a Channel",
+        "summary": "Create a Subreddit",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChannelCreate"
+                "$ref": "#/components/schemas/SubredditCreate"
               }
             }
           }
@@ -96,7 +96,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Channel"
+                  "$ref": "#/components/schemas/Subreddit"
                 }
               }
             }
@@ -107,9 +107,9 @@
         }
       }
     },
-    "/v1/channels/{id}": {
+    "/v1/subreddits/{id}": {
       "get": {
-        "summary": "Get a Channel",
+        "summary": "Get a Subreddit",
         "parameters": [
           {
             "name": "id",
@@ -133,7 +133,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Channel"
+                  "$ref": "#/components/schemas/Subreddit"
                 }
               }
             }
@@ -144,7 +144,7 @@
         }
       },
       "patch": {
-        "summary": "Update a Channel",
+        "summary": "Update a Subreddit",
         "parameters": [
           {
             "name": "id",
@@ -159,7 +159,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChannelCreate"
+                "$ref": "#/components/schemas/SubredditCreate"
               }
             }
           }
@@ -170,7 +170,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Channel"
+                  "$ref": "#/components/schemas/Subreddit"
                 }
               }
             }
@@ -181,192 +181,7 @@
         }
       },
       "delete": {
-        "summary": "Delete a Channel",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "deleted"
-          },
-          "404": {
-            "description": "not_found"
-          }
-        }
-      }
-    },
-    "/v1/messages": {
-      "get": {
-        "summary": "List Messages",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "default": 20,
-              "maximum": 100
-            }
-          },
-          {
-            "name": "starting_after",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "expand",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "list",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "object": {
-                      "type": "string"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Message"
-                      }
-                    },
-                    "has_more": {
-                      "type": "boolean"
-                    },
-                    "count": {
-                      "type": "integer"
-                    },
-                    "total": {
-                      "type": "integer"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "summary": "Create a Message",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MessageCreate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Message"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "invalid_request_error"
-          }
-        }
-      }
-    },
-    "/v1/messages/{id}": {
-      "get": {
-        "summary": "Get a Message",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "expand",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Message"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "not_found"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Update a Message",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MessageCreate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Message"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "not_found"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete a Message",
+        "summary": "Delete a Subreddit",
         "parameters": [
           {
             "name": "id",
@@ -572,9 +387,9 @@
         }
       }
     },
-    "/v1/rooms": {
+    "/v1/posts": {
       "get": {
-        "summary": "List Rooms",
+        "summary": "List Posts",
         "parameters": [
           {
             "name": "limit",
@@ -614,7 +429,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/Room"
+                        "$ref": "#/components/schemas/Post"
                       }
                     },
                     "has_more": {
@@ -634,13 +449,13 @@
         }
       },
       "post": {
-        "summary": "Create a Room",
+        "summary": "Create a Post",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RoomCreate"
+                "$ref": "#/components/schemas/PostCreate"
               }
             }
           }
@@ -651,7 +466,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Room"
+                  "$ref": "#/components/schemas/Post"
                 }
               }
             }
@@ -662,9 +477,9 @@
         }
       }
     },
-    "/v1/rooms/{id}": {
+    "/v1/posts/{id}": {
       "get": {
-        "summary": "Get a Room",
+        "summary": "Get a Post",
         "parameters": [
           {
             "name": "id",
@@ -688,7 +503,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Room"
+                  "$ref": "#/components/schemas/Post"
                 }
               }
             }
@@ -699,7 +514,7 @@
         }
       },
       "patch": {
-        "summary": "Update a Room",
+        "summary": "Update a Post",
         "parameters": [
           {
             "name": "id",
@@ -714,7 +529,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RoomCreate"
+                "$ref": "#/components/schemas/PostCreate"
               }
             }
           }
@@ -725,7 +540,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Room"
+                  "$ref": "#/components/schemas/Post"
                 }
               }
             }
@@ -736,7 +551,7 @@
         }
       },
       "delete": {
-        "summary": "Delete a Room",
+        "summary": "Delete a Post",
         "parameters": [
           {
             "name": "id",
@@ -757,9 +572,9 @@
         }
       }
     },
-    "/v1/streams": {
+    "/v1/comments": {
       "get": {
-        "summary": "List Streams",
+        "summary": "List Comments",
         "parameters": [
           {
             "name": "limit",
@@ -799,7 +614,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/Stream"
+                        "$ref": "#/components/schemas/Comment"
                       }
                     },
                     "has_more": {
@@ -819,13 +634,13 @@
         }
       },
       "post": {
-        "summary": "Create a Stream",
+        "summary": "Create a Comment",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StreamCreate"
+                "$ref": "#/components/schemas/CommentCreate"
               }
             }
           }
@@ -836,7 +651,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Stream"
+                  "$ref": "#/components/schemas/Comment"
                 }
               }
             }
@@ -847,9 +662,9 @@
         }
       }
     },
-    "/v1/streams/{id}": {
+    "/v1/comments/{id}": {
       "get": {
-        "summary": "Get a Stream",
+        "summary": "Get a Comment",
         "parameters": [
           {
             "name": "id",
@@ -873,7 +688,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Stream"
+                  "$ref": "#/components/schemas/Comment"
                 }
               }
             }
@@ -884,7 +699,7 @@
         }
       },
       "patch": {
-        "summary": "Update a Stream",
+        "summary": "Update a Comment",
         "parameters": [
           {
             "name": "id",
@@ -899,7 +714,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StreamCreate"
+                "$ref": "#/components/schemas/CommentCreate"
               }
             }
           }
@@ -910,7 +725,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Stream"
+                  "$ref": "#/components/schemas/Comment"
                 }
               }
             }
@@ -921,7 +736,7 @@
         }
       },
       "delete": {
-        "summary": "Delete a Stream",
+        "summary": "Delete a Comment",
         "parameters": [
           {
             "name": "id",
@@ -942,9 +757,9 @@
         }
       }
     },
-    "/v1/webhooks": {
+    "/v1/votes": {
       "get": {
-        "summary": "List Webhooks",
+        "summary": "List Votes",
         "parameters": [
           {
             "name": "limit",
@@ -984,7 +799,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/Webhook"
+                        "$ref": "#/components/schemas/Vote"
                       }
                     },
                     "has_more": {
@@ -1004,13 +819,13 @@
         }
       },
       "post": {
-        "summary": "Create a Webhook",
+        "summary": "Create a Vote",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/WebhookCreate"
+                "$ref": "#/components/schemas/VoteCreate"
               }
             }
           }
@@ -1021,7 +836,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Webhook"
+                  "$ref": "#/components/schemas/Vote"
                 }
               }
             }
@@ -1032,9 +847,9 @@
         }
       }
     },
-    "/v1/webhooks/{id}": {
+    "/v1/votes/{id}": {
       "get": {
-        "summary": "Get a Webhook",
+        "summary": "Get a Vote",
         "parameters": [
           {
             "name": "id",
@@ -1058,7 +873,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Webhook"
+                  "$ref": "#/components/schemas/Vote"
                 }
               }
             }
@@ -1069,7 +884,7 @@
         }
       },
       "patch": {
-        "summary": "Update a Webhook",
+        "summary": "Update a Vote",
         "parameters": [
           {
             "name": "id",
@@ -1084,7 +899,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/WebhookCreate"
+                "$ref": "#/components/schemas/VoteCreate"
               }
             }
           }
@@ -1095,7 +910,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Webhook"
+                  "$ref": "#/components/schemas/Vote"
                 }
               }
             }
@@ -1106,7 +921,7 @@
         }
       },
       "delete": {
-        "summary": "Delete a Webhook",
+        "summary": "Delete a Vote",
         "parameters": [
           {
             "name": "id",
@@ -1123,16 +938,6 @@
           },
           "404": {
             "description": "not_found"
-          }
-        }
-      }
-    },
-    "/healthz": {
-      "get": {
-        "summary": "Health probe",
-        "responses": {
-          "200": {
-            "description": "ok"
           }
         }
       }
@@ -1140,7 +945,7 @@
   },
   "components": {
     "schemas": {
-      "Channel": {
+      "Subreddit": {
         "type": "object",
         "properties": {
           "id": {
@@ -1149,14 +954,17 @@
           "name": {
             "type": "string"
           },
-          "type": {
+          "title": {
             "type": "string"
           },
-          "topic": {
+          "description": {
             "type": "string"
           },
-          "memberCount": {
+          "subscriberCount": {
             "type": "integer"
+          },
+          "over18": {
+            "type": "boolean"
           },
           "createdAt": {
             "type": "string",
@@ -1168,75 +976,28 @@
           }
         }
       },
-      "ChannelCreate": {
+      "SubredditCreate": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string"
           },
-          "type": {
+          "title": {
             "type": "string"
           },
-          "topic": {
+          "description": {
             "type": "string"
           },
-          "memberCount": {
+          "subscriberCount": {
             "type": "integer"
+          },
+          "over18": {
+            "type": "boolean"
           }
         },
         "required": [
           "name",
-          "type"
-        ]
-      },
-      "Message": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "channelId": {
-            "type": "string"
-          },
-          "authorId": {
-            "type": "string"
-          },
-          "body": {
-            "type": "string"
-          },
-          "sentAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "MessageCreate": {
-        "type": "object",
-        "properties": {
-          "channelId": {
-            "type": "string"
-          },
-          "authorId": {
-            "type": "string"
-          },
-          "body": {
-            "type": "string"
-          },
-          "sentAt": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "body",
-          "sentAt"
+          "title"
         ]
       },
       "User": {
@@ -1245,11 +1006,11 @@
           "id": {
             "type": "string"
           },
-          "handle": {
+          "username": {
             "type": "string"
           },
-          "displayName": {
-            "type": "string"
+          "karma": {
+            "type": "integer"
           },
           "verified": {
             "type": "boolean"
@@ -1267,120 +1028,48 @@
       "UserCreate": {
         "type": "object",
         "properties": {
-          "handle": {
+          "username": {
             "type": "string"
           },
-          "displayName": {
-            "type": "string"
+          "karma": {
+            "type": "integer"
           },
           "verified": {
             "type": "boolean"
           }
         },
         "required": [
-          "handle",
-          "displayName"
+          "username"
         ]
       },
-      "Room": {
+      "Post": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string"
           },
-          "name": {
+          "subredditId": {
             "type": "string"
           },
-          "maxParticipants": {
-            "type": "integer"
-          },
-          "recording": {
-            "type": "boolean"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "RoomCreate": {
-        "type": "object",
-        "properties": {
-          "name": {
+          "authorId": {
             "type": "string"
           },
-          "maxParticipants": {
-            "type": "integer"
-          },
-          "recording": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "name",
-          "maxParticipants"
-        ]
-      },
-      "Stream": {
-        "type": "object",
-        "properties": {
-          "id": {
+          "title": {
             "type": "string"
           },
-          "roomId": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "bitrate": {
-            "type": "integer"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "StreamCreate": {
-        "type": "object",
-        "properties": {
-          "roomId": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "bitrate": {
-            "type": "integer"
-          }
-        },
-        "required": [
-          "status",
-          "bitrate"
-        ]
-      },
-      "Webhook": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "event": {
+          "selftext": {
             "type": "string"
           },
           "url": {
             "type": "string"
           },
-          "active": {
+          "score": {
+            "type": "integer"
+          },
+          "numComments": {
+            "type": "integer"
+          },
+          "isSelf": {
             "type": "boolean"
           },
           "createdAt": {
@@ -1393,22 +1082,145 @@
           }
         }
       },
-      "WebhookCreate": {
+      "PostCreate": {
         "type": "object",
         "properties": {
-          "event": {
+          "subredditId": {
+            "type": "string"
+          },
+          "authorId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "selftext": {
             "type": "string"
           },
           "url": {
             "type": "string"
           },
-          "active": {
+          "score": {
+            "type": "integer"
+          },
+          "numComments": {
+            "type": "integer"
+          },
+          "isSelf": {
             "type": "boolean"
           }
         },
         "required": [
-          "event",
-          "url"
+          "subredditId",
+          "authorId",
+          "title"
+        ]
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "postId": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": "string"
+          },
+          "authorId": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "score": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CommentCreate": {
+        "type": "object",
+        "properties": {
+          "postId": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": "string"
+          },
+          "authorId": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "score": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "postId",
+          "authorId",
+          "body"
+        ]
+      },
+      "Vote": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "targetType": {
+            "type": "string"
+          },
+          "targetId": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "VoteCreate": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "targetType": {
+            "type": "string"
+          },
+          "targetId": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "targetType",
+          "targetId",
+          "direction"
         ]
       }
     }

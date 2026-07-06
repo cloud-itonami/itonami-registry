@@ -4,10 +4,16 @@
   L4 production surface: CRUD + pagination + filtering + relationship
   expansion + strict validation, over a Datomic-backed Kotoba schema.
 
-  py→cljc port of src/main.py (ADR 260607 L4 cohort). Data-driven: every
-  handler is a generic fold over `entity-specs`, so the actor's whole REST
-  surface is derivable from the schema/manifest. No proprietary code or
-  credentials; resource shapes only.
+  Models Reddit's real domain (Subreddit/User/Post/Comment/Vote), including
+  Reddit's own `fullname` id-prefix convention (t5_=subreddit, t2_=account,
+  t3_=link, t1_=comment — https://www.reddit.com/dev/api#fullnames). Vote
+  isn't a Reddit `thing` type (voting is a verb, `POST /api/vote`, not a
+  stored resource) but is modeled as an entity here so it gets the same
+  CRUD/audit surface as everything else in this actor.
+
+  Data-driven: every handler is a generic fold over `entity-specs`, so the
+  actor's whole REST surface is derivable from the schema/manifest. No
+  proprietary code or credentials; resource shapes only.
 
   State lives on the kotoba Datom log: `emit-facts` produces namespaced EAVT
   facts (`reddit.<Entity>/<field>`); `*store*` is the in-memory materialization
@@ -21,24 +27,31 @@
 
 ;; --- schema-derived entity specs (the single source the handlers fold over) ---
 (def entity-specs
-  [{:entity "Channel"   :plural "channels"   :id-prefix "reddit_cha"
-    :fields [:name :type :topic :memberCount]           :required [:name :type]
-    :coerce {:memberCount :int}             :refs {}}
-   {:entity "Message"   :plural "messages"   :id-prefix "reddit_mes"
-    :fields [:channelId :authorId :body :sentAt]        :required [:body :sentAt]
-    :coerce {}                               :refs {:channelId "Channel"}}
-   {:entity "User"      :plural "users"      :id-prefix "reddit_use"
-    :fields [:handle :displayName :verified]            :required [:handle :displayName]
-    :coerce {:verified :bool}                :refs {}}
-   {:entity "Room"      :plural "rooms"      :id-prefix "reddit_roo"
-    :fields [:name :maxParticipants :recording]         :required [:name :maxParticipants]
-    :coerce {:maxParticipants :int :recording :bool}    :refs {}}
-   {:entity "Stream"    :plural "streams"    :id-prefix "reddit_str"
-    :fields [:roomId :status :bitrate]                  :required [:status :bitrate]
-    :coerce {:bitrate :int}                  :refs {:roomId "Room"}}
-   {:entity "Webhook"   :plural "webhooks"   :id-prefix "reddit_web"
-    :fields [:event :url :active]                       :required [:event :url]
-    :coerce {:active :bool}                  :refs {}}])
+  [{:entity "Subreddit" :plural "subreddits" :id-prefix "t5"
+    :fields [:name :title :description :subscriberCount :over18]
+    :required [:name :title]
+    :coerce {:subscriberCount :int :over18 :bool}
+    :refs {}}
+   {:entity "User"      :plural "users"      :id-prefix "t2"
+    :fields [:username :karma :verified]
+    :required [:username]
+    :coerce {:karma :int :verified :bool}
+    :refs {}}
+   {:entity "Post"      :plural "posts"      :id-prefix "t3"
+    :fields [:subredditId :authorId :title :selftext :url :score :numComments :isSelf]
+    :required [:subredditId :authorId :title]
+    :coerce {:score :int :numComments :int :isSelf :bool}
+    :refs {:subredditId "Subreddit" :authorId "User"}}
+   {:entity "Comment"   :plural "comments"   :id-prefix "t1"
+    :fields [:postId :parentId :authorId :body :score]
+    :required [:postId :authorId :body]
+    :coerce {:score :int}
+    :refs {:postId "Post" :authorId "User" :parentId "Comment"}}
+   {:entity "Vote"      :plural "votes"      :id-prefix "reddit_vot"
+    :fields [:userId :targetType :targetId :direction]
+    :required [:userId :targetType :targetId :direction]
+    :coerce {}
+    :refs {:userId "User"}}])
 
 (def entities (mapv :entity entity-specs))
 
@@ -50,6 +63,11 @@
                   {:method "PATCH"  :path (str "/v1/" plural "/{id}") :op (str "update " entity) :entity entity}
                   {:method "DELETE" :path (str "/v1/" plural "/{id}") :op (str "delete " entity) :entity entity}])
                entity-specs)))
+
+;; Reddit's real OAuth2 token endpoint (script/installed-app flow,
+;; POST /api/v1/access_token) isn't modeled as a route here — it isn't an
+;; entity, and `routes` stays purely schema-derived (5 × entity-specs) to
+;; match this actor family's invariant (see route-surface test).
 
 ;; --- platform primitives ---
 (defn now []

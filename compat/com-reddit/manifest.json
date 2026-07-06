@@ -4,7 +4,7 @@
   "did": "did:web:etzhayyim.com:actor:reddit-compat",
   "kind": "compat",
   "title": "reddit clean-room actor",
-  "description": "Clean-room, API-compatible communications / social actor (reddit); runs browser-local on IPFS + kotoba-WASM.",
+  "description": "Clean-room, API-compatible social/discussion-platform actor (reddit) \u2014 subreddits, posts, comments, votes; runs browser-local on IPFS + kotoba-WASM.",
   "wasmCid": "bafkreihfajoc2d23xdarepoqzeuo2fu3glzuwtlf2thgbboc6aok4qhv6u",
   "wasmProvenance": "built-rust-raw",
   "runtime": "kotoba-wasm",
@@ -14,12 +14,11 @@
   "tier": "L4",
   "verified": null,
   "entities": [
-    "Channel",
-    "Message",
+    "Subreddit",
     "User",
-    "Room",
-    "Stream",
-    "Webhook"
+    "Post",
+    "Comment",
+    "Vote"
   ],
   "adr": [
     "260607",
@@ -31,57 +30,32 @@
     "api": {
       "type": "rest",
       "runtime": "kotoba-wasm",
-      "endpointCount": 30,
+      "endpointCount": 25,
       "routes": [
         {
           "method": "POST",
-          "path": "/v1/channels",
-          "op": "create Channel"
+          "path": "/v1/subreddits",
+          "op": "create Subreddit"
         },
         {
           "method": "GET",
-          "path": "/v1/channels",
-          "op": "list Channel"
+          "path": "/v1/subreddits",
+          "op": "list Subreddit"
         },
         {
           "method": "GET",
-          "path": "/v1/channels/{id}",
-          "op": "get Channel"
+          "path": "/v1/subreddits/{id}",
+          "op": "get Subreddit"
         },
         {
           "method": "PATCH",
-          "path": "/v1/channels/{id}",
-          "op": "update Channel"
+          "path": "/v1/subreddits/{id}",
+          "op": "update Subreddit"
         },
         {
           "method": "DELETE",
-          "path": "/v1/channels/{id}",
-          "op": "delete Channel"
-        },
-        {
-          "method": "POST",
-          "path": "/v1/messages",
-          "op": "create Message"
-        },
-        {
-          "method": "GET",
-          "path": "/v1/messages",
-          "op": "list Message"
-        },
-        {
-          "method": "GET",
-          "path": "/v1/messages/{id}",
-          "op": "get Message"
-        },
-        {
-          "method": "PATCH",
-          "path": "/v1/messages/{id}",
-          "op": "update Message"
-        },
-        {
-          "method": "DELETE",
-          "path": "/v1/messages/{id}",
-          "op": "delete Message"
+          "path": "/v1/subreddits/{id}",
+          "op": "delete Subreddit"
         },
         {
           "method": "POST",
@@ -110,78 +84,78 @@
         },
         {
           "method": "POST",
-          "path": "/v1/rooms",
-          "op": "create Room"
+          "path": "/v1/posts",
+          "op": "create Post"
         },
         {
           "method": "GET",
-          "path": "/v1/rooms",
-          "op": "list Room"
+          "path": "/v1/posts",
+          "op": "list Post"
         },
         {
           "method": "GET",
-          "path": "/v1/rooms/{id}",
-          "op": "get Room"
+          "path": "/v1/posts/{id}",
+          "op": "get Post"
         },
         {
           "method": "PATCH",
-          "path": "/v1/rooms/{id}",
-          "op": "update Room"
+          "path": "/v1/posts/{id}",
+          "op": "update Post"
         },
         {
           "method": "DELETE",
-          "path": "/v1/rooms/{id}",
-          "op": "delete Room"
+          "path": "/v1/posts/{id}",
+          "op": "delete Post"
         },
         {
           "method": "POST",
-          "path": "/v1/streams",
-          "op": "create Stream"
+          "path": "/v1/comments",
+          "op": "create Comment"
         },
         {
           "method": "GET",
-          "path": "/v1/streams",
-          "op": "list Stream"
+          "path": "/v1/comments",
+          "op": "list Comment"
         },
         {
           "method": "GET",
-          "path": "/v1/streams/{id}",
-          "op": "get Stream"
+          "path": "/v1/comments/{id}",
+          "op": "get Comment"
         },
         {
           "method": "PATCH",
-          "path": "/v1/streams/{id}",
-          "op": "update Stream"
+          "path": "/v1/comments/{id}",
+          "op": "update Comment"
         },
         {
           "method": "DELETE",
-          "path": "/v1/streams/{id}",
-          "op": "delete Stream"
+          "path": "/v1/comments/{id}",
+          "op": "delete Comment"
         },
         {
           "method": "POST",
-          "path": "/v1/webhooks",
-          "op": "create Webhook"
+          "path": "/v1/votes",
+          "op": "create Vote"
         },
         {
           "method": "GET",
-          "path": "/v1/webhooks",
-          "op": "list Webhook"
+          "path": "/v1/votes",
+          "op": "list Vote"
         },
         {
           "method": "GET",
-          "path": "/v1/webhooks/{id}",
-          "op": "get Webhook"
+          "path": "/v1/votes/{id}",
+          "op": "get Vote"
         },
         {
           "method": "PATCH",
-          "path": "/v1/webhooks/{id}",
-          "op": "update Webhook"
+          "path": "/v1/votes/{id}",
+          "op": "update Vote"
         },
         {
           "method": "DELETE",
-          "path": "/v1/webhooks/{id}",
-          "op": "delete Webhook"
+          "path": "/v1/votes/{id}",
+          "op": "delete Vote"
         }
       ],
       "features": {
@@ -244,44 +218,47 @@
       "type": "model-context-protocol",
       "runtime": "kotoba-wasm",
       "transport": "ipfs+kotoba-wasm",
-      "toolCount": 30,
+      "toolCount": 25,
       "tools": [
         {
-          "name": "create_channel",
-          "description": "Create a Channel.",
+          "name": "create_subreddit",
+          "description": "Create a Subreddit.",
           "inputSchema": {
             "type": "object",
             "properties": {
               "name": {
                 "type": "string"
               },
-              "type": {
+              "title": {
                 "type": "string"
               },
-              "topic": {
+              "description": {
                 "type": "string"
               },
-              "memberCount": {
+              "subscriberCount": {
                 "type": "integer"
+              },
+              "over18": {
+                "type": "boolean"
               }
             },
             "required": [
               "name",
-              "type"
+              "title"
             ]
           }
         },
         {
-          "name": "list_channels",
-          "description": "List Channels.",
+          "name": "list_subreddits",
+          "description": "List Subreddits.",
           "inputSchema": {
             "type": "object",
             "properties": {}
           }
         },
         {
-          "name": "get_channel",
-          "description": "Get a Channel by id.",
+          "name": "get_subreddit",
+          "description": "Get a Subreddit by id.",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -295,8 +272,8 @@
           }
         },
         {
-          "name": "update_channel",
-          "description": "Update a Channel.",
+          "name": "update_subreddit",
+          "description": "Update a Subreddit.",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -306,14 +283,17 @@
               "name": {
                 "type": "string"
               },
-              "type": {
+              "title": {
                 "type": "string"
               },
-              "topic": {
+              "description": {
                 "type": "string"
               },
-              "memberCount": {
+              "subscriberCount": {
                 "type": "integer"
+              },
+              "over18": {
+                "type": "boolean"
               }
             },
             "required": [
@@ -322,98 +302,8 @@
           }
         },
         {
-          "name": "delete_channel",
-          "description": "Delete a Channel.",
-          "inputSchema": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "create_message",
-          "description": "Create a Message.",
-          "inputSchema": {
-            "type": "object",
-            "properties": {
-              "channelId": {
-                "type": "string"
-              },
-              "authorId": {
-                "type": "string"
-              },
-              "body": {
-                "type": "string"
-              },
-              "sentAt": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "body",
-              "sentAt"
-            ]
-          }
-        },
-        {
-          "name": "list_messages",
-          "description": "List Messages.",
-          "inputSchema": {
-            "type": "object",
-            "properties": {}
-          }
-        },
-        {
-          "name": "get_message",
-          "description": "Get a Message by id.",
-          "inputSchema": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "update_message",
-          "description": "Update a Message.",
-          "inputSchema": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              },
-              "channelId": {
-                "type": "string"
-              },
-              "authorId": {
-                "type": "string"
-              },
-              "body": {
-                "type": "string"
-              },
-              "sentAt": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "delete_message",
-          "description": "Delete a Message.",
+          "name": "delete_subreddit",
+          "description": "Delete a Subreddit.",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -432,19 +322,18 @@
           "inputSchema": {
             "type": "object",
             "properties": {
-              "handle": {
+              "username": {
                 "type": "string"
               },
-              "displayName": {
-                "type": "string"
+              "karma": {
+                "type": "integer"
               },
               "verified": {
                 "type": "boolean"
               }
             },
             "required": [
-              "handle",
-              "displayName"
+              "username"
             ]
           }
         },
@@ -480,11 +369,11 @@
               "id": {
                 "type": "string"
               },
-              "handle": {
+              "username": {
                 "type": "string"
               },
-              "displayName": {
-                "type": "string"
+              "karma": {
+                "type": "integer"
               },
               "verified": {
                 "type": "boolean"
@@ -511,206 +400,54 @@
           }
         },
         {
-          "name": "create_room",
-          "description": "Create a Room.",
+          "name": "create_post",
+          "description": "Create a Post.",
           "inputSchema": {
             "type": "object",
             "properties": {
-              "name": {
+              "subredditId": {
                 "type": "string"
               },
-              "maxParticipants": {
-                "type": "integer"
-              },
-              "recording": {
-                "type": "boolean"
-              }
-            },
-            "required": [
-              "name",
-              "maxParticipants"
-            ]
-          }
-        },
-        {
-          "name": "list_rooms",
-          "description": "List Rooms.",
-          "inputSchema": {
-            "type": "object",
-            "properties": {}
-          }
-        },
-        {
-          "name": "get_room",
-          "description": "Get a Room by id.",
-          "inputSchema": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "update_room",
-          "description": "Update a Room.",
-          "inputSchema": {
-            "type": "object",
-            "properties": {
-              "id": {
+              "authorId": {
                 "type": "string"
               },
-              "name": {
+              "title": {
                 "type": "string"
               },
-              "maxParticipants": {
-                "type": "integer"
-              },
-              "recording": {
-                "type": "boolean"
-              }
-            },
-            "required": [
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "delete_room",
-          "description": "Delete a Room.",
-          "inputSchema": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "create_stream",
-          "description": "Create a Stream.",
-          "inputSchema": {
-            "type": "object",
-            "properties": {
-              "roomId": {
-                "type": "string"
-              },
-              "status": {
-                "type": "string"
-              },
-              "bitrate": {
-                "type": "integer"
-              }
-            },
-            "required": [
-              "status",
-              "bitrate"
-            ]
-          }
-        },
-        {
-          "name": "list_streams",
-          "description": "List Streams.",
-          "inputSchema": {
-            "type": "object",
-            "properties": {}
-          }
-        },
-        {
-          "name": "get_stream",
-          "description": "Get a Stream by id.",
-          "inputSchema": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "update_stream",
-          "description": "Update a Stream.",
-          "inputSchema": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              },
-              "roomId": {
-                "type": "string"
-              },
-              "status": {
-                "type": "string"
-              },
-              "bitrate": {
-                "type": "integer"
-              }
-            },
-            "required": [
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "delete_stream",
-          "description": "Delete a Stream.",
-          "inputSchema": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "create_webhook",
-          "description": "Create a Webhook.",
-          "inputSchema": {
-            "type": "object",
-            "properties": {
-              "event": {
+              "selftext": {
                 "type": "string"
               },
               "url": {
                 "type": "string"
               },
-              "active": {
+              "score": {
+                "type": "integer"
+              },
+              "numComments": {
+                "type": "integer"
+              },
+              "isSelf": {
                 "type": "boolean"
               }
             },
             "required": [
-              "event",
-              "url"
+              "subredditId",
+              "authorId",
+              "title"
             ]
           }
         },
         {
-          "name": "list_webhooks",
-          "description": "List Webhooks.",
+          "name": "list_posts",
+          "description": "List Posts.",
           "inputSchema": {
             "type": "object",
             "properties": {}
           }
         },
         {
-          "name": "get_webhook",
-          "description": "Get a Webhook by id.",
+          "name": "get_post",
+          "description": "Get a Post by id.",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -724,21 +461,36 @@
           }
         },
         {
-          "name": "update_webhook",
-          "description": "Update a Webhook.",
+          "name": "update_post",
+          "description": "Update a Post.",
           "inputSchema": {
             "type": "object",
             "properties": {
               "id": {
                 "type": "string"
               },
-              "event": {
+              "subredditId": {
+                "type": "string"
+              },
+              "authorId": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "selftext": {
                 "type": "string"
               },
               "url": {
                 "type": "string"
               },
-              "active": {
+              "score": {
+                "type": "integer"
+              },
+              "numComments": {
+                "type": "integer"
+              },
+              "isSelf": {
                 "type": "boolean"
               }
             },
@@ -748,8 +500,197 @@
           }
         },
         {
-          "name": "delete_webhook",
-          "description": "Delete a Webhook.",
+          "name": "delete_post",
+          "description": "Delete a Post.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_comment",
+          "description": "Create a Comment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "postId": {
+                "type": "string"
+              },
+              "parentId": {
+                "type": "string"
+              },
+              "authorId": {
+                "type": "string"
+              },
+              "body": {
+                "type": "string"
+              },
+              "score": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "postId",
+              "authorId",
+              "body"
+            ]
+          }
+        },
+        {
+          "name": "list_comments",
+          "description": "List Comments.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_comment",
+          "description": "Get a Comment by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_comment",
+          "description": "Update a Comment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "postId": {
+                "type": "string"
+              },
+              "parentId": {
+                "type": "string"
+              },
+              "authorId": {
+                "type": "string"
+              },
+              "body": {
+                "type": "string"
+              },
+              "score": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_comment",
+          "description": "Delete a Comment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_vote",
+          "description": "Create a Vote.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "type": "string"
+              },
+              "targetType": {
+                "type": "string"
+              },
+              "targetId": {
+                "type": "string"
+              },
+              "direction": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "userId",
+              "targetType",
+              "targetId",
+              "direction"
+            ]
+          }
+        },
+        {
+          "name": "list_votes",
+          "description": "List Votes.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_vote",
+          "description": "Get a Vote by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_vote",
+          "description": "Update a Vote.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "userId": {
+                "type": "string"
+              },
+              "targetType": {
+                "type": "string"
+              },
+              "targetId": {
+                "type": "string"
+              },
+              "direction": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_vote",
+          "description": "Delete a Vote.",
           "inputSchema": {
             "type": "object",
             "properties": {
