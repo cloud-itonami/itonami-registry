@@ -1,6 +1,8 @@
 {:paths ["src" "test"]
  :tasks {test {:doc "Run the cljc contract + behavioral test under babashka"
                :extra-paths ["test"]
-               :requires ([eclinicalworks.main-test])
-               :task (let [{:keys [fail error]} (clojure.test/run-tests 'eclinicalworks.main-test)]
+               :requires ([eclinicalworks.main-test] [eclinicalworks.validation-test])
+               :task (let [{:keys [fail error]} (clojure.test/run-tests
+                                                  'eclinicalworks.main-test
+                                                  'eclinicalworks.validation-test)]
                        (System/exit (if (pos? (+ fail error)) 1 0)))}}}
