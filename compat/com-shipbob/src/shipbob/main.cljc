@@ -76,7 +76,16 @@
         :else 0.0))
 
 (defn as-bool [v]
-  (if (nil? v) false (contains? #{"1" "true" "yes" "on" true} (if (string? v) (str/lower-case v) v))))
+  (cond (nil? v) false
+        ;; as-int/as-float both special-case a raw number before falling
+        ;; through to the truthy-string-set check; as-bool didn't, so a
+        ;; numeric 1/1.0 (plausible from JSON/spreadsheet-derived request
+        ;; bodies) fell into the set-membership check as-is, wasn't
+        ;; `contains?`-equal to the string "1" or boolean true, and
+        ;; silently coerced to false instead of true.
+        (number? v) (not (zero? v))
+        (string? v) (contains? #{"1" "true" "yes" "on"} (str/lower-case v))
+        :else (boolean v)))
 
 (defn coerce-field [kind v]
   (case kind :int (as-int v) :float (as-float v) :bool (as-bool v) v))
