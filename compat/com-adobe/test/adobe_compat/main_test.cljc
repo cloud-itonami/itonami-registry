@@ -79,6 +79,24 @@
       (is (= "n" (get facts "adobe.Project/name")))
       (is (= "adobe_pro_x" (get facts "adobe.Project/id"))))))
 
+(deftest update-coercion
+  ;; CONFIRMED BUG regression: handle-update never ran field values through
+  ;; coerce-field the way handle-create does, so updating a :bool/:int/:float
+  ;; field with a raw string (plausible from a JSON request body) silently
+  ;; stored the wrong type instead of coercing it.
+  (let [s (m/fresh-store)
+        [rec _] (m/handle-create s "File" {:name "a" :version "7"})
+        [updated _] (m/handle-update s "File" (:id rec) {:version "9"})]
+    (is (= 9 (:version updated))))
+  (let [s (m/fresh-store)
+        [rec _] (m/handle-create s "Frame" {:name "f" :width "12.5"})
+        [updated _] (m/handle-update s "Frame" (:id rec) {:width "20.5"})]
+    (is (= 20.5 (:width updated))))
+  (let [s (m/fresh-store)
+        [rec _] (m/handle-create s "Comment" {:body "hi" :resolved "true"})
+        [updated _] (m/handle-update s "Comment" (:id rec) {:resolved "false"})]
+    (is (false? (:resolved updated)))))
+
 (deftest healthz
   (is (= [{:status "ok" :actor "adobe-compat" :tier "L4" :entities entities} 200] (m/healthz))))
 
