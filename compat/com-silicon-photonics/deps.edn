@@ -1,2 +1,13 @@
-{:paths ["src" "tests"]
- :deps {org.clojure/clojure {:mvn/version "1.11.1"}}}
+{:paths ["src"]
+ :deps {org.clojure/clojure {:mvn/version "1.11.1"}}
+ :aliases
+ {:test {:extra-paths ["tests"]
+         :extra-deps {io.github.cognitect-labs/test-runner
+                      {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+         :main-opts ["-m" "cognitect.test-runner" "-d" "tests"]
+         :exec-fn cognitect.test-runner.api/test
+         :exec-args {:dirs ["tests"]}}
+  ;; clj-kondo as a Clojars lib (no Homebrew/system install needed).
+  :lint {:replace-deps {clj-kondo/clj-kondo {:mvn/version "2024.11.14"}}
+         :main-opts ["-m" "clj-kondo.main" "--lint" "src" "tests"
+                     "--fail-level" "error"]}}}
