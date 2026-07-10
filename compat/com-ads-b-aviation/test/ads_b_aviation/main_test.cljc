@@ -81,6 +81,20 @@
       (is (= "D" (get facts "ads_b_aviation.Object/designator")))
       (is (= "adsbavia_obj_x" (get facts "ads_b_aviation.Object/id"))))))
 
+(deftest update-coercion
+  ;; CONFIRMED BUG regression: handle-update never ran field values through
+  ;; coerce-field the way handle-create does, so updating a :bool/:int/:float
+  ;; field with a raw string (plausible from a JSON request body) silently
+  ;; stored the wrong type instead of coercing it.
+  (let [s (m/fresh-store)
+        [rec _] (m/handle-create s "Position" {:lat "12.5" :lon "-122.3" :objectId "obj1"})
+        [updated _] (m/handle-update s "Position" (:id rec) {:lat "20.5"})]
+    (is (= 20.5 (:lat updated))))
+  (let [s (m/fresh-store)
+        [rec _] (m/handle-create s "Scene" {:satellite "Sentinel" :cloudCover "45.7"})
+        [updated _] (m/handle-update s "Scene" (:id rec) {:cloudCover "10.2"})]
+    (is (= 10.2 (:cloudCover updated)))))
+
 (deftest healthz
   (is (= [{:status "ok" :actor "ads_b_aviation-compat" :tier "L4" :entities entities} 200] (m/healthz))))
 
