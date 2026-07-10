@@ -35,6 +35,23 @@
         (is (= 400 (second (m/handle-create s entity {}))) (str entity " missing-required"))
         (is (= 400 (second (m/handle-create s entity (assoc (full-record spec) :__bogus__ 1)))) (str entity " unknown"))))))
 
+(deftest as-bool-coerces-numeric-input
+  ;; CONFIRMED BUG regression: as-bool never special-cased a raw number the
+  ;; way as-int/as-float both do, so a numeric 1/1.0 (plausible from JSON/
+  ;; spreadsheet-derived request bodies) silently coerced to false.
+  (is (true? (m/as-bool 1)))
+  (is (true? (m/as-bool 1.0)))
+  (is (false? (m/as-bool 0)))
+  (is (false? (m/as-bool 0.0)))
+  (is (true? (m/as-bool true)))
+  (is (false? (m/as-bool false)))
+  (is (false? (m/as-bool nil)))
+  (is (true? (m/as-bool "1")))
+  (is (true? (m/as-bool "true")))
+  (is (true? (m/as-bool "YES")))
+  (is (false? (m/as-bool "0")))
+  (is (false? (m/as-bool "no"))))
+
 (deftest coercion
   (doseq [{:keys [entity coerce] :as spec} m/entity-specs]
     (when (seq coerce)
