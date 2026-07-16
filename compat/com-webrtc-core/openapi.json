@@ -1,0 +1,1370 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "webrtc_core clean-room API",
+    "version": "1.0.0",
+    "description": "Clean-room, API-compatible deep internet / core routing actor (webrtc_core); runs browser-local on IPFS + kotoba-WASM.",
+    "x-etzhayyim-did": "did:web:etzhayyim.com:actor:webrtc_core-compat",
+    "x-wasm-cid": "bafkreia73ojcn3fiznzoivhsoylxlsfsovulinz7dpwkbuiqbd5tqsfjxu",
+    "x-runtime": "kotoba-wasm",
+    "x-exec": "browser-local|donated-mesh",
+    "x-tier": "L5"
+  },
+  "servers": [
+    {
+      "url": "ipfs://bafkreia73ojcn3fiznzoivhsoylxlsfsovulinz7dpwkbuiqbd5tqsfjxu",
+      "description": "browser-local kotoba-wasm component"
+    }
+  ],
+  "paths": {
+    "/v1/rtcpeerconnections": {
+      "get": {
+        "summary": "List RTCPeerConnections",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/RTCPeerConnection"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a RTCPeerConnection",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RTCPeerConnectionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RTCPeerConnection"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/rtcpeerconnections/{id}": {
+      "get": {
+        "summary": "Get a RTCPeerConnection",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RTCPeerConnection"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a RTCPeerConnection",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RTCPeerConnectionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RTCPeerConnection"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a RTCPeerConnection",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/v1/rtcdatachannels": {
+      "get": {
+        "summary": "List RTCDataChannels",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/RTCDataChannel"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a RTCDataChannel",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RTCDataChannelCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RTCDataChannel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/rtcdatachannels/{id}": {
+      "get": {
+        "summary": "Get a RTCDataChannel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RTCDataChannel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a RTCDataChannel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RTCDataChannelCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RTCDataChannel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a RTCDataChannel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/v1/rtcsessiondescriptions": {
+      "get": {
+        "summary": "List RTCSessionDescriptions",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/RTCSessionDescription"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a RTCSessionDescription",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RTCSessionDescriptionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RTCSessionDescription"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/rtcsessiondescriptions/{id}": {
+      "get": {
+        "summary": "Get a RTCSessionDescription",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RTCSessionDescription"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a RTCSessionDescription",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RTCSessionDescriptionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RTCSessionDescription"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a RTCSessionDescription",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/v1/rtcicecandidates": {
+      "get": {
+        "summary": "List RTCIceCandidates",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/RTCIceCandidate"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a RTCIceCandidate",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RTCIceCandidateCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RTCIceCandidate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/rtcicecandidates/{id}": {
+      "get": {
+        "summary": "Get a RTCIceCandidate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RTCIceCandidate"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a RTCIceCandidate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RTCIceCandidateCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RTCIceCandidate"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a RTCIceCandidate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/v1/rtcrtptransceivers": {
+      "get": {
+        "summary": "List RTCRtpTransceivers",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/RTCRtpTransceiver"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a RTCRtpTransceiver",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RTCRtpTransceiverCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RTCRtpTransceiver"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/rtcrtptransceivers/{id}": {
+      "get": {
+        "summary": "Get a RTCRtpTransceiver",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RTCRtpTransceiver"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a RTCRtpTransceiver",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RTCRtpTransceiverCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RTCRtpTransceiver"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a RTCRtpTransceiver",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/healthz": {
+      "get": {
+        "summary": "Health probe",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RTCPeerConnection": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "signalingState": {
+            "type": "string",
+            "enum": [
+              "stable",
+              "have-local-offer",
+              "have-remote-offer",
+              "have-local-pranswer",
+              "have-remote-pranswer",
+              "closed"
+            ]
+          },
+          "iceConnectionState": {
+            "type": "string",
+            "enum": [
+              "new",
+              "checking",
+              "connected",
+              "completed",
+              "failed",
+              "disconnected",
+              "closed"
+            ]
+          },
+          "iceGatheringState": {
+            "type": "string",
+            "enum": [
+              "new",
+              "gathering",
+              "complete"
+            ]
+          },
+          "connectionState": {
+            "type": "string",
+            "enum": [
+              "new",
+              "connecting",
+              "connected",
+              "disconnected",
+              "failed",
+              "closed"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RTCPeerConnectionCreate": {
+        "type": "object",
+        "properties": {
+          "signalingState": {
+            "type": "string",
+            "enum": [
+              "stable",
+              "have-local-offer",
+              "have-remote-offer",
+              "have-local-pranswer",
+              "have-remote-pranswer",
+              "closed"
+            ]
+          },
+          "iceConnectionState": {
+            "type": "string",
+            "enum": [
+              "new",
+              "checking",
+              "connected",
+              "completed",
+              "failed",
+              "disconnected",
+              "closed"
+            ]
+          },
+          "iceGatheringState": {
+            "type": "string",
+            "enum": [
+              "new",
+              "gathering",
+              "complete"
+            ]
+          },
+          "connectionState": {
+            "type": "string",
+            "enum": [
+              "new",
+              "connecting",
+              "connected",
+              "disconnected",
+              "failed",
+              "closed"
+            ]
+          }
+        },
+        "required": [
+          "signalingState",
+          "iceConnectionState"
+        ]
+      },
+      "RTCDataChannel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "label": {
+            "type": "string"
+          },
+          "ordered": {
+            "type": "boolean"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "negotiated": {
+            "type": "boolean"
+          },
+          "readyState": {
+            "type": "string",
+            "enum": [
+              "connecting",
+              "open",
+              "closing",
+              "closed"
+            ]
+          },
+          "bufferedAmount": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RTCDataChannelCreate": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "ordered": {
+            "type": "boolean"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "negotiated": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "readyState": {
+            "type": "string",
+            "enum": [
+              "connecting",
+              "open",
+              "closing",
+              "closed"
+            ]
+          },
+          "bufferedAmount": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "label",
+          "ordered"
+        ]
+      },
+      "RTCSessionDescription": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "offer",
+              "pranswer",
+              "answer",
+              "rollback"
+            ]
+          },
+          "sdp": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RTCSessionDescriptionCreate": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "offer",
+              "pranswer",
+              "answer",
+              "rollback"
+            ]
+          },
+          "sdp": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "sdp"
+        ]
+      },
+      "RTCIceCandidate": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "candidate": {
+            "type": "string"
+          },
+          "sdpMLineIndex": {
+            "type": "integer"
+          },
+          "sdpMid": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string",
+            "enum": [
+              "udp",
+              "tcp"
+            ]
+          },
+          "port": {
+            "type": "integer"
+          },
+          "address": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "host",
+              "srflx",
+              "prflx",
+              "relay"
+            ]
+          },
+          "tcpType": {
+            "type": "string",
+            "enum": [
+              "active",
+              "passive",
+              "so"
+            ]
+          },
+          "priority": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RTCIceCandidateCreate": {
+        "type": "object",
+        "properties": {
+          "candidate": {
+            "type": "string"
+          },
+          "sdpMLineIndex": {
+            "type": "integer"
+          },
+          "sdpMid": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string",
+            "enum": [
+              "udp",
+              "tcp"
+            ]
+          },
+          "port": {
+            "type": "integer"
+          },
+          "address": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "host",
+              "srflx",
+              "prflx",
+              "relay"
+            ]
+          },
+          "tcpType": {
+            "type": "string",
+            "enum": [
+              "active",
+              "passive",
+              "so"
+            ]
+          },
+          "priority": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "candidate",
+          "sdpMLineIndex"
+        ]
+      },
+      "RTCRtpTransceiver": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "mid": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "sendrecv",
+              "sendonly",
+              "recvonly",
+              "inactive"
+            ]
+          },
+          "currentDirection": {
+            "type": "string",
+            "enum": [
+              "sendrecv",
+              "sendonly",
+              "recvonly",
+              "inactive"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RTCRtpTransceiverCreate": {
+        "type": "object",
+        "properties": {
+          "mid": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "sendrecv",
+              "sendonly",
+              "recvonly",
+              "inactive"
+            ]
+          },
+          "currentDirection": {
+            "type": "string",
+            "enum": [
+              "sendrecv",
+              "sendonly",
+              "recvonly",
+              "inactive"
+            ]
+          }
+        },
+        "required": [
+          "mid",
+          "direction"
+        ]
+      }
+    }
+  }
+}
