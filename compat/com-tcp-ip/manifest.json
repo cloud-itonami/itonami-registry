@@ -1,0 +1,652 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "tcp_ip-compat",
+  "did": "did:web:etzhayyim.com:actor:tcp_ip-compat",
+  "kind": "compat",
+  "title": "tcp_ip clean-room actor",
+  "description": "Clean-room, API-compatible deep internet / core routing actor (tcp_ip); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreighwiwqsfrfugqsvuqu2pyqd3agz6pzzbg2m36jyyihvdltu2mvsi",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreighwiwqsfrfugqsvuqu2pyqd3agz6pzzbg2m36jyyihvdltu2mvsi",
+  "schema": "schema/tcp_ip.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://datatracker.ietf.org/doc/html/rfc9293",
+    "verifiedAt": "2026-06-10",
+    "resources": [
+      "TcpSegment",
+      "TcpConnection",
+      "IpPacket",
+      "IcmpMessage"
+    ],
+    "enums": {
+      "TcpConnection": {
+        "state": [
+          "CLOSED",
+          "LISTEN",
+          "SYN-SENT",
+          "SYN-RECEIVED",
+          "ESTABLISHED",
+          "FIN-WAIT-1",
+          "FIN-WAIT-2",
+          "CLOSE-WAIT",
+          "CLOSING",
+          "LAST-ACK",
+          "TIME-WAIT"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "TcpSegment",
+    "TcpConnection",
+    "IpPacket",
+    "IcmpMessage"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 20,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/tcpsegments",
+          "op": "create TcpSegment"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/tcpsegments",
+          "op": "list TcpSegment"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/tcpsegments/{id}",
+          "op": "get TcpSegment"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/tcpsegments/{id}",
+          "op": "update TcpSegment"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/tcpsegments/{id}",
+          "op": "delete TcpSegment"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/tcpconnections",
+          "op": "create TcpConnection"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/tcpconnections",
+          "op": "list TcpConnection"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/tcpconnections/{id}",
+          "op": "get TcpConnection"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/tcpconnections/{id}",
+          "op": "update TcpConnection"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/tcpconnections/{id}",
+          "op": "delete TcpConnection"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/ippackets",
+          "op": "create IpPacket"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/ippackets",
+          "op": "list IpPacket"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/ippackets/{id}",
+          "op": "get IpPacket"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/ippackets/{id}",
+          "op": "update IpPacket"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/ippackets/{id}",
+          "op": "delete IpPacket"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/icmpmessages",
+          "op": "create IcmpMessage"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/icmpmessages",
+          "op": "list IcmpMessage"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/icmpmessages/{id}",
+          "op": "get IcmpMessage"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/icmpmessages/{id}",
+          "op": "update IcmpMessage"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/icmpmessages/{id}",
+          "op": "delete IcmpMessage"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "tcp_ip-compat",
+            "purl": "pkg:etzhayyim/tcp_ip-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "tcp_ip.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 20,
+      "tools": [
+        {
+          "name": "create_tcp_segment",
+          "description": "Create a TcpSegment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "sourcePort": {
+                "type": "integer"
+              },
+              "destinationPort": {
+                "type": "integer"
+              },
+              "sequenceNumber": {
+                "type": "integer"
+              },
+              "acknowledgmentNumber": {
+                "type": "integer"
+              },
+              "dataOffset": {
+                "type": "integer"
+              },
+              "controlBits": {
+                "type": "string"
+              },
+              "window": {
+                "type": "integer"
+              },
+              "urgentPointer": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "sourcePort",
+              "destinationPort"
+            ]
+          }
+        },
+        {
+          "name": "list_tcp_segments",
+          "description": "List TcpSegments.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_tcp_segment",
+          "description": "Get a TcpSegment by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_tcp_segment",
+          "description": "Update a TcpSegment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "sourcePort": {
+                "type": "integer"
+              },
+              "destinationPort": {
+                "type": "integer"
+              },
+              "sequenceNumber": {
+                "type": "integer"
+              },
+              "acknowledgmentNumber": {
+                "type": "integer"
+              },
+              "dataOffset": {
+                "type": "integer"
+              },
+              "controlBits": {
+                "type": "string"
+              },
+              "window": {
+                "type": "integer"
+              },
+              "urgentPointer": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_tcp_segment",
+          "description": "Delete a TcpSegment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_tcp_connection",
+          "description": "Create a TcpConnection.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "localPort": {
+                "type": "integer"
+              },
+              "remotePort": {
+                "type": "integer"
+              },
+              "state": {
+                "type": "string"
+              },
+              "sequenceSendNext": {
+                "type": "integer"
+              },
+              "sequenceReceiveNext": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "localPort",
+              "remotePort"
+            ]
+          }
+        },
+        {
+          "name": "list_tcp_connections",
+          "description": "List TcpConnections.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_tcp_connection",
+          "description": "Get a TcpConnection by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_tcp_connection",
+          "description": "Update a TcpConnection.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "localPort": {
+                "type": "integer"
+              },
+              "remotePort": {
+                "type": "integer"
+              },
+              "state": {
+                "type": "string"
+              },
+              "sequenceSendNext": {
+                "type": "integer"
+              },
+              "sequenceReceiveNext": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_tcp_connection",
+          "description": "Delete a TcpConnection.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_ip_packet",
+          "description": "Create a IpPacket.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "version": {
+                "type": "integer"
+              },
+              "headerLength": {
+                "type": "integer"
+              },
+              "totalLength": {
+                "type": "integer"
+              },
+              "identification": {
+                "type": "integer"
+              },
+              "flags": {
+                "type": "string"
+              },
+              "fragmentOffset": {
+                "type": "integer"
+              },
+              "timeToLive": {
+                "type": "integer"
+              },
+              "protocol": {
+                "type": "integer"
+              },
+              "sourceAddress": {
+                "type": "string"
+              },
+              "destinationAddress": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "version",
+              "headerLength"
+            ]
+          }
+        },
+        {
+          "name": "list_ip_packets",
+          "description": "List IpPackets.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_ip_packet",
+          "description": "Get a IpPacket by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_ip_packet",
+          "description": "Update a IpPacket.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              },
+              "headerLength": {
+                "type": "integer"
+              },
+              "totalLength": {
+                "type": "integer"
+              },
+              "identification": {
+                "type": "integer"
+              },
+              "flags": {
+                "type": "string"
+              },
+              "fragmentOffset": {
+                "type": "integer"
+              },
+              "timeToLive": {
+                "type": "integer"
+              },
+              "protocol": {
+                "type": "integer"
+              },
+              "sourceAddress": {
+                "type": "string"
+              },
+              "destinationAddress": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_ip_packet",
+          "description": "Delete a IpPacket.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_icmp_message",
+          "description": "Create a IcmpMessage.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "integer"
+              },
+              "code": {
+                "type": "integer"
+              },
+              "checksum": {
+                "type": "string"
+              },
+              "restOfHeader": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "code"
+            ]
+          }
+        },
+        {
+          "name": "list_icmp_messages",
+          "description": "List IcmpMessages.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_icmp_message",
+          "description": "Get a IcmpMessage by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_icmp_message",
+          "description": "Update a IcmpMessage.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "integer"
+              },
+              "code": {
+                "type": "integer"
+              },
+              "checksum": {
+                "type": "string"
+              },
+              "restOfHeader": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_icmp_message",
+          "description": "Delete a IcmpMessage.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
