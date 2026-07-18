@@ -4,7 +4,7 @@ This actor provides a clean-room, API-compatible implementation of the Adobe pla
 
 ## Architecture
 - **State:** Backed by Datomic for immutable, time-travel-capable record keeping.
-- **Schema:** Defined in `schema/adobe.kotoba`.
+- **Schema:** Defined in `schema/adobe.kotoba-schema` (legacy generated schema DSL, not canonical Kotoba guest source).
 - **Execution:** Runs in `Py Kotodama WASM`, intercepting inbound REST requests.
 
 ## Provenance
