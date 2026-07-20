@@ -2,6 +2,9 @@
 
 Clean-room API-compatible implementation of the ads_b_aviation physical substrate/core protocol, backed by Datomic and Py Kotodama WASM.
 
+The generated actor schema uses `.kotoba-schema`; bare `.kotoba` is reserved
+for canonical capability-safe Kotoba guest/component source.
+
 ## Provenance
 
 Relocated 2026-07-04 from `etzhayyim/root/20-actors/ads_b_aviation-compat` to
