@@ -2,6 +2,9 @@
 
 This actor provides a clean-room, API-compatible implementation of the Adyen platform.
 
+The generated actor schema uses `.kotoba-schema`; bare `.kotoba` is reserved
+for canonical capability-safe Kotoba guest/component source.
+
 ## Architecture
 - **State:** Backed by Datomic for immutable, time-travel-capable record keeping.
 - **Schema:** Defined in `schema/adyen.kotoba`.
