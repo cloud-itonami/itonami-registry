@@ -19,6 +19,15 @@
 (def default-limit 20)
 (def max-limit 100)
 
+(defn page-limit
+  "Bound a requested page size. Non-positive input selects the API default;
+  positive input is capped at max-limit. This is the retained CLJC oracle for
+  src/airbyte/page_limit.kotoba."
+  [requested]
+  (if (pos? requested)
+    (min requested max-limit)
+    default-limit))
+
 ;; --- schema-derived entity specs (the single source the handlers fold over) ---
 (def entity-specs
   [{:entity "Connector" :plural "connectors" :id-prefix "airbyte_con"
@@ -125,7 +134,7 @@
           rows fields))
 
 (defn paginate [rows params]
-  (let [limit (min (max (or (let [l (as-int (get params :limit))] (when (pos? l) l)) default-limit) 1) max-limit)
+  (let [limit (page-limit (as-int (get params :limit)))
         start (get params :starting_after)
         rows (if (some? start)
                (let [ids (mapv :id rows) idx (.indexOf ^java.util.List ids start)]
