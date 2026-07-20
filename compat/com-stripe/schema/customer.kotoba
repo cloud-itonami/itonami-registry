@@ -1,0 +1,46 @@
+;; customer.kotoba — pilot port of stripe.main's Customer entity
+;; (com-stripe/src/stripe/main.cljc entity-specs "Customer") to the real
+;; kotoba language (guest-grammar.edn, kotoba-lang/kotoba backend), proving
+;; the compile -> wasm emit -> execute loop for a Stripe-shaped CRUD record
+;; end to end. See docs/kotoba-pilot-notes.md for scope and known gaps.
+;;
+;; Known language-maturity gap (guest-grammar.edn :portable-string-symbol-values,
+;; status :p0-p1-in-progress): there is no runtime string-building/concat
+;; builtin, so kgraph-assert!/kgraph-query take compile-time string literals
+;; only -- arbitrary request-time email/name values cannot be interpolated
+;; into an assert yet. This pilot therefore seeds two canned Customer
+;; records (fixed literals, same shape stripe.main/handle-create would
+;; persist) rather than accepting live input, and proves get/list against
+;; that real, running kgraph store.
+(ns stripe.customer)
+
+(defn create-customers []
+  (let [c1 (kgraph-assert! (str-ptr "[\"stripe_cus_0001\" :stripe.Customer/email \"ada@example.com\"]")
+                           (str-len "[\"stripe_cus_0001\" :stripe.Customer/email \"ada@example.com\"]"))
+        c2 (kgraph-assert! (str-ptr "[\"stripe_cus_0001\" :stripe.Customer/name \"Ada Lovelace\"]")
+                           (str-len "[\"stripe_cus_0001\" :stripe.Customer/name \"Ada Lovelace\"]"))
+        c3 (kgraph-assert! (str-ptr "[\"stripe_cus_0001\" :stripe.Customer/balance 0]")
+                           (str-len "[\"stripe_cus_0001\" :stripe.Customer/balance 0]"))
+        c4 (kgraph-assert! (str-ptr "[\"stripe_cus_0002\" :stripe.Customer/email \"grace@example.com\"]")
+                           (str-len "[\"stripe_cus_0002\" :stripe.Customer/email \"grace@example.com\"]"))
+        c5 (kgraph-assert! (str-ptr "[\"stripe_cus_0002\" :stripe.Customer/name \"Grace Hopper\"]")
+                           (str-len "[\"stripe_cus_0002\" :stripe.Customer/name \"Grace Hopper\"]"))
+        c6 (kgraph-assert! (str-ptr "[\"stripe_cus_0002\" :stripe.Customer/balance 500]")
+                           (str-len "[\"stripe_cus_0002\" :stripe.Customer/balance 500]"))]
+    c6))
+
+(defn get-customer [buf cap]
+  (kgraph-query (str-ptr "{:find [?a ?v] :where [[\"stripe_cus_0001\" ?a ?v]]}")
+               (str-len "{:find [?a ?v] :where [[\"stripe_cus_0001\" ?a ?v]]}")
+               buf cap))
+
+(defn list-customers [buf cap]
+  (kgraph-query (str-ptr "{:find [?e ?v] :where [[?e :stripe.Customer/email ?v]]}")
+               (str-len "{:find [?e ?v] :where [[?e :stripe.Customer/email ?v]]}")
+               buf cap))
+
+(defn main []
+  (let [_seed (create-customers)
+        buf (alloc 256)
+        n (list-customers buf 256)]
+    n))
