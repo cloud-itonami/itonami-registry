@@ -4,7 +4,7 @@ This actor provides a clean-room, API-compatible implementation of the Atlassian
 
 ## Architecture
 - **State:** Backed by Datomic for immutable, time-travel-capable record keeping.
-- **Schema:** Defined in `schema/atlassian.kotoba`.
+- **Schema:** Defined in `schema/atlassian.kotoba-schema`.
 - **Execution:** Runs in `Py Kotodama WASM`, intercepting inbound REST requests.
 
 ## Provenance
