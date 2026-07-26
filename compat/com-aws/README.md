@@ -4,7 +4,7 @@ This actor provides a clean-room, API-compatible implementation of the Aws platf
 
 ## Architecture
 - **State:** Backed by Datomic for immutable, time-travel-capable record keeping.
-- **Schema:** Defined in `schema/aws.kotoba`.
+- **Schema:** Defined in `schema/aws.kotoba-schema`.
 - **Execution:** Runs in `Py Kotodama WASM`, intercepting inbound REST requests.
 
 ## Provenance
