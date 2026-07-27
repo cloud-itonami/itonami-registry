@@ -57,6 +57,10 @@
   (let [[body status] (m/healthz)]
     (is (= 200 status)) (is (= "aadhaar-compat" (:actor body))) (is (= (set m/entities) (set (:entities body))))))
 
+(deftest page-limit-oracle
+  (is (= [20 20 1 20 100]
+         (mapv m/page-limit [-1 0 1 20 250]))))
+
 #?(:clj (defn -main [& _]
           (let [{:keys [fail error]} (run-tests 'aadhaar.main-test)]
             (System/exit (if (pos? (+ fail error)) 1 0)))))
