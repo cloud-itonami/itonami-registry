@@ -1,0 +1,126 @@
+(ns notion.connector-test
+  (:require [clojure.edn :as edn]
+            [clojure.string :as str]
+            [clojure.test :refer [deftest is testing]]
+            [connector.auth :as auth]
+            [connector.consent :as consent]
+            [connector.declare :as decl]
+            [connector.invoke :as invoke]
+            [connector.model :as m]
+            [connector.ports :as ports]
+            [connector.registry :as reg]
+            [connector.validate :as v]
+            [notion.connector :as c]))
+
+(def registry (reg/registry [c/provider]))
+(def tokens (ports/static-tokens {"com.notion" "tok"}))
+
+(defn- responding [body]
+  (ports/http-fn (fn [_] {:connector.http/status 200 :connector.http/body body})))
+
+(deftest descriptor-is-valid-and-correctly-named
+  (is (empty? (v/errors c/descriptor)))
+  (is (true? (v/name-conformant? c/descriptor "com-notion"))))
+
+(deftest notion-has-no-scopes-and-the-descriptor-says-so
+  (is (false? (m/scoped? c/descriptor)))
+  (testing "no tool declares a scope, and declaring one is an error"
+    (doseq [t (m/tools c/descriptor)]
+      (is (empty? (:connector/scopes t))))
+    (let [d (m/add-tool c/descriptor "notion_search" {:effect :read :scopes ["read"]})]
+      (is (some #(= :tool/unexpected-scopes (:connector/code %)) (v/errors d))
+          "a consent screen printing scopes Notion ignores is worse than one printing none")))
+  (testing "the authorization URL has no scope parameter"
+    (let [url (auth/authorization-url c/descriptor
+                                      {:client-id "cid" :redirect-uri "https://app/cb"
+                                       :state "st" :scopes []})]
+      (is (not (str/includes? url "scope=")))
+      (is (str/includes? url "owner=user") "Notion requires owner=user"))))
+
+(deftest the-grant-cannot-be-narrowed-and-that-is-visible
+  (testing "enabling a reader and enabling a writer request the same access —
+            stated here so nobody reads the connector plane as narrowing Notion"
+    (let [reading (reg/select registry #{"com.notion"} #{"notion_search"})
+          writing (reg/select registry #{"com.notion"} #{"notion_create_page"})]
+      (is (= (:connector.consent/scopes (first (consent/groups reading)))
+             (:connector.consent/scopes (first (consent/groups writing)))
+             [])))))
+
+(deftest the-token-request-uses-http-basic
+  (let [req (auth/token-exchange-request
+             c/descriptor
+             {:client-id "cid" :client-secret "sec" :code "abc"
+              :redirect-uri "https://app/cb"})]
+    (is (str/starts-with? (get-in req [:connector.http/headers "authorization"]) "Basic "))
+    (is (not (str/includes? (:connector.http/body req) "client_secret"))
+        "Notion accepts client_secret_basic only")))
+
+(deftest the-api-version-is-pinned-on-every-request
+  (doseq [t (m/tool-names c/descriptor)
+          :let [req (invoke/request-for registry t {"page_id" "p" "block_id" "b"
+                                                    "database_id" "d"
+                                                    "parent" {} "properties" {}})]]
+    (is (= "2022-06-28" (get-in req [:connector.http/headers "notion-version"]))
+        (str t " omits notion-version; the server would pick and the shape could move"))))
+
+(deftest a-title-is-found-by-property-type-not-by-name
+  (testing "the title property's NAME is chosen by whoever built the database,
+            so looking for \"Name\" works until somebody renames it"
+    (let [result (invoke/call registry "notion_search" {"query" "x"}
+                              {:http (responding
+                                      {"results"
+                                       [{"object" "page" "id" "p1" "url" "https://notion.so/p1"
+                                         "properties" {"Task name"
+                                                       {"type" "title"
+                                                        "title" [{"plain_text" "Ship "}
+                                                                 {"plain_text" "it"}]}}}]})
+                               :tokens tokens})]
+      (is (= "Ship it" (:title (first (:results result))))
+          "annotated runs are joined; the annotations are formatting"))))
+
+(deftest block-text-is-extracted-per-block-type
+  (let [result (invoke/call registry "notion_get_block_children" {"block_id" "b1"}
+                            {:http (responding
+                                    {"results" [{"id" "b2" "type" "paragraph"
+                                                 "has_children" false
+                                                 "paragraph" {"rich_text" [{"plain_text" "hello"}]}}
+                                                {"id" "b3" "type" "heading_1"
+                                                 "heading_1" {"rich_text" [{"plain_text" "Title"}]}}]
+                                     "has_more" false})
+                             :tokens tokens})]
+    (is (= ["hello" "Title"] (mapv :text (:blocks result))))))
+
+(deftest search-filter-is-built-into-notions-shape
+  (let [req (invoke/request-for registry "notion_search"
+                               {"query" "q" "filter_object" "database"})]
+    (is (= {"property" "object" "value" "database"}
+           (get-in req [:connector.http/body "filter"])))))
+
+(deftest a-401-is-an-error-not-an-empty-workspace
+  (let [result (invoke/call registry "notion_search" {}
+                            {:http (ports/http-fn
+                                    (fn [_] {:connector.http/status 401
+                                             :connector.http/body {"message" "API token is invalid"}}))
+                             :tokens tokens})]
+    (is (true? (:connector/error result)))
+    (is (nil? (:results result)))))
+
+(deftest the-request-carries-no-credential
+  (is (nil? (get-in (invoke/request-for registry "notion_search" {})
+                    [:connector.http/headers "authorization"]))))
+
+(deftest every-tool-declares-an-effect
+  (doseq [t (m/tools c/descriptor)]
+    (is (#{:read :write} (:connector/effect t)))
+    (is (str/starts-with? (:connector/name t) "notion_"))))
+
+(deftest connector-edn-matches-the-descriptor
+  (let [committed (edn/read-string
+                   #?(:clj (slurp "connector.edn")
+                      :cljs (.readFileSync (js/require "fs") "connector.edn" "utf8")))]
+    (is (= (decl/declaration c/provider
+                             {:namespace "notion.connector"
+                              :var "provider"
+                              :authority "90-docs/adr/2608097000-connector-plane-one-repo-per-connector.edn"})
+           committed)
+        "run: nbb --classpath \"src:../connector/src\" emit-connector-edn.cljs")))
