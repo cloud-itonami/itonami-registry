@@ -1,0 +1,119 @@
+(ns github.connector-test
+  (:require [clojure.edn :as edn]
+            [clojure.string :as str]
+            [clojure.test :refer [deftest is testing]]
+            [connector.auth :as auth]
+            [connector.declare :as decl]
+            [connector.invoke :as invoke]
+            [connector.model :as m]
+            [connector.ports :as ports]
+            [connector.registry :as reg]
+            [connector.validate :as v]
+            [github.connector :as c]))
+
+(def registry (reg/registry [c/provider]))
+(def tokens (ports/static-tokens {"com.github" "tok"}))
+
+(deftest descriptor-is-valid-and-correctly-named
+  (is (empty? (v/errors c/descriptor)))
+  (is (true? (v/name-conformant? c/descriptor "com-github"))
+      "github.com reverses to com-github, and this repository already holds that name"))
+
+(deftest pkce-is-declared-false-because-github-does-not-verify-it
+  (is (false? (get-in c/descriptor [:connector/auth :connector.auth/pkce?])))
+  (let [url (auth/authorization-url c/descriptor
+                                    {:client-id "cid" :redirect-uri "https://app/cb"
+                                     :state "st" :scopes ["repo"]})]
+    (is (not (str/includes? url "code_challenge"))
+        "sending a challenge nobody checks would suggest a protection that is not in force")))
+
+(deftest reading-a-profile-does-not-grant-repository-access
+  (let [scopes (m/scopes-for c/descriptor ["github_get_authenticated_user"])]
+    (is (= ["read:user"] scopes))
+    (is (not (some #{c/repo-scope} scopes)))))
+
+(deftest read-only-drops-the-only-write-tool
+  (let [d (m/read-only c/descriptor)]
+    (is (nil? (m/tool d "github_create_issue")))
+    (is (= 6 (count (m/tools d))))))
+
+(deftest the-api-version-is-pinned
+  (doseq [t (m/tool-names c/descriptor)
+          :let [req (invoke/request-for registry t (if (str/includes? t "repositor")
+                                                     {}
+                                                     {"owner" "o" "repo" "r" "title" "t"}))]]
+    (is (= "2022-11-28" (get-in req [:connector.http/headers "x-github-api-version"]))
+        (str t " does not pin the API version; a shape change would arrive as wrong data"))))
+
+(deftest owner-and-repo-are-encoded-into-the-path
+  (let [req (invoke/request-for registry "github_get_repository"
+                                {"owner" "a/b" "repo" "c d"})]
+    (is (= "https://api.github.com/repos/a%2Fb/c%20d" (:connector.http/url req)))))
+
+(deftest create-issue-omits-absent-optional-fields
+  (let [req (invoke/request-for registry "github_create_issue"
+                                {"owner" "o" "repo" "r" "title" "t"})]
+    (is (= {"title" "t"} (:connector.http/body req)))
+    (is (= :post (:connector.http/method req)))))
+
+(deftest list-issues-excludes-pull-requests
+  (testing "GitHub returns PRs from /issues, marked only by a pull_request key.
+            A caller that asked for issues and counted the result would be
+            counting PRs, with nothing in the response saying so."
+    (let [http (ports/http-fn
+                (fn [_] {:connector.http/status 200
+                         :connector.http/body
+                         [{"number" 1 "title" "a real issue" "state" "open"
+                           "user" {"login" "jun"} "labels" [{"name" "bug"}]}
+                          {"number" 2 "title" "a pull request" "state" "open"
+                           "user" {"login" "jun"} "labels" []
+                           "pull_request" {"url" "…"}}]}))
+          result (invoke/call registry "github_list_issues" {"owner" "o" "repo" "r"}
+                              {:http http :tokens tokens})]
+      (is (= 1 (count (:issues result))))
+      (is (= "a real issue" (:title (first (:issues result)))))
+      (is (= ["bug"] (:labels (first (:issues result))))))))
+
+(deftest pull-requests-carry-their-branches
+  (let [http (ports/http-fn
+              (fn [_] {:connector.http/status 200
+                       :connector.http/body
+                       [{"number" 7 "title" "wire it up" "state" "open" "draft" true
+                         "user" {"login" "jun"} "labels" []
+                         "base" {"ref" "main"} "head" {"ref" "agent/x"}}]}))
+        [pr] (:pull-requests (invoke/call registry "github_list_pull_requests"
+                                          {"owner" "o" "repo" "r"}
+                                          {:http http :tokens tokens}))]
+    (is (= "main" (:base pr)))
+    (is (= "agent/x" (:head pr)))
+    (is (true? (:draft? pr)))))
+
+(deftest a-404-is-an-error-not-an-empty-repository
+  (let [http (ports/http-fn (fn [_] {:connector.http/status 404
+                                     :connector.http/body {"message" "Not Found"}}))
+        result (invoke/call registry "github_list_issues" {"owner" "o" "repo" "r"}
+                            {:http http :tokens tokens})]
+    (is (true? (:connector/error result)))
+    (is (= 404 (:connector.http/status result)))
+    (is (nil? (:issues result)) "normalizing it would produce {:issues []}")))
+
+(deftest the-request-carries-no-credential
+  (is (nil? (get-in (invoke/request-for registry "github_get_authenticated_user" {})
+                    [:connector.http/headers "authorization"]))))
+
+(deftest every-tool-declares-scopes-and-an-effect
+  (doseq [t (m/tools c/descriptor)]
+    (is (seq (:connector/scopes t)))
+    (is (#{:read :write} (:connector/effect t)))
+    (is (str/starts-with? (:connector/name t) "github_"))))
+
+(deftest connector-edn-matches-the-descriptor
+  (let [committed (edn/read-string
+                   #?(:clj (slurp "connector.edn")
+                      :cljs (.readFileSync (js/require "fs") "connector.edn" "utf8")))]
+    (is (= (decl/declaration c/provider
+                             {:namespace "github.connector"
+                              :var "provider"
+                              :authority "90-docs/adr/2608097000-connector-plane-one-repo-per-connector.edn"})
+           committed)
+        "run: nbb --classpath \"src:../connector/src\" emit-connector-edn.cljs")))
