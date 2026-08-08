@@ -1,0 +1,34 @@
+{:schema "kotoba.connector.repository.v1",
+ :connector/docs-url "https://api.slack.com/methods",
+ :connector/origin-domain "slack.com",
+ :connector/base-scopes [],
+ :connector/id "com.slack",
+ :connector/var "provider",
+ :connector/scopes
+ ["channels:history" "channels:read" "chat:write" "users:read"],
+ :authority
+ "90-docs/adr/2608097000-connector-plane-one-repo-per-connector.edn",
+ :connector/namespace "slack.connector",
+ :connector/auth-kind :oauth2,
+ :connector/auth-pkce? false,
+ :connector/summary
+ "Read channels and history, post messages, look up users.",
+ :connector/name "Slack",
+ :connector/client-id-env "SLACK_CLIENT_ID",
+ :connector/tools
+ [{:connector/name "slack_channel_history",
+   :connector/effect :read,
+   :connector/scopes ["channels:history"],
+   :connector/description "Recent messages in a channel."}
+  {:connector/name "slack_list_channels",
+   :connector/effect :read,
+   :connector/scopes ["channels:read"],
+   :connector/description "Public channels in the workspace."}
+  {:connector/name "slack_list_users",
+   :connector/effect :read,
+   :connector/scopes ["users:read"],
+   :connector/description "Members of the workspace."}
+  {:connector/name "slack_post_message",
+   :connector/effect :write,
+   :connector/scopes ["chat:write"],
+   :connector/description "Post a message to a channel."}]}
