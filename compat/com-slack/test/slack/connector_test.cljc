@@ -1,0 +1,103 @@
+(ns slack.connector-test
+  (:require [clojure.edn :as edn]
+            [clojure.string :as str]
+            [clojure.test :refer [deftest is testing]]
+            [connector.declare :as decl]
+            [connector.invoke :as invoke]
+            [connector.model :as m]
+            [connector.ports :as ports]
+            [connector.registry :as reg]
+            [connector.validate :as v]
+            [slack.connector :as c]))
+
+(def registry (reg/registry [c/provider]))
+(def tokens (ports/static-tokens {"com.slack" "xoxb-tok"}))
+
+(defn- responding [body]
+  (ports/http-fn (fn [_] {:connector.http/status 200 :connector.http/body body})))
+
+(deftest descriptor-is-valid-and-correctly-named
+  (is (empty? (v/errors c/descriptor)))
+  (is (true? (v/name-conformant? c/descriptor "com-slack"))))
+
+(deftest ok-false-arrives-as-a-failure-not-an-empty-workspace
+  (testing "Slack answers HTTP 200 with ok:false, so the status check cannot see it"
+    (let [result (invoke/call registry "slack_list_channels" {}
+                              {:http (responding {"ok" false
+                                                  "error" "missing_scope"
+                                                  "needed" "channels:read"
+                                                  "provided" "chat:write"})
+                               :tokens tokens})]
+      (is (true? (:connector/error result)))
+      (is (= :slack/not-ok (:connector/code result)))
+      (is (= "missing_scope" (:slack/error result)))
+      (is (= "channels:read" (:slack/needed result))
+          "the scope Slack says is missing is the one an operator has to grant")
+      (is (nil? (:channels result))
+          "without this the caller sees no channels and concludes there are none"))))
+
+(deftest a-successful-call-normalizes
+  (let [result (invoke/call registry "slack_list_channels" {}
+                            {:http (responding
+                                    {"ok" true
+                                     "channels" [{"id" "C1" "name" "general" "is_member" true
+                                                  "topic" {"value" "everything"} "num_members" 42}]
+                                     "response_metadata" {"next_cursor" "cur2"}})
+                             :tokens tokens})]
+    (is (= "general" (:name (first (:channels result)))))
+    (is (= 42 (:members (first (:channels result)))))
+    (is (= "cur2" (:next-cursor result)))))
+
+(deftest posting-does-not-require-read-scopes
+  (let [scopes (m/scopes-for c/descriptor ["slack_post_message"])]
+    (is (= ["chat:write"] scopes))
+    (is (not (some #{c/channels-history-scope} scopes))
+        "a notifier must not be able to read the channel it posts to")))
+
+(deftest reading-history-is-a-separate-grant-from-listing-channels
+  (is (= [c/channels-read-scope]
+         (:connector/scopes (m/tool c/descriptor "slack_list_channels"))))
+  (is (= [c/channels-history-scope]
+         (:connector/scopes (m/tool c/descriptor "slack_channel_history")))))
+
+(deftest read-only-leaves-no-way-to-post
+  (let [d (m/read-only c/descriptor)]
+    (is (nil? (m/tool d "slack_post_message")))
+    (is (not (some #{c/chat-write-scope} (m/scopes d))))))
+
+(deftest archived-channels-are-excluded-unless-asked-for
+  (is (= "true" (get-in (invoke/request-for registry "slack_list_channels" {})
+                        [:connector.http/query "exclude_archived"])))
+  (is (= "false" (get-in (invoke/request-for registry "slack_list_channels"
+                                             {"exclude_archived" false})
+                         [:connector.http/query "exclude_archived"]))))
+
+(deftest post-message-omits-an-absent-thread
+  (let [req (invoke/request-for registry "slack_post_message"
+                                {"channel" "C1" "text" "hi"})]
+    (is (= {"channel" "C1" "text" "hi"} (:connector.http/body req))
+        "thread_ts: null would be a reply to nothing")))
+
+(deftest pkce-is-declared-false
+  (is (false? (get-in c/descriptor [:connector/auth :connector.auth/pkce?]))))
+
+(deftest the-request-carries-no-credential
+  (is (nil? (get-in (invoke/request-for registry "slack_list_channels" {})
+                    [:connector.http/headers "authorization"]))))
+
+(deftest every-tool-declares-scopes-and-an-effect
+  (doseq [t (m/tools c/descriptor)]
+    (is (seq (:connector/scopes t)))
+    (is (#{:read :write} (:connector/effect t)))
+    (is (str/starts-with? (:connector/name t) "slack_"))))
+
+(deftest connector-edn-matches-the-descriptor
+  (let [committed (edn/read-string
+                   #?(:clj (slurp "connector.edn")
+                      :cljs (.readFileSync (js/require "fs") "connector.edn" "utf8")))]
+    (is (= (decl/declaration c/provider
+                             {:namespace "slack.connector"
+                              :var "provider"
+                              :authority "90-docs/adr/2608097000-connector-plane-one-repo-per-connector.edn"})
+           committed)
+        "run: nbb --classpath \"src:../connector/src\" emit-connector-edn.cljs")))
