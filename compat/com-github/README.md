@@ -28,6 +28,35 @@ Committed public organization profiles live under `resources/organizations/`.
 The `gftdcojp` profile uses business domain `gftd.co.jp` and operator contact
 `jun@gftd.group`; credentials and tokens never belong in these profiles.
 
+## Connector
+
+`github.connector` exposes this client as **tools with an OAuth profile and
+per-tool scopes**, so an agent can be granted part of GitHub rather than all of
+it — the connector plane of ADR-2608097000. `connector.edn` declares the
+contract without loading any Clojure.
+
+| | |
+|---|---|
+| `github.main` | the clean-room actor — GitHub's API implemented *here* |
+| `github.workflow` | a client that normalizes one repository into a snapshot |
+| `github.connector` | a client exposed as tools, grantable scope by scope |
+
+`workflow` and `connector` are both clients and deliberately not layered on
+each other: `workflow` answers one fixed question by fetching a plan, a
+connector answers whatever the tool was called with. They share the origin and
+nothing else.
+
+Seven tools; only `github_create_issue` writes, and only it needs `repo` write
+access to be exercised. `github_get_authenticated_user` asks for `read:user`
+alone, so a deployment that only identifies the account never holds `repo`.
+GitHub's OAuth Apps do not verify PKCE and the descriptor says so rather than
+sending a challenge nobody checks.
+
+```sh
+nbb --classpath "src:test:../connector/src" run-connector-tests.cljs   # 13 tests, 50 assertions
+nbb --classpath "src:../connector/src" emit-connector-edn.cljs         # regenerate connector.edn
+```
+
 ## Architecture
 - **State:** Backed by Datomic for immutable, time-travel-capable record keeping.
 - **Schema:** Defined in `schema/github.kotoba`.
