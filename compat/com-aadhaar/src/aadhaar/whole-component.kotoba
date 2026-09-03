@@ -1,0 +1,162 @@
+(ns aadhaar.whole-component
+  "Q9 whole-component build attempt for the com-aadhaar L4 compatibility
+  component (a full requalification of aadhaar.main's public surface as a
+  single Kotoba component entry, per lang/q9-migration.edn v3
+  :whole-component-build-contract).
+
+  Scope: EVERY pure public export of src/aadhaar/main.cljc is represented
+  here un-shrunk. Native TCB members (now, new-id/rand-hex16, fresh-store,
+  *store*, persist!, retract!) require declared capability imports for
+  clock/uuid/mutable-store and are noted in migration-record.edn; they are
+  NOT silently dropped (:ambient-host-fallback-forbidden). String and
+  collection operations appear exactly as the oracle uses them — if the
+  admitted subset has no lowering, the gate must fail closed and the
+  migration is recorded as blocked."
+  (:export [ns-prefix tier default-limit max-limit entity-specs entities
+            routes page-limit as-int as-float as-bool coerce-field
+            require-fields reject-unknown apply-filters paginate expand
+            handle-create handle-list handle-get handle-update handle-delete
+            healthz]))
+
+(def ns-prefix "aadhaar")
+(def tier "L4")
+(def default-limit 20)
+(def max-limit 100)
+
+(def entity-specs
+  [{:entity "Identity" :plural "identities" :id-prefix "aadhaar_ide"
+    :fields [:externalId :jurisdiction :verified]
+    :required [:jurisdiction :verified]
+    :coerce {:verified :bool} :refs {}}
+   {:entity "Credential" :plural "credentials" :id-prefix "aadhaar_cre"
+    :fields [:identityId :type :issuer :issuedAt]
+    :required [:type :issuer]
+    :coerce {} :refs {:identityId "Identity"}}
+   {:entity "Consent" :plural "consents" :id-prefix "aadhaar_con"
+    :fields [:identityId :purpose :granted :expiresAt]
+    :required [:purpose :granted]
+    :coerce {:granted :bool} :refs {:identityId "Identity"}}
+   {:entity "Transaction" :plural "transactions" :id-prefix "aadhaar_tra"
+    :fields [:identityId :type :amount :status]
+    :required [:type :amount]
+    :coerce {:amount :float} :refs {:identityId "Identity"}}
+   {:entity "Document" :plural "documents" :id-prefix "aadhaar_doc"
+    :fields [:identityId :type :contentRef]
+    :required [:type]
+    :coerce {} :refs {:identityId "Identity"}}
+   {:entity "VerificationRequest" :plural "verificationrequests"
+    :id-prefix "aadhaar_ver"
+    :fields [:identityId :verifier :status]
+    :required [:verifier :status]
+    :coerce {} :refs {:identityId "Identity"}}])
+
+(def entities (mapv :entity entity-specs))
+
+(def routes
+  (vec (mapcat (fn [{:keys [plural entity]}]
+                 [{:method "POST" :path (str "/v1/" plural)
+                   :op (str "create " entity) :entity entity}
+                  {:method "GET" :path (str "/v1/" plural)
+                   :op (str "list " entity) :entity entity}
+                  {:method "GET" :path (str "/v1/" plural "/{id}")
+                   :op (str "get " entity) :entity entity}
+                  {:method "PATCH" :path (str "/v1/" plural "/{id}")
+                   :op (str "update " entity) :entity entity}
+                  {:method "DELETE" :path (str "/v1/" plural "/{id}")
+                   :op (str "delete " entity) :entity entity}])
+               entity-specs)))
+
+(defn page-limit [requested]
+  (if (pos? requested)
+    (if (> requested max-limit) max-limit requested)
+    default-limit))
+
+(defn as-int [v]
+  (if (number? v) (long v) (if (string? v) (long (parse-long (trim v))) 0)))
+
+(defn as-float [v]
+  (if (number? v) (double v) (if (string? v) (parse-double (trim v)) 0.0)))
+
+(defn as-bool [v]
+  (if (nil? v)
+    false
+    (contains? #{"1" "true" "yes" "on" true}
+               (if (string? v) (lower-case v) v))))
+
+(defn coerce-field [kind v]
+  (case kind :int (as-int v) :float (as-float v) :bool (as-bool v) v))
+
+(defn require-fields [data fields]
+  (let [missing (remove #(let [v (get data %)] (and (some? v) (not= v ""))) fields)]
+    (if (seq missing)
+      {:error {:message (str "Missing required fields: " (str/join ", " (map name missing)))
+               :type "invalid_request_error"}}
+      nil)))
+
+(defn reject-unknown [data allowed]
+  (let [extra (remove #(contains? allowed %) (keys data))]
+    (if (seq extra)
+      {:error {:message (str "Unknown fields: " (str/join ", " (map name extra)))
+               :type "invalid_request_error"}}
+      nil)))
+
+(defn apply-filters [rows params fields]
+  (reduce (fn [out f]
+            (let [want (get params f)]
+              (if (and (some? want) (not= want ""))
+                (filterv #(= (str (get % f)) (str want)) out)
+                out)))
+          rows fields))
+
+(defn paginate [rows params]
+  (let [limit (page-limit (as-int (get params :limit)))
+        page (vec (take limit rows))]
+    [page (> (count rows) limit)]))
+
+(defn expand [rec params refs lookup]
+  (reduce (fn [r [field ent]]
+            (if (and (contains? params field) (get r field))
+              (assoc r field (lookup ent (get r field)))
+              r))
+          rec refs))
+
+(defn spec-for [entity]
+  (first (filterv (fn [s] (= (:entity s) entity)) entity-specs)))
+
+(defn not-found []
+  [{:error {:message "Not found" :type "not_found"}} 404])
+
+(defn handle-create [store entity data new-id now]
+  (let [{:keys [fields required coerce id-prefix]} (spec-for entity)]
+    (or (some-> (reject-unknown data fields) (vector 400))
+        (some-> (require-fields data required) (vector 400))
+        (let [base {:id (new-id id-prefix)}
+              rec (reduce (fn [m f] (assoc m f (coerce-field (get coerce f) (get data f)))) base fields)
+              rec (assoc rec :createdAt (now) :updatedAt (now))]
+          [(assoc (persist! store entity rec) :store store) 201]))))
+
+(defn handle-list [store entity params]
+  (let [{:keys [fields]} (spec-for entity)
+        rows (apply-filters (query store entity) params fields)
+        [page has-more] (paginate rows params)]
+    [{:object "list" :data page :has_more has-more :count (count page) :total (count rows)} 200]))
+
+(defn handle-get [store entity id params]
+  (let [{:keys [refs]} (spec-for entity) rows (query store entity id)]
+    (if (empty? rows) (not-found) [(expand store (first rows) params refs) 200])))
+
+(defn handle-update [store entity id data now]
+  (let [{:keys [fields coerce]} (spec-for entity) rows (query store entity id)]
+    (if (empty? rows)
+      (not-found)
+      (or (some-> (reject-unknown data fields) (vector 400))
+          (let [rec (reduce-kv (fn [m k v] (if (= k :id) m (assoc m k (coerce-field (get coerce k) v))))
+                               (first rows) data)
+                rec (assoc rec :updatedAt (now))]
+            [(assoc (persist! store entity rec) :store store) 200])))))
+
+(defn handle-delete [store entity id]
+  (if (empty? (query store entity id)) (not-found) [{:id id :deleted true} 200]))
+
+(defn healthz []
+  [{:status "ok" :actor "aadhaar-compat" :tier tier :entities entities} 200])
