@@ -1,0 +1,101 @@
+{:kotoba.lang.q9.migration-record/version 1
+ :repository "orgs/kotoba-lang/com-aadhaar"
+ :as-of "2026-09-03"
+ :wave :wave-1
+ :disposition :blocked
+ :record-author "jvm-dep-migrator (Hermes profile)"
+
+ :baseline-paths
+ ["src/aadhaar/main.cljc"
+  "src/aadhaar/page_limit.kotoba"
+  "schema/aadhaar.kotoba-schema"]
+
+ :classifications
+ {"src/aadhaar/main.cljc" :split-required
+  "src/aadhaar/page_limit.kotoba" :kotoba-only
+  "schema/aadhaar.kotoba-schema" :generated}
+
+ :component-boundary
+ "Attempted whole-component entry src/aadhaar/whole-component.kotoba covers
+  every pure public export of aadhaar.main un-shrunk (ns-prefix, tier,
+  default-limit, max-limit, entity-specs, entities, routes, page-limit,
+  as-int, as-float, as-bool, coerce-field, require-fields, reject-unknown,
+  apply-filters, paginate, expand, spec-for, handle-create/list/get/update/
+  delete, healthz). Native TCB members (now, new-id/rand-hex16, fresh-store,
+  *store*, persist!, retract!) require declared capability imports
+  (clock/uuid/mutable-store); no ambient fallback was used."
+
+ :path-mapping
+ {"aadhaar.main" "aadhaar.whole-component (attempted, blocked)"}
+
+ :builds
+ {:kotoba-cli-check
+  {:command "kotoba check --safe src/aadhaar/whole-component.kotoba"
+   :status :fail-closed
+   :result :runtime/rejected
+   :evidence "migration-evidence/gates-20260903.txt"}
+  :kotoba-cli-build
+  {:command "kotoba compile src/aadhaar/whole-component.kotoba --target wasm --output target/wc.wasm"
+   :status :fail-closed
+   :message "constant value must be closed bounded integer/string/keyword/boolean/nil/vector/map or non-empty keyword-set data"
+   :phase :subset}
+  :package-build
+  {:command "kotoba rad build --project . --profile release"
+   :status :fail-closed
+   :result :package/lock-not-readable
+   :note "repo has no kotoba.lock.edn; gate refused before source evaluation"}
+  :amu-check
+  {:command "amu check src/aadhaar/whole-component.kotoba --jvm-free"
+   :status :fail-closed
+   :code :kotoba/source-read-failed}
+  :amu-compile
+  {:command "amu compile ... --target wasm --jvm-free"
+   :status :fail-closed
+   :message "this Amu command or target has no JVM-free implementation; refusing to invoke the Clojure/JVM compatibility path"
+   :note "wasm32 target reached the source reader and failed on the same source"}}
+
+ :language-subset-gaps-measured
+ "Measured 2026-09-03 against kotoba-lang/amu main 57ba0ee0, amu check
+  --jvm-free. Each cell = one minimal probe, one verdict:
+  PASS: (get m :k) (get m :k 0) (assoc m :k 1) {:a x} [x x] (case x 1 2 0)
+        (if b 1 2) (pos? x) (count ... NO) — see below.
+  REJECTED (:subset-reject / :source-read-failed):
+    string literals anywhere (def or fn body); (str a b) / (str a) / (str x \"y\");
+    parse-long / lower-case / trim; (count v); (reduce f 0 xs); (mapv f xs);
+    (filterv f xs); (remove f xs); (min a b); (seq xs); (some-> x f);
+    (keys m); (reduce-kv f 0 m); (long x); #() fn literals (read failure);
+    (:k m) keyword projection (:record-projection-unresolved);
+    (contains? m :k) on maps (:map-presence-receiver);
+    (def d [{:a 1} {:b 2}]) vector-of-maps top-level constant.
+  PASS: (get m :k) (get m :k 0) (assoc m :k 1) (case) (if) (pos?) (empty?)
+        (first) (take 2 xs) map/vector literals, int arithmetic."
+
+ :blocked-reason
+ "The whole public surface of aadhaar.main cannot be expressed in the
+  admitted kotoba subset exposed by amu --jvm-free at amu@57ba0ee0: every
+  route spec, error message, id prefix, filter comparison and entity name is
+  a string; handlers fold with reduce/mapv/filterv/reduce-kv/keys. Shrinking
+  the component to the int-only decision core is forbidden
+  (:decision-only-extraction-forbidden), so the whole-component migration is
+  recorded as :blocked, not :partial."
+
+ :consumers
+ {:status :unchanged
+  :note "no consumer cutover attempted; oracle main.cljc retained"}
+
+ :verification
+ {:oracle-parity :not-reached
+  :jvm-free-process-proof
+  "amu compile --target wasm --jvm-free failed closed with an explicit
+   JVM-compatibility-path refusal; no java/clojure process was invoked by
+   any gate in this record."}
+
+ :rollback
+ {:status :not-applicable
+  :note "nothing landed on main; working branch bot/migrate-com-aadhaar-20260903 only"}
+
+ :residual-risk
+ "Blocked on upstream language subset (string lowering, collection folds,
+  fn literals, keyword projection) and on declared capability imports for
+  clock/uuid/mutable-store. Re-run these probes after any amu frontend
+  landing that extends the admitted subset."}
