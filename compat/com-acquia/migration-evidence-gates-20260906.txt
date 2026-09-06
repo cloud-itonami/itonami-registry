@@ -1,0 +1,15 @@
+q9 wave-1 pilot slice 2 evidence (com-acquia, measured 2026-09-06)
+kotoba -M check src/acquia_compat/paginate.kotoba
+{:ok true, :format :kotoba.check/v1, :effects #{}, :exports [as-int clamp-limit has-more? test-agrees main], :admission {:admitted? true, :abac #:abac{:allowed? true}}}
+kotoba -M test src/acquia_compat/paginate.kotoba
+kotoba test: 3/3 passed tests=[test-agrees] targets=[:jvm-kir :js :wasm]
+kotoba -M compile src/acquia_compat/paginate.kotoba --target wasm32
+{:ok true, :target :wasm32-kotoba-v1, :definitions-recompiled 5, :kotoba.compile/inputs :single-file}
+amu check src/acquia_compat/paginate.kotoba --jvm-free
+{:ok true, :format :kotoba.check/v1, :effects #{}, :exports [as-int clamp-limit has-more? test-agrees main], :admission {:admitted? true}}
+amu compile src/acquia_compat/paginate.kotoba --target wasm32 --jvm-free
+{:ok true, :target :wasm32-kotoba-v1, :definitions-recompiled 5}
+clojure -M:test
+Ran 8 tests containing 104 assertions. 0 failures, 0 errors.
+nbb --classpath src:test run-tests.cljs
+nbb: 6 tests, 94 passed, 0 failed, 0 errors
