@@ -34,6 +34,26 @@
     (min requested max-limit)
     default-limit))
 
+(defn as-int-kernel
+  "Positive-int coercion of an untrusted page-size input (int in, int out).
+  Kotoba twin of as-int in paginate.kotoba; the string/parse half of
+  eighth-wall.main/as-int stays here as the retained oracle."
+  [v]
+  (if (pos? v) v 0))
+
+(defn clamp-limit
+  "Kotoba twin of clamp-limit in paginate.kotoba."
+  [requested]
+  (if (pos? requested)
+    (min requested max-limit)
+    default-limit))
+
+(defn has-more-kernel?
+  "Kotoba twin of has-more? in paginate.kotoba. Returns the same decision as
+  paginate's `has_more` for a remaining count and applied limit."
+  [remaining limit]
+  (> remaining limit))
+
 ;; --- schema-derived entity specs (the single source the handlers fold over) ---
 (def entity-specs
   [{:entity "Anchor"  :plural "anchors"  :id-prefix "8thwall_anc"

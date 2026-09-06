@@ -1,11 +1,19 @@
 {:kotoba.q9.pilot/version 1
- :source "src/eighth_wall/page_limit.kotoba"
- :oracle {:namespace eighth-wall.main
-          :function page-limit
-          :cases [-1 0 1 20 250]
-          :expected [20 20 1 20 100]}
+ :sources ["src/eighth_wall/page_limit.kotoba"
+           "src/eighth_wall/paginate.kotoba"]
+ :oracles [{:namespace eighth-wall.main
+            :function page-limit
+            :source "src/eighth_wall/page_limit.kotoba"
+            :cases [-1 0 1 20 250]
+            :expected [20 20 1 20 100]}
+           {:namespace eighth-wall.main
+            :functions [as-int-kernel clamp-limit has-more-kernel?]
+            :source "src/eighth_wall/paginate.kotoba"
+            :main-expression [has-more-kernel? 101 [clamp-limit [as-int-kernel 100]]]
+            :expected true}]
  :effects #{}
  :capabilities #{}
+ :consumer-cutover false
  :host-boundary
  {:retained-cljc ["src/eighth_wall/main.cljc"]
   :owns [:clock :uuid :mutable-crud-state :exceptions :maps :strings :floating-point]}
