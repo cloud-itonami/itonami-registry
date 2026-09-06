@@ -16,7 +16,7 @@
 
   Measured 2026-08-20 -- the two runtimes agree on the shared namespace:
 
-    clojure -M:test   ->  Ran 7 tests containing 86 assertions
+    clojure -M:test   ->  Ran 8 tests containing 92 assertions
     this runner       ->      6 tests containing 82 assertions
 
   The difference is exactly 1 deftest(s) and 4 assertions, which is the
