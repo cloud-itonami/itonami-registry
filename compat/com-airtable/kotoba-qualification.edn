@@ -1,15 +1,22 @@
 {:kotoba.q9.pilot/version 1
- :source "src/airtable/page_limit.kotoba"
- :oracle {:namespace airtable.main
-          :function page-limit
-          :cases [-1 0 1 20 250]
-          :expected [20 20 1 20 100]}
+ :sources ["src/airtable/page_limit.kotoba"
+           "src/airtable/paginate.kotoba"]
+ :oracles [{:namespace airtable.main
+            :function page-limit
+            :source "src/airtable/page_limit.kotoba"
+            :cases [-1 0 1 20 250]
+            :expected [20 20 1 20 100]}
+           {:namespace airtable.main
+            :functions [as-int-kernel clamp-limit has-more-kernel?]
+            :source "src/airtable/paginate.kotoba"
+            :main-expression [has-more-kernel? 101 [clamp-limit [as-int-kernel 100]]]
+            :expected true}]
  :effects #{}
  :capabilities #{}
+ :consumer-cutover false
  :host-boundary
  {:retained-cljc ["src/airtable/main.cljc"]
   :owns [:clock :uuid :mutable-crud-state :exceptions :maps :strings :floating-point]}
  :rollback
  {:oracle-retained true
-  :consumer-cutover false
   :action :remove-pilot-source-and-continue-using-cljc-oracle}}

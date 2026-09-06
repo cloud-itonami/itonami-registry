@@ -1,0 +1,24 @@
+q9 wave-1 pilot slice 2: paginate decision kernel (com-airtable)
+
+kotoba -M check src/airtable/paginate.kotoba
+{:ok true, :exports [as-int clamp-limit has-more? test-paginate-kernel main], :effects #{}}
+kotoba -M check src/airtable/page_limit.kotoba
+{:ok true, :exports [page-limit test-page-limit main], :effects #{}}
+
+kotoba -M test src/airtable/paginate.kotoba --json
+{:ok true, :tests [test-paginate-kernel], :targets [:jvm-kir :js :wasm], :failed []}
+kotoba -M test src/airtable/page_limit.kotoba --json
+{:ok true, :tests [test-page-limit], :targets [:jvm-kir :js :wasm], :failed []}
+
+kotoba -M compile src/airtable/paginate.kotoba --target wasm32
+{:ok true, :target :wasm32-kotoba-v1, :definitions-recompiled 5}
+kotoba -M compile src/airtable/page_limit.kotoba --target wasm32
+{:ok true, :target :wasm32-kotoba-v1, :definitions-recompiled 3}
+
+amu check src/airtable/paginate.kotoba --jvm-free
+{:ok true, :admission {:admitted? true, :abac {:allowed? true}}}
+amu check src/airtable/page_limit.kotoba --jvm-free
+{:ok true, :admission {:admitted? true, :abac {:allowed? true}}}
+
+clojure -M:test
+Ran 9 tests containing 92 assertions. 0 failures, 0 errors.
