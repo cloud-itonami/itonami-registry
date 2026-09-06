@@ -1,15 +1,22 @@
 {:kotoba.q9.pilot/version 1
- :source "src/ads_b_aviation/page_limit.kotoba"
- :oracle {:namespace ads_b_aviation.main
-          :function page-limit
-          :cases [-1 0 1 20 250]
-          :expected [20 20 1 20 100]}
+ :sources ["src/ads_b_aviation/page_limit.kotoba"
+           "src/ads_b_aviation/paginate.kotoba"]
+ :oracles [{:namespace ads_b_aviation.main
+            :function page-limit
+            :source "src/ads_b_aviation/page_limit.kotoba"
+            :cases [-1 0 1 20 250]
+            :expected [20 20 1 20 100]}
+           {:namespace ads_b_aviation.main
+            :functions [as-int-kernel clamp-limit has-more-kernel?]
+            :source "src/ads_b_aviation/paginate.kotoba"
+            :main-expression [has-more-kernel? 101 [clamp-limit [as-int-kernel 100]]]
+            :expected true}]
  :effects #{}
  :capabilities #{}
+ :consumer-cutover false
  :host-boundary
  {:retained-cljc ["src/ads_b_aviation/main.cljc"]
   :owns [:clock :uuid :mutable-crud-state :exceptions :maps :strings :floating-point]}
  :rollback
  {:oracle-retained true
-  :consumer-cutover false
   :action :remove-pilot-source-and-continue-using-cljc-oracle}}
