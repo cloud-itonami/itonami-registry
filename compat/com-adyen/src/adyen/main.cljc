@@ -28,6 +28,16 @@
     (min requested max-limit)
     default-limit))
 
+;; --- Q9 wave-1 oracle twins for src/adyen/paginate.kotoba (pagination
+;; decision kernel). The kotoba file is authoritative for this pure-int
+;; surface once merged; these twins stay so the qualification test can
+;; pin parity. ---
+(defn as-int-kernel [v]
+  (if (pos? v) v 0))
+
+(defn has-more-kernel? [remaining limit]
+  (> remaining limit))
+
 ;; --- schema-derived entity specs (the single source the handlers fold over) ---
 (def entity-specs
   [{:entity "Payment"           :plural "payments"           :id-prefix "adyen_pay"
