@@ -7,20 +7,21 @@
   test namespaces:
 
     adobe-compat.main-test  (.cljc) -- portable, listed below
-    adobe-compat.kotoba-qualification-test  (.clj) -- JVM-only, NOT listed
+    adobe-compat.kotoba-qualification-test and
+    adobe-compat.kotoba-paginate-qualification-test  (.clj) -- JVM-only, NOT listed
 
-  The qualification namespace requires kotoba.compiler.core, kotoba.runtime
-  and kotoba.wasm-exec to compile src/adobe_compat/page_limit.kotoba and execute it on
-  two backends. That toolchain is JVM-only, so nbb cannot run it and must
+  The qualification namespaces require kotoba.compiler.core, kotoba.runtime
+  and kotoba.wasm-exec to compile src/adobe_compat/page_limit.kotoba and
+  src/adobe_compat/paginate.kotoba and execute them on two backends. That toolchain is JVM-only, so nbb cannot run it and must
   not pretend to.
 
   Measured 2026-08-20 -- the two runtimes agree on the shared namespace:
 
-    clojure -M:test   ->  Ran 12 tests containing 60 assertions
+    clojure -M:test   ->  Ran 13 tests containing 66 assertions
     this runner       ->      11 tests containing 56 assertions
 
-  The difference is exactly 1 deftest(s) and 4 assertions, which is the
-  whole of the qualification namespace. If that arithmetic stops holding,
+  The difference is exactly 2 deftest(s) and 10 assertions, which is the
+  whole of the two qualification namespaces (page_limit and paginate). If that arithmetic stops holding,
   one of the two runners has silently stopped running something.
 
   Every namespace is listed explicitly on purpose: clojure -M:test finds
