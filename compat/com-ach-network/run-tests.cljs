@@ -16,12 +16,13 @@
 
   Measured 2026-08-20 -- the two runtimes agree on the shared namespace:
 
-    clojure -M:test   ->  Ran 7 tests containing 96 assertions
+    clojure -M:test   ->  Ran 8 tests containing 102 assertions
     this runner       ->      6 tests containing 92 assertions
 
-  The difference is exactly 1 deftest(s) and 4 assertions, which is the
-  whole of the qualification namespace. If that arithmetic stops holding,
-  one of the two runners has silently stopped running something.
+  The difference is exactly 2 deftest(s) and 10 assertions, which is the
+  whole of the two qualification namespaces (page_limit and paginate).
+  If that arithmetic stops holding, one of the two runners has silently
+  stopped running something.
 
   Every namespace is listed explicitly on purpose: clojure -M:test finds
   namespaces by scanning the test directory, but a cljs runner does not, so
