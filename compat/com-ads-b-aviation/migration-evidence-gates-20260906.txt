@@ -1,0 +1,16 @@
+q9 wave-1 pilot slice 2: paginate decision kernel (kotoba-lang/com-ads-b-aviation)
+base e39be4a, branch agent/kotoba-migration, 2026-09-06
+
+kotoba -M check src/ads_b_aviation/paginate.kotoba
+  -> {:ok true, :exports [as-int clamp-limit has-more? test-paginate-kernel main], :effects #{}}
+kotoba -M test src/ads_b_aviation/paginate.kotoba
+  -> kotoba test: 3/3 passed tests=[test-paginate-kernel] targets=[:jvm-kir :js :wasm]
+kotoba -M compile src/ads_b_aviation/paginate.kotoba --target wasm32
+  -> {:ok true, :target :wasm32-kotoba-v1, :definitions-recompiled 4}
+amu check src/ads_b_aviation/paginate.kotoba --jvm-free
+  -> {:ok true, :admitted? true, :minimal-policy {:allow #{}}, :unused-grants #{}}
+amu compile src/ads_b_aviation/paginate.kotoba --target wasm32 --jvm-free
+  -> {:ok true, :target :wasm32-kotoba-v1, :definitions-recompiled 4}
+clojure -M:test
+  -> Ran 15 tests containing 66 assertions. 0 failures, 0 errors.
+.wasm artifacts not committed.

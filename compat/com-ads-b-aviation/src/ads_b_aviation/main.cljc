@@ -28,6 +28,26 @@
     (min requested max-limit)
     default-limit))
 
+;; --- retained oracle kernels for src/ads_b_aviation/paginate.kotoba ---
+;; The pure integer decision surface of `paginate`, kept here as the CLJC
+;; oracle; the .kotoba slice is the migrated twin (Q9 wave-1 pilot, slice 2).
+(defn as-int-kernel
+  "Positive-int coercion of an untrusted page-size input; non-positive -> 0."
+  [v]
+  (if (pos? v) v 0))
+
+(defn clamp-limit-kernel
+  "Clamp a coerced page size into [1, max-limit]; 0 (absent) -> default-limit."
+  [requested]
+  (if (pos? requested)
+    (min requested max-limit)
+    default-limit))
+
+(defn has-more-kernel?
+  "The `has_more` decision of handle-list."
+  [remaining limit]
+  (> remaining limit))
+
 ;; --- schema-derived entity specs (the single source the handlers fold over) ---
 (def entity-specs
   [{:entity "Object"      :plural "objects"      :id-prefix "adsbavia_obj"
