@@ -28,6 +28,26 @@
     (min requested max-limit)
     default-limit))
 
+;; --- Q9 wave-1 oracle twins for src/airbyte/paginate.kotoba (pagination
+;; decision kernel). The kotoba file is authoritative for this pure-int
+;; surface once merged; these twins stay so the qualification test can
+;; pin parity. ---
+(defn as-int-kernel [v]
+  (if (pos? v) v 0))
+
+(defn clamp-limit
+  "Kotoba twin of clamp-limit in paginate.kotoba."
+  [requested]
+  (if (pos? requested)
+    (min requested max-limit)
+    default-limit))
+
+(defn has-more-kernel?
+  "Kotoba twin of has-more? in paginate.kotoba. Returns the same decision
+  as paginate's `has_more` for a remaining count and applied limit."
+  [remaining limit]
+  (> remaining limit))
+
 ;; --- schema-derived entity specs (the single source the handlers fold over) ---
 (def entity-specs
   [{:entity "Connector" :plural "connectors" :id-prefix "airbyte_con"
