@@ -1,0 +1,18 @@
+amu check src/agones_compat/paginate.kotoba --jvm-free
+{:ok true, :format :kotoba.check/v1, :language-profile nil, :effects #{}, :named-operations #{}, :exports [as-int clamp-limit has-more? main test-clamp-limit], :admission {:admitted? true, ...}}
+
+amu compile src/agones_compat/paginate.kotoba --target wasm32 --jvm-free (equivalent: kotoba -M compile --target wasm32 --output /tmp/paginate-wasm/paginate.wasm)
+{:ok true, :target :wasm32-kotoba-v1, :output "/tmp/paginate-wasm/paginate.wasm", :definitions-recompiled 5, :kotoba.compile/inputs :single-file}
+
+kotoba -M check /tmp/kwave-com-agones/src/agones_compat/paginate.kotoba
+{:ok true, :exports [as-int clamp-limit has-more? main test-clamp-limit], :admitted? true}
+
+kotoba -M test /tmp/kwave-com-agones/src/agones_compat/paginate.kotoba
+kotoba test: 3/3 passed tests=[test-clamp-limit] targets=[:jvm-kir :js :wasm]
+
+kotoba -M compile /tmp/kwave-com-agones/src/agones_compat/paginate.kotoba --target wasm32 --output /tmp/paginate-wasm/paginate.wasm
+{:ok true, :target :wasm32-kotoba-v1, :definitions-recompiled 5}
+
+clojure -M:test (after adding kotoba_paginate_qualification_test.clj)
+Ran 9 tests containing 100 assertions.
+0 failures, 0 errors.
