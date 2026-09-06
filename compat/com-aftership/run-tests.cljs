@@ -7,21 +7,22 @@
   test namespaces:
 
     aftership.main-test  (.cljc) -- portable, listed below
-    aftership.kotoba-qualification-test  (.clj) -- JVM-only, NOT listed
+    aftership.kotoba-qualification-test       (.clj) -- JVM-only, NOT listed
+    aftership.kotoba-paginate-qualification-test (.clj) -- JVM-only, NOT listed
 
-  The qualification namespace requires kotoba.compiler.core, kotoba.runtime
-  and kotoba.wasm-exec to compile src/aftership/page_limit.kotoba and execute it on
-  two backends. That toolchain is JVM-only, so nbb cannot run it and must
-  not pretend to.
+  The qualification namespaces require kotoba.compiler.core, kotoba.runtime
+  and kotoba.wasm-exec to compile src/aftership/page_limit.kotoba and
+  src/aftership/paginate.kotoba and execute them on two backends. That
+  toolchain is JVM-only, so nbb cannot run it and must not pretend to.
 
-  Measured 2026-08-20 -- the two runtimes agree on the shared namespace:
+  Measured 2026-09-06 -- the two runtimes agree on the shared namespace:
 
-    clojure -M:test   ->  Ran 7 tests containing 78 assertions
+    clojure -M:test   ->  Ran 8 tests containing 84 assertions
     this runner       ->      6 tests containing 74 assertions
 
-  The difference is exactly 1 deftest(s) and 4 assertions, which is the
-  whole of the qualification namespace. If that arithmetic stops holding,
-  one of the two runners has silently stopped running something.
+  The difference is exactly the two qualification deftest(s), which is the
+  whole of the JVM-only namespaces. If that arithmetic stops holding, one of
+  the two runners has silently stopped running something.
 
   Every namespace is listed explicitly on purpose: clojure -M:test finds
   namespaces by scanning the test directory, but a cljs runner does not, so
