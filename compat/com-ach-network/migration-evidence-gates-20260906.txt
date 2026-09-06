@@ -1,0 +1,14 @@
+amu check src/ach_network/paginate.kotoba --jvm-free
+{:ok true, :format :kotoba.check/v1, :effects #{}, :exports [as-int clamp-limit has-more? main test-paginate-kernel], :admission {:admitted? true, :required #{}, :minimal-policy {:allow #{}}, :unused-grants #{}, :abac #:abac{:allowed? true, ...}}}
+
+amu compile src/ach_network/paginate.kotoba --target wasm32 --jvm-free
+{:ok true, :target :wasm32-kotoba-v1, :output ".../src/ach_network/paginate.kotoba.wasm", :definitions-recompiled 5, :kotoba.compile/inputs :single-file}
+
+kotoba -M test src/ach_network/paginate.kotoba
+kotoba test: 3/3 passed tests=[test-paginate-kernel] targets=[:jvm-kir :js :wasm]
+
+clojure -M:test
+Ran 8 tests containing 102 assertions. 0 failures, 0 errors.
+
+nbb --classpath src:test run-tests.cljs
+nbb: 6 tests, 92 passed, 0 failed, 0 errors
