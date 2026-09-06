@@ -1,9 +1,17 @@
-(ns airtable.page-limit)
+(ns airtable.page-limit
+  (:export [page-limit test-page-limit main]))
 
 (defn page-limit [requested]
   (if (> requested 0)
     (if (> requested 100) 100 requested)
     20))
+
+(defn test-page-limit []
+  (and (= (page-limit -1) 20)
+       (= (page-limit 0) 20)
+       (= (page-limit 1) 1)
+       (= (page-limit 20) 20)
+       (= (page-limit 250) 100)))
 
 (defn main []
   (page-limit 250))
