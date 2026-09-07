@@ -40,5 +40,5 @@ channel list, and the caller would conclude the workspace has no channels.
 
 ```sh
 nbb --classpath "src:test:../connector/src" run-connector-tests.cljs   # 12 tests, 34 assertions
-nbb --classpath "src:../connector/src" emit-connector-edn.cljs
+nbb --classpath "src:../connector/src:../fmt/src" emit-connector-edn.cljs
 ```

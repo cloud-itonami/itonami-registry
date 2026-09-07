@@ -1,16 +1,19 @@
 #!/usr/bin/env nbb
 ;; Regenerate connector.edn from the descriptor.
-;;   nbb --classpath "src:../connector/src" emit-connector-edn.cljs
+;;   nbb --classpath "src:../connector/src:../fmt/src" emit-connector-edn.cljs
 ;; connector_test asserts the committed file still matches.
-(require '[clojure.pprint :as pp]
+(require '[kotoba.lang.fmt :as fmt]
          '[connector.declare :as decl]
          '[slack.connector :as c])
 
 (let [fs (js/require "fs")
-      edn (with-out-str
-            (pp/pprint (decl/declaration c/provider
-                                         {:namespace "slack.connector"
-                                          :var "provider"
-                                          :authority "90-docs/adr/2608097000-connector-plane-one-repo-per-connector.edn"})))]
+      ;; pprint-str returns just the printed form, with no trailing newline
+      ;; (unlike clojure.pprint/pprint, which is pprint-str + println). Add
+      ;; it back so the committed file keeps ending in a newline.
+      edn (str (fmt/pprint-str (decl/declaration c/provider
+                                                 {:namespace "slack.connector"
+                                                  :var "provider"
+                                                  :authority "90-docs/adr/2608097000-connector-plane-one-repo-per-connector.edn"}))
+               "\n")]
   (.writeFileSync fs "connector.edn" edn)
   (println "wrote" (count edn) "bytes to connector.edn"))
