@@ -1,0 +1,19 @@
+(ns run-tests
+  "Run the portable half of this actor's suite under nbb (ClojureScript on
+  Node via SCI). Coverage is deliberately partial: the JVM-only kotoba
+  qualification namespaces are NOT listed here. Every portable namespace
+  is listed explicitly on purpose -- a cljs runner does not scan the test
+  directory, so an omitted namespace would never run and nothing would
+  say so.
+
+    nbb --classpath src:test run-tests.cljs"
+  (:require [cljs.test :as t]
+            [airbyte.main-test]))
+
+(defmethod t/report [:cljs.test/default :end-run-tests] [m]
+  (println (str "\nnbb: " (:test m) " tests, " (:pass m) " passed, "
+                (:fail m) " failed, " (:error m) " errors"))
+  (when (pos? (+ (or (:fail m) 0) (or (:error m) 0)))
+    (set! (.-exitCode js/process) 1)))
+
+(t/run-tests 'airbyte.main-test)
