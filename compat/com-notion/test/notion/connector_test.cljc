@@ -1,6 +1,6 @@
 (ns notion.connector-test
   (:require [clojure.edn :as edn]
-            [clojure.string :as str]
+            [kotoba.lang.text :as str]
             [clojure.test :refer [deftest is testing]]
             [connector.auth :as auth]
             [connector.consent :as consent]
