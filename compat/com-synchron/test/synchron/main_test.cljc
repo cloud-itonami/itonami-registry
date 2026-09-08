@@ -1,6 +1,6 @@
 (ns synchron.main-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [clojure.string :as str]
+            [kotoba.lang.text :as str]
             [synchron.main :as m]))
 
 (defn- dummy [field coerce]
