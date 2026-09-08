@@ -1,6 +1,6 @@
 (ns meta_presence.main-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [clojure.string :as str]
+            [kotoba.lang.text :as str]
             [meta_presence.main :as m]))
 
 (defn- dummy [field coerce] (case (get coerce field) :int 1 :float 1.0 :bool true (name field)))
