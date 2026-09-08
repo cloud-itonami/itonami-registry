@@ -12,7 +12,7 @@
   State lives on the kotoba Datom log: `emit-facts` produces namespaced EAVT
   facts (`naver_cert.<Entity>/<field>`); `*store*` is the in-memory materialization
   used by the contract test and by the WASM runtime before a live engine binds."
-  (:require [clojure.string :as str]))
+  (:require [kotoba.lang.text :as str]))
 
 (def ns-prefix "naver_cert")
 (def tier "L4")
@@ -84,7 +84,7 @@
         ;; `contains?`-equal to the string "1" or boolean true, and
         ;; silently coerced to false instead of true.
         (number? v) (not (zero? v))
-        (string? v) (contains? #{"1" "true" "yes" "on"} (str/lower-case v))
+        (string? v) (contains? #{"1" "true" "yes" "on"} (str/lower v))
         :else (boolean v)))
 
 (defn coerce-field [kind v]
