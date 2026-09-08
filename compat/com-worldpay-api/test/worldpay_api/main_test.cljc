@@ -1,6 +1,6 @@
 (ns worldpay_api.main-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [clojure.string :as str]
+            [kotoba.lang.text :as str]
             [worldpay_api.main :as m]))
 
 (defn- dummy [field coerce] (case (get coerce field) :int 1 :float 1.0 :bool true (name field)))
