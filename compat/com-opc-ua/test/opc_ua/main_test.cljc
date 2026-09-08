@@ -1,6 +1,6 @@
 (ns opc_ua.main-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [clojure.string :as str]
+            [kotoba.lang.text :as str]
             [opc_ua.main :as m]))
 
 (defn- dummy [field coerce]
