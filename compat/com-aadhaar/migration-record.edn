@@ -1,148 +1,284 @@
-{:kotoba.lang.q9.migration-record/version 1
+{:kotoba.lang.q9.migration-record/version 2
  :repository "orgs/kotoba-lang/com-aadhaar"
- :as-of "2026-09-03"
+ :as-of "2026-09-09"
  :wave :wave-1
- :disposition :blocked
- :record-author "jvm-dep-migrator (Hermes profile)"
+ :disposition :partial-and-running
+ :record-author "whole-component port + re-measurement, 2026-09-09"
+
+ :what-changed-in-this-revision
+ "Version 1 recorded :disposition :blocked on the strength of a language-subset
+  gap table measured 2026-09-03 against amu 57ba0ee0. That record's own
+  :residual-risk said to re-run the probes after any amu frontend landing.
+  This is that re-run, against amu 6ffc1d71, plus the whole-component port the
+  re-run showed was possible.
+
+  The old table is NOT deleted -- it is kept below under
+  :language-subset-gaps-measured-20260903 with each claim next to what replaced
+  it, because the SHAPE of its error is the most useful thing in this file.
+
+  The disposition moves from :blocked to :partial-and-running. Not to
+  :complete: one layer is genuinely blocked, and unlike the com-aave sibling
+  this component REACHES it."
 
  :baseline-paths
  ["src/aadhaar/main.cljc"
   "src/aadhaar/page_limit.kotoba"
+  "src/aadhaar/whole_component.kotoba"
   "schema/aadhaar.kotoba-schema"]
 
  :classifications
- {"src/aadhaar/main.cljc" :split-required
+ {"src/aadhaar/main.cljc" :retained-oracle
   "src/aadhaar/page_limit.kotoba" :kotoba-only
+  "src/aadhaar/whole_component.kotoba" :whole-component-entry
   "schema/aadhaar.kotoba-schema" :generated}
 
+ :amu-measured-against "6ffc1d71"
+ :amu-pin-relationship
+ "The west pin for amu is 2451634067a9676f5f063ea17121f8dac278eee6. 6ffc1d71 is
+  that pin plus two commits; the pin is an ancestor (verified with
+  git merge-base --is-ancestor). Three different amu shas appear across the
+  three rounds of measurement on this repo -- 57ba0ee0 (2026-09-03),
+  13acc443 (a partial re-measure), 6ffc1d71 (this one) -- so every claim below
+  names its sha instead of saying 'current'."
+
+ ;; ------------------------------------------------------------------
  :component-boundary
- "Attempted whole-component entry src/aadhaar/whole-component.kotoba covers
-  every pure public export of aadhaar.main un-shrunk (ns-prefix, tier,
-  default-limit, max-limit, entity-specs, entities, routes, page-limit,
-  as-int, as-float, as-bool, coerce-field, require-fields, reject-unknown,
-  apply-filters, paginate, expand, spec-for, handle-create/list/get/update/
-  delete, healthz). Native TCB members (now, new-id/rand-hex16, fresh-store,
-  *store*, persist!, retract!) require declared capability imports
-  (clock/uuid/mutable-store); no ambient fallback was used."
+ "src/aadhaar/whole_component.kotoba is the whole public surface of
+  aadhaar.main as ONE component entry: the six-entity table, the thirty routes,
+  coercion, the store, validation, filtering, pagination, relationship
+  expansion, all five handlers, healthz and start. It was not shrunk to a
+  decision core and the domain was not reshaped to fit the backend.
+
+  Two structural choices, both forced by measurement and both documented in the
+  file's header:
+    * rows cross as JSON TEXT rather than as :document, because :document
+      passes `amu check` and is refused by the aarch64 backend (exit 70). For a
+      REST actor this is the wire format the component already speaks, not a
+      reshaping.
+    * the store is THREADED rather than held in an atom, because ambient module
+      state is refused by the language on purpose (:ambient-authority-
+      forbidden). Every handler in aadhaar.main already takes the store as its
+      first argument.
+
+  Native TCB members cross as DECLARED CAPABILITY IMPORTS, which ADR-q9 says is
+  the correct treatment and not a reason to keep a component in Clojure:
+  clock/now (wire id 7) and entropy/draw (wire id 23), granted by policy.edn."
 
  :path-mapping
- {"aadhaar.main" "aadhaar.whole-component (attempted, blocked)"}
+ {"aadhaar.main" "aadhaar.whole-component"}
 
+ ;; ------------------------------------------------------------------
  :builds
- {:kotoba-cli-check
-  {:command "kotoba check --safe src/aadhaar/whole-component.kotoba"
-   :status :fail-closed
-   :result :runtime/rejected
-   :evidence "migration-evidence/gates-20260903.txt"}
-  :kotoba-cli-build
-  {:command "kotoba compile src/aadhaar/whole-component.kotoba --target wasm --output target/wc.wasm"
-   :status :fail-closed
-   :message "constant value must be closed bounded integer/string/keyword/boolean/nil/vector/map or non-empty keyword-set data"
-   :phase :subset}
-  :package-build
-  {:command "kotoba rad build --project . --profile release"
-   :status :fail-closed
-   :result :package/lock-not-readable
-   :note "repo has no kotoba.lock.edn; gate refused before source evaluation"}
-  :amu-check
-  {:command "amu check src/aadhaar/whole-component.kotoba --jvm-free"
-   :status :fail-closed
-   :code :kotoba/source-read-failed}
-  :amu-compile
-  {:command "amu compile ... --target wasm --jvm-free"
-   :status :fail-closed
-   :message "this Amu command or target has no JVM-free implementation; refusing to invoke the Clojure/JVM compatibility path"
-   :note "wasm32 target reached the source reader and failed on the same source"}}
-
- :language-subset-gaps-remeasured
- ;; 2026-09-09, against amu main (13acc443), `amu check --jvm-free`, probes
- ;; checked in under `q9-probes/`.
- ;;
- ;; THE 2026-09-03 TABLE BELOW PROBED CLOJURE'S VOCABULARY AGAINST A LANGUAGE
- ;; THAT HAS ITS OWN. Three of its rejections do not reproduce:
- ;;
- ;;   claim 2026-09-03                measured 2026-09-09
- ;;   "string literals anywhere"      PASS. (defn label [] :string "hello")
- ;;                                   compiles. `examples/todo-app.kotoba` has
- ;;                                   used string literals throughout for
- ;;                                   longer than this record has existed.
- ;;   "(str a b) rejected"            true AS SPELLED, and irrelevant: the
- ;;                                   admitted head is `string-concat`.
- ;;                                   `string-concat` / `string=?` /
- ;;                                   `string-substring` all PASS.
- ;;   "(count v) rejected"            PASS over `[:list :i64]`. The earlier
- ;;                                   probe used `[:vector ...]`, which is not
- ;;                                   the collection type -- it answers
- ;;                                   :hetero-vector-type, a spelling error
- ;;                                   reported as a language gap.
- ;;
- ;; Still rejecting with the spellings tried here, and NOT yet re-derived in
- ;; the language's own vocabulary: `reduce` and `typed-map-get`. Those are
- ;; recorded as UNRESOLVED, not as gaps -- the three above are exactly why
- ;; that distinction now matters.
- ;;
- ;; The method error is the finding. `guest-grammar.edn` admits `count`,
- ;; `keys`, `vals`, `reduce`, `typed-map-*`, `vector-*` and `string-*`; a probe
- ;; written in `str`/`subs`/`mapv` measures whether Clojure's names resolve,
- ;; not whether the capability exists. A `:blocked` disposition derived that
- ;; way understates the language and, left standing, keeps a component out of
- ;; the migration for a reason that was never true.
- ;;
- ;; This does NOT re-dispose the component. Whether aadhaar.main as a whole is
- ;; expressible needs the surface re-derived head by head, which is the next
- ;; piece of work and is not done here.
- {:as-of "2026-09-09"
-  :amu "13acc443"
-  :command "amu check --jvm-free"
-  :probes "q9-probes/"
-  :pass ["string literal with a declared :string return"
-         "string-concat" "string=?" "string-substring"
-         "count over [:list :i64]"]
-  :unresolved ["reduce" "typed-map-get"]
-  :note "unresolved means the spelling tried here was rejected, not that the capability is absent"}
-
- :language-subset-gaps-measured
- "Measured 2026-09-03 against kotoba-lang/amu main 57ba0ee0, amu check
-  --jvm-free. Each cell = one minimal probe, one verdict:
-  PASS: (get m :k) (get m :k 0) (assoc m :k 1) {:a x} [x x] (case x 1 2 0)
-        (if b 1 2) (pos? x) (count ... NO) — see below.
-  REJECTED (:subset-reject / :source-read-failed):
-    string literals anywhere (def or fn body); (str a b) / (str a) / (str x \"y\");
-    parse-long / lower-case / trim; (count v); (reduce f 0 xs); (mapv f xs);
-    (filterv f xs); (remove f xs); (min a b); (seq xs); (some-> x f);
-    (keys m); (reduce-kv f 0 m); (long x); #() fn literals (read failure);
-    (:k m) keyword projection (:record-projection-unresolved);
-    (contains? m :k) on maps (:map-presence-receiver);
-    (def d [{:a 1} {:b 2}]) vector-of-maps top-level constant.
-  PASS: (get m :k) (get m :k 0) (assoc m :k 1) (case) (if) (pos?) (empty?)
-        (first) (take 2 xs) map/vector literals, int arithmetic."
-
- :blocked-reason
- "The whole public surface of aadhaar.main cannot be expressed in the
-  admitted kotoba subset exposed by amu --jvm-free at amu@57ba0ee0: every
-  route spec, error message, id prefix, filter comparison and entity name is
-  a string; handlers fold with reduce/mapv/filterv/reduce-kv/keys. Shrinking
-  the component to the int-only decision core is forbidden
-  (:decision-only-extraction-forbidden), so the whole-component migration is
-  recorded as :blocked, not :partial."
-
- :consumers
- {:status :unchanged
-  :note "no consumer cutover attempted; oracle main.cljc retained"}
+ {:amu-check
+  {:command "amu check src/aadhaar/whole_component.kotoba --jvm-free --policy policy.edn"
+   :status :ok :exit 0}
+  :amu-compile-native
+  {:command "amu compile src/aadhaar/whole_component.kotoba --target aarch64-macos --policy policy.edn --output aadhaar.kexe"
+   :status :ok :exit 0 :bytes 236678}
+  :executed
+  {:command "KEXE_FUEL=100000000 ./kexe-loader <sym>.bin <offset> <arity> aarch64 7,23 [args]"
+   :status :ok
+   :note "A build is not acceptance. Every layer below was RUN and compared
+          against aadhaar.main under nbb; see q9-findings.edn."}}
 
  :verification
- {:oracle-parity :not-reached
+ {:oracle-parity :reached-except-one-input
+  :oracle-harness "q9-oracle.cljs (runs aadhaar.main under nbb)"
+  :layers-compared 15
+  :summary
+  "route-count, page-limit (8 inputs), as-bool (9), the six entity-table
+   hashes, the six refs hashes, validation (6), store counts (5), filters (6),
+   paginate (6), cursor (5), handler status codes (13), emit-facts (3),
+   healthz, rfc3339 (4) and expand (4) all agree between the native artifact
+   and aadhaar.main."
+  :the-one-disagreement
+  "as-int(\"12abc\"): native 0, nbb oracle 12. The oracle disagrees with
+   ITSELF here -- aadhaar.main/as-int is a reader conditional whose :clj arm
+   answers 0 (Long/parseLong throws into a catch) and whose :cljs arm answers
+   12 (js/parseInt truncates). The port matches the :clj arm. The :cljs arm was
+   measured; the :clj arm was NOT executed (JVM-free exercise) and is read from
+   the source."
   :jvm-free-process-proof
-  "amu compile --target wasm --jvm-free failed closed with an explicit
-   JVM-compatibility-path refusal; no java/clojure process was invoked by
-   any gate in this record."}
+  "All compilation and checking used --jvm-free. No java/clojure process was
+   invoked by any gate in this record. The oracle side runs under nbb (Node),
+   not the JVM."}
+
+ ;; ------------------------------------------------------------------
+ :blocked-layers
+ {:as-float
+  {:status :blocked
+   :probe "q9-probes/g23-f64.kotoba"
+   :check-exit 0
+   :native-compile-exit 70
+   :refusal "typed values currently require the kotoba-script web target, typed Wasm target, or qualified native string/scalar-record/option-i64/result-i64 features"
+   :reached-by-this-component true
+   :why-that-matters
+   "This is the one place com-aadhaar is materially worse off than the com-aave
+    sibling, and it must not be read across from that record. aave coerces
+    NOTHING to :float, so its missing as-float was a public function of the
+    oracle that no code path reached. aadhaar's Transaction spec is
+    :coerce {:amount :float} and `amount` is ALSO one of Transaction's two
+    required fields, so the blocked arm sits on the create and update path of
+    one of the six entities."
+   :measured-divergence
+   "coerce-field on the :float kind, oracle vs port, five inputs:
+      JSON number 12.5    -> 12.5 vs 12.5    agree
+      JSON string \"12.5\" -> 12.5 vs \"12.5\" DIFFER
+      JSON string \"abc\"  -> 0    vs \"abc\"  DIFFER
+      JSON number 0       -> 0    vs 0       agree
+      absent field        -> 0    vs null    DIFFER
+    Three of five disagree. The port keeps the raw JSON token where the oracle
+    stores a double."
+   :not-reshaped
+   "The entity table still declares amount:float truthfully and coerce-field
+    carries an explicit `float` arm rather than letting the case fall through
+    :else, so the divergence is visible in the source instead of being an
+    accident of cond ordering."
+   :not-proven-to-be-a-language-gap
+   "Only aarch64-macos was compiled. The refusal names kotoba-script web and
+    typed Wasm as targets that DO carry typed values, so this may be a gap in
+    THIS TARGET rather than in the language. Not tried."}}
+
+ ;; ------------------------------------------------------------------
+ :language-subset-gaps-measured-20260903
+ ;; KEPT VERBATIM, because what it got wrong is more instructive than what it
+ ;; got right. Superseded by :language-subset-gaps-remeasured-20260909 below.
+ {:superseded-by :language-subset-gaps-remeasured-20260909
+  :as-of "2026-09-03"
+  :amu "57ba0ee0"
+  :command "amu check --jvm-free"
+  :claim
+  "PASS: (get m :k) (get m :k 0) (assoc m :k 1) {:a x} [x x] (case x 1 2 0)
+         (if b 1 2) (pos? x) (empty?) (first) (take 2 xs) map/vector literals,
+         int arithmetic.
+   REJECTED (:subset-reject / :source-read-failed):
+     string literals anywhere (def or fn body); (str a b) / (str a) / (str x \"y\");
+     parse-long / lower-case / trim; (count v); (reduce f 0 xs); (mapv f xs);
+     (filterv f xs); (remove f xs); (min a b); (seq xs); (some-> x f);
+     (keys m); (reduce-kv f 0 m); (long x); #() fn literals (read failure);
+     (:k m) keyword projection (:record-projection-unresolved);
+     (contains? m :k) on maps (:map-presence-receiver);
+     (def d [{:a 1} {:b 2}]) vector-of-maps top-level constant."
+  :original-blocked-reason
+  "The whole public surface of aadhaar.main cannot be expressed in the admitted
+   kotoba subset exposed by amu --jvm-free at amu@57ba0ee0: every route spec,
+   error message, id prefix, filter comparison and entity name is a string;
+   handlers fold with reduce/mapv/filterv/reduce-kv/keys. Shrinking the
+   component to the int-only decision core is forbidden
+   (:decision-only-extraction-forbidden), so the whole-component migration is
+   recorded as :blocked, not :partial."
+  :verdict-on-that-reason
+  "False in its premise and therefore false in its conclusion. Strings, count,
+   reduce, mapv, filterv, min and #() literals all pass. The component was
+   built without shrinking it."}
+
+ :language-subset-gaps-remeasured-20260909
+ {:as-of "2026-09-09"
+  :amu "6ffc1d71"
+  :command "amu check --jvm-free"
+  :probes "q9-probes/ (one file per row; failing probes kept as evidence)"
+  :rows-claimed-rejected 18
+  :rows-that-reproduce 2
+
+  :passes
+  ["string literals anywhere" "(str a b)" "(count v)" "(reduce f 0 xs)"
+   "(mapv f xs)" "(filterv f xs)" "(min a b)" "#() fn literals"
+   "typed-map-get (previously UNRESOLVED)" "reduce (previously UNRESOLVED)"]
+
+  :vocabulary-mismatch
+  ["parse-long" "lower-case" "(remove f xs)" "(seq xs)" "(some-> x f)"
+   "(keys m)" "(reduce-kv f 0 m)" "(long x)" "(:k m)" "(contains? m :k)"]
+
+  :reproduces
+  ["trim" "(def d [{:a 1} {:b 2}]) as a USED top-level constant"]
+
+  :trim
+  {:message "unknown operation: trim is not a builtin, a sugar head, or a function of this module"
+   :assessment
+   "A stdlib gap, not a language limit. No admitted head trims under any
+    spelling, but a hand-written walk over string-code-point-at and
+    string-substring passes and is what this component uses. It did not block
+    the port."}
+
+  :vector-of-maps-constant
+  {:message "map literal with keyword keys carries i64 values; the value at key :entity is :string. A keyword-keyed literal lowers to the legacy untagged pair map that `map-get`, `map-assoc` and every `match` map pattern are written against, so its value type is not inferred; write (typed-map-new [:map :keyword :string] ...) for a typed map with keyword keys"
+   :isolated
+   "q9-probes/g20k-i64-count-control.kotoba is the same def with only the
+    ELEMENT TYPE changed, same consumer, and it passes. So the refusal is the
+    map element, not the vector constant."
+   :no-native-workaround
+   "(document [...]) inside a function body passes check, and then fails
+    compilation for aarch64-macos with exit 70. For the native target there is
+    no working spelling of a vector-of-maps constant. This is precisely why the
+    component carries its entity table as comma-separated strings."
+   :was-recorded-pass-in-the-previous-round
+   "and that PASS was a measurement defect -- see :the-method-error below."}
+
+  :the-method-error
+  "Three distinct causes, and the first is the one worth carrying forward.
+
+   1. UNUSED DEFINITIONS ARE NOT TYPE-CHECKED. The identical
+      (def specs [{:a 1} {:a 2}]) answers exit 0 when nothing consumes it and
+      is refused with 'expression type mismatch: expected i64, got map' when an
+      exported function's return value reaches it. The passing run does not even
+      list `specs` in its :order. That is exactly how the vector-of-maps row was
+      recorded PASS on 2026-09-03 while actually being refused. Every probe in
+      this round consumes its own result.
+
+   2. CLOJURE'S VOCABULARY TESTED AGAINST A DIFFERENT LANGUAGE. parse-long,
+      lower-case, seq, remove, reduce-kv and long are not heads; the
+      capabilities exist under other names. A probe in Clojure's spelling
+      measures whether Clojure's names resolve, not whether the capability
+      exists.
+
+   3. ROWS THAT WERE NEVER GAPS. str, mapv and filterv are accepted as spelled
+      in Clojure AND are the same operations as string-concat, map and filter --
+      proven by identical definition CIDs, not by inspection.
+
+   A :blocked disposition derived this way understates the language and, left
+   standing, keeps a component out of the migration for a reason that was never
+   true. This one stood for six days."
+
+  :the-limit-of-a-check-only-table
+  "Every verdict in this section is `amu check --jvm-free`, the FRONTEND ONLY.
+   Check acceptance is NOT backend acceptance, and this component proves it
+   twice: its blocked :f64 layer passes check and is refused by aarch64 with
+   exit 70, and so is the only workaround for the vector-of-maps row. A gap
+   table measured with check alone cannot say what will run. The 2026-09-03
+   table was measured that way and so is this one; the difference is that this
+   one says so."}
+
+ ;; ------------------------------------------------------------------
+ :consumers
+ {:status :unchanged
+  :note "No consumer cutover attempted; aadhaar.main is retained as the oracle
+         and nothing requires aadhaar.whole-component. This is a
+         whole-component BUILD that runs and is compared, not a completed
+         migration."}
 
  :rollback
  {:status :not-applicable
-  :note "nothing landed on main; working branch bot/migrate-com-aadhaar-20260903 only"}
+  :oracle-retained true
+  :consumer-cutover false
+  :note "Nothing landed on main; working branch agent/whole-component-kotoba
+         only. Removing src/aadhaar/whole_component.kotoba and policy.edn
+         returns the repo to its previous state."}
 
  :residual-risk
- "Blocked on upstream language subset (string lowering, collection folds,
-  fn literals, keyword projection) and on declared capability imports for
-  clock/uuid/mutable-store. Re-run these probes after any amu frontend
-  landing that extends the admitted subset."}
+ "One layer is blocked (as-float) and it is REACHED by this component, so the
+  port is partial: Transaction.amount does not store what aadhaar.main stores
+  for three of five probed inputs. Do not read the com-aave record across to
+  this repo on that point.
+
+  Four of the six entities (Consent, Transaction, Document,
+  VerificationRequest) were not driven end to end through the handlers; the
+  table, refs and route hashes cover all six, but the float arm in particular
+  was probed directly and NOT through handle-create on a Transaction.
+
+  The as-float refusal is a NATIVE-TARGET refusal. kotoba-script web and typed
+  Wasm are named by the refusal itself as targets that carry typed values and
+  were not tried, so this may not be a language gap at all.
+
+  Re-run q9-probes/ after any amu frontend OR BACKEND landing -- the 2026-09-03
+  record said 'frontend' and that was too narrow: the two things that block
+  this component now are both backend refusals of modules the frontend admits."}

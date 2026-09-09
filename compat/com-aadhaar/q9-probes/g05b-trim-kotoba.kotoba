@@ -1,0 +1,13 @@
+;; Row 5, in Kotoba's vocabulary. There is no trim head; this is the walk that
+;; the same primitives (string-code-point-at / string-substring) express.
+(ns g05b (:export [probe]))
+(defn lead [s :string i :i64 len :i64] :i64
+  (if (>= i len) i (if (= (string-code-point-at s i) 32) (lead s (+ i 1) len) i)))
+(defn tail [s :string j :i64] :i64
+  (if (<= j 0) j (if (= (string-code-point-at s (- j 1)) 32) (tail s (- j 1)) j)))
+(defn trim-sp [s :string] :string
+  (let [len (string-byte-length s)
+        a (lead s 0 len)
+        b (tail s len)]
+    (if (< a b) (string-substring s a b) "")))
+(defn probe [] :i64 (string-byte-length (trim-sp "  x  ")))

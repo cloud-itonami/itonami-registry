@@ -311,6 +311,124 @@
                         exercised by every table hash"}}
 
  ;; ------------------------------------------------------------------
+ :the-gap-table-re-measured
+ ;; migration-record.edn carried a table dated 2026-09-03, measured against amu
+ ;; 57ba0ee0, listing eighteen constructs as REJECTED and resting the whole
+ ;; :blocked disposition on them. Re-measured here against 6ffc1d71: one probe
+ ;; file per row under q9-probes/, each consuming its own definition, each
+ ;; verdict recorded with the compiler's exact message. Failing probes kept.
+ {:rows-claimed-rejected 18
+  :rows-that-reproduce 2
+  :headline
+  "Twenty of twenty-two claims do not reproduce. Two do. The two that do are
+   not the two the table emphasised, and one of them was recorded as a PASS in
+   the previous round for a reason that turns out to be a measurement defect."
+
+  :three-distinct-causes-of-the-wrong-table
+  {:unused-definitions-are-not-type-checked
+   "The decisive control, and the reason this matters beyond bookkeeping. The
+    IDENTICAL (def specs [{:a 1} {:a 2}]) answers exit 0 when nothing consumes
+    it (q9-probes/g00a) and is REFUSED with 'expression type mismatch: expected
+    i64, got map' when an exported function's return value reaches it
+    (q9-probes/g00b). The passing run does not even list `specs` in its
+    :order. So a probe that defines a value and never uses it reports a
+    meaningless PASS -- which is exactly how the vector-of-maps row was
+    recorded PASS on 2026-09-03 while actually being refused."
+
+   :clojure-vocabulary-tested-against-a-different-language
+   "parse-long, lower-case, seq, remove, reduce-kv and long are simply not
+    heads. The capabilities exist under other names: string-fold-case,
+    first/rest, filter with a complement, and an indexed vals walk all pass.
+    A probe written in Clojure's spelling measures whether Clojure's names
+    resolve, not whether the capability exists."
+
+   :rows-that-were-never-gaps
+   "str, mapv and filterv are accepted AS SPELLED IN CLOJURE, and are not
+    merely also-accepted -- they are the SAME operation, proven by identical
+    definition CIDs (str = string-concat, mapv = map, filterv = filter).
+    #(> % 1) is accepted verbatim as a predicate."}
+
+  :verdicts
+  {"string literals anywhere" :passes
+   "(str a b)" :passes
+   "parse-long" :vocabulary-mismatch
+   "lower-case" :vocabulary-mismatch
+   "trim" :reproduces
+   "(count v)" :passes
+   "(reduce f 0 xs)" :passes
+   "(mapv f xs)" :passes
+   "(filterv f xs)" :passes
+   "(remove f xs)" :vocabulary-mismatch
+   "(min a b)" :passes
+   "(seq xs)" :vocabulary-mismatch
+   "(some-> x f)" :vocabulary-mismatch
+   "(keys m)" :vocabulary-mismatch
+   "(reduce-kv f 0 m)" :vocabulary-mismatch
+   "(long x)" :vocabulary-mismatch
+   "#() fn literals" :passes
+   "(:k m) keyword projection" :vocabulary-mismatch
+   "(contains? m :k)" :vocabulary-mismatch
+   "(def d [{:a 1} {:b 2}]) used" :reproduces
+   "reduce (previously UNRESOLVED)" :passes
+   "typed-map-get (previously UNRESOLVED)" :passes}
+
+  :reproduces-1-trim
+  {:probe "q9-probes/g05a-trim-clj.kotoba"
+   :exit 65
+   :message "unknown operation: trim is not a builtin, a sugar head, or a function of this module"
+   :scope "No admitted head trims under ANY spelling; the whole string-operations
+           table in frontend.cljc was read and has no trim or strip entry."
+   :workaround "A hand-written walk over string-code-point-at and
+                string-substring passes (q9-probes/g05b), which is exactly what
+                this component's `trim` does. So this is a STDLIB gap, not a
+                language limit, and it did not block the port."}
+
+  :reproduces-2-vector-of-maps-constant
+  {:probe "q9-probes/g20-vector-of-maps-used.kotoba"
+   :exit 65
+   :message "map literal with keyword keys carries i64 values; the value at key :entity is :string. A keyword-keyed literal lowers to the legacy untagged pair map that `map-get`, `map-assoc` and every `match` map pattern are written against, so its value type is not inferred; write (typed-map-new [:map :keyword :string] ...) for a typed map with keyword keys"
+   :also-refused
+   "i64-valued maps ('expression type mismatch: expected i64, got map'); a
+    vector of typed-map-new; the [:vector T] annotation; and (document [...])
+    as a def ('constant value must be closed bounded integer/string/keyword/
+    boolean/nil/vector/map or non-empty keyword-set data')."
+   :isolating-control
+   "q9-probes/g20k-i64-count-control.kotoba is g20b with the ELEMENT TYPE
+    changed and nothing else -- same consumer, same shape -- and it passes.
+    (An earlier control, g20i, differed in the consumer as well as the element
+    type and so did not isolate the cause; g20k was added to close that.) The
+    refusal is therefore the map element, not the vector constant."
+   :the-workaround-does-not-survive-the-backend
+   "(document [...]) INSIDE a function body passes check (q9-probes/g20f). It
+    does NOT survive compilation: amu compile --target aarch64-macos answers
+    exit 70, 'typed values currently require the kotoba-script web target,
+    typed Wasm target, or qualified native ... features'. So for the native
+    target there is NO working spelling of a vector-of-maps constant. Measured,
+    not assumed -- and this is why this component carries the entity table as
+    comma-separated strings rather than as a table of maps."
+   :previous-round "Recorded PASS on 2026-09-03. That PASS is the
+                    unused-definition artifact described above."}
+
+  :the-two-previously-unresolved-rows-were-both-wrong-spellings
+  {:typed-map-get
+   "frontend.cljc desugars it as (type value key) -- TYPE FIRST, three
+    arguments, no default. The old (typed-map-get m :k default) put the MAP in
+    the type slot, which is why it answered 'value type is outside the safe
+    profile'. With the real arity it passes for :i64 and :string values alike;
+    it answers an option, so option-value-of supplies the default."
+   :reduce
+   "Works. It demands a vector-i64 receiver and refuses [:list T], which is
+    what a [:list :i64] parameter and the `vals` projection both are. The
+    earlier rejection was a RECEIVER type, not an absent capability."}
+
+  :the-limit-of-this-whole-table
+  "Every verdict above is `amu check --jvm-free` -- the FRONTEND ONLY. Check
+   acceptance is not backend acceptance, and this component is the proof: its
+   own blocked layer (:f64) passes check and is refused by aarch64 with exit
+   70, and so is the one workaround for row 20. A gap table measured with
+   `check` alone cannot tell you what will run."}
+
+ ;; ------------------------------------------------------------------
  :not-measured
  {:the-clj-arm-of-as-int
   "The one mismatch rests on Long/parseLong throwing on '12abc'. That arm was
