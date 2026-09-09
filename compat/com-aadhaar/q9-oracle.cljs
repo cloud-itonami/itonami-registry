@@ -1,0 +1,243 @@
+(ns q9-oracle
+  "The Clojure side of the whole-component acceptance: run `aadhaar.main` --
+  the oracle this port is a port OF -- under nbb, and print the same numbers
+  the aarch64 artifact prints.
+
+    nbb --classpath src q9-oracle.cljs
+
+  Two kinds of answer are printed, and they are not equally strong.
+
+  * The i64 answers (as-int, as-bool, page-limit, filter counts, pagination
+    counts, handler status codes, store counts) call `aadhaar.main` and count.
+    Nothing is rendered on the way, so a disagreement is a disagreement about
+    the component's behaviour.
+  * The hash answers go through a rendering. `str-hash` is the same rolling
+    hash the .kotoba computes (acc*131 + code-point, mod 1000000007, seeded
+    7; every intermediate stays under 2^53 so a JS double is exact). The
+    STRING being hashed is built here from `aadhaar.main`'s own values, but the
+    JSON shape around them is this port's convention, so a disagreement means
+    either a behaviour difference or a rendering difference and has to be read
+    before it is believed.
+
+  NOT printed, because they are not reproducible by construction:
+  `now` (reads a real clock) and `rand-hex16` (reads a real UUID). The .kotoba
+  side drives those through a loader stub that answers `seed + 1`; the
+  corresponding oracle-clock / oracle-entropy numbers are determinism checks on
+  the artifact, not parity checks against this file."
+  (:require [aadhaar.main :as m]
+            [clojure.string :as s]))
+
+(defn str-hash [x]
+  (reduce (fn [acc ch] (mod (+ (* acc 131) (.charCodeAt ch 0)) 1000000007)) 7 (seq (str x))))
+
+(defn jstr [v] (str "\"" v "\""))
+(defn jkv [k v] (str (jstr k) ":" (jstr v)))
+(defn jkv-raw [k raw] (str (jstr k) ":" raw))
+
+;; --- the entity table -----------------------------------------------------
+
+(defn pair-csv [m]
+  (s/join "," (map (fn [[k v]] (str (name k) ":" (name v))) m)))
+
+(defn table-line [spec]
+  (s/join "|" [(:entity spec) (:plural spec) (:id-prefix spec)
+               (s/join "," (map name (:fields spec)))
+               (s/join "," (map name (:required spec)))
+               (pair-csv (:coerce spec))]))
+
+(defn refs-line [spec] (pair-csv (:refs spec)))
+
+(defn route-line [r]
+  (s/join " " [(:method r) (:path r) (str (:op r) "|" (:entity r))]))
+
+;; --- validation, rendered the way the .kotoba renders it ------------------
+
+(defn error-json [err]
+  (if (nil? err)
+    ""
+    (str "{" (jkv-raw "error"
+                      (str "{" (jkv "message" (get-in err [:error :message])) ","
+                           (jkv "type" (get-in err [:error :type])) "}"))
+         "}")))
+
+;; --- fixtures, the same documents the .kotoba carries ---------------------
+
+(def fixture-data
+  {0 {:jurisdiction "IN" :verified "yes"}
+   1 {:jurisdiction "IN"}
+   2 {:jurisdiction "IN" :verified true :bogus "x"}
+   3 {:type "debit" :amount "12.5" :status "ok"}
+   4 {:purpose "kyc" :granted "YES"}
+   5 {}})
+
+(def fixture-text
+  {0 "12" 1 " 42 " 2 "-7" 3 "12abc" 4 "" 5 "true" 6 "TRUE" 7 "Yes" 8 "on"
+   9 "1" 10 "0" 11 "false" 12 "null" 13 "nope"})
+
+(defn seeded-row [i]
+  {:id (str "aadhaar_ide_" i)
+   :externalId i
+   :jurisdiction (if (even? i) "IN" "US")})
+
+(defn cred-row [i]
+  {:id (str "aadhaar_cre_" i)
+   :identityId (str "aadhaar_ide_" i)
+   :type "passport"
+   :issuer "UIDAI"})
+
+(defn seeded-store [n]
+  (let [st (m/fresh-store)]
+    (doseq [i (range n)] (m/persist! st "Identity" (seeded-row i)))
+    st))
+
+(defn seeded-both [n]
+  (let [st (seeded-store n)] (m/persist! st "Credential" (cred-row 1)) st))
+
+(defn spec-for [e] (first (filter #(= (:entity %) e) m/entity-specs)))
+
+;; A record rendered the way the .kotoba renders one: string values quoted,
+;; numbers bare, nil as null, a nested row as its own object.
+(defn rec-json [r]
+  (str "{" (s/join "," (map (fn [[k v]]
+                              (jkv-raw (name k)
+                                       (cond (nil? v) "null"
+                                             (string? v) (jstr v)
+                                             (map? v) (str "{" (s/join "," (map (fn [[k2 v2]]
+                                                                                  (jkv-raw (name k2)
+                                                                                           (if (string? v2) (jstr v2) (str v2))))
+                                                                                v)) "}")
+                                             :else (str v))))
+                            r)) "}"))
+
+;; --- print ----------------------------------------------------------------
+
+(defn row [label v] (println (str label "\t" v)))
+
+(println "; oracle = aadhaar.main under nbb")
+(row "main(route-count)" (count m/routes))
+(row "entities" (s/join "," m/entities))
+(row "entity-count" (count m/entity-specs))
+
+(println "; as-int")
+(doseq [i [0 1 2 3 4 5 12]] (row (str "as-int " i) (m/as-int (fixture-text i))))
+(println "; as-bool")
+(doseq [i [5 6 7 8 9 10 11 4 13]] (row (str "as-bool " i) (if (m/as-bool (fixture-text i)) 1 0)))
+(println "; page-limit")
+(doseq [r [-5 0 1 20 99 100 101 250]] (row (str "page-limit " r) (m/page-limit (m/as-int r))))
+
+(println "; table (hash) -- six entities")
+(doseq [i (range 6)] (row (str "table " i) (str-hash (table-line (nth m/entity-specs i)))))
+(println "; refs (hash) -- LIVE on five of six, unlike the aave sibling")
+(doseq [i (range 6)] (row (str "refs " i) (str-hash (refs-line (nth m/entity-specs i)))))
+(println "; route-shape (hash) -- thirty routes")
+(doseq [i (range (count m/routes))] (row (str "route-shape " i) (str-hash (route-line (nth m/routes i)))))
+
+(println "; validation (hash)")
+(row "validation 0" (str-hash (error-json (m/require-fields (fixture-data 0) (:required (spec-for "Identity"))))))
+(row "validation 1" (str-hash (error-json (m/require-fields (fixture-data 1) (:required (spec-for "Identity"))))))
+(row "validation 2" (str-hash (error-json (m/reject-unknown (fixture-data 0) (:fields (spec-for "Identity"))))))
+(row "validation 3" (str-hash (error-json (m/reject-unknown (fixture-data 2) (:fields (spec-for "Identity"))))))
+(row "validation 4" (str-hash (error-json (m/require-fields (fixture-data 5) (:required (spec-for "Identity"))))))
+(row "validation 5" (str-hash (error-json (m/reject-unknown (fixture-data 3) (:fields (spec-for "Transaction"))))))
+
+(println "; store")
+(row "store 0" (count (m/query (seeded-store 3) "Identity")))
+(row "store 3" (let [st (seeded-store 3)] (m/retract! st "Identity" "aadhaar_ide_1")
+                    (count (m/query st "Identity"))))
+(row "store 4" (let [st (seeded-store 3)] (m/retract! st "Identity" "nope")
+                    (count (m/query st "Identity"))))
+(row "store 5" (let [st (seeded-store 3)] (m/persist! st "Identity" (seeded-row 1))
+                    (count (m/query st "Identity"))))
+(row "store 7" (count (m/query (seeded-store 3) "Credential")))
+
+(println "; filters")
+(let [rows (m/query (seeded-store 5) "Identity")
+      fields (:fields (spec-for "Identity"))]
+  (row "filters 0" (count (m/apply-filters rows {} fields)))
+  (row "filters 1" (count (m/apply-filters rows {:jurisdiction "IN"} fields)))
+  (row "filters 2" (count (m/apply-filters rows {:jurisdiction ""} fields)))
+  (row "filters 3" (count (m/apply-filters rows {:externalId "3"} fields)))
+  (row "filters 4" (count (m/apply-filters rows {:externalId "99"} fields)))
+  (row "filters 5" (count (m/apply-filters rows {:notAField "x"} fields))))
+
+(println "; paginate  page*10 + has_more")
+(doseq [[n lim] [[5 2] [5 5] [5 0] [5 200] [3 2] [0 2]]]
+  (let [rows (m/query (seeded-store n) "Identity")
+        [page more] (m/paginate rows {:limit lim})]
+    (row (str "paginate " n " " lim) (+ (* 10 (count page)) (if more 1 0)))))
+
+(println "; cursor -- rows remaining after aadhaar_ide_<after>")
+(doseq [[n after] [[5 0] [5 2] [5 4] [5 9] [3 0]]]
+  (let [rows (m/query (seeded-store n) "Identity")]
+    (row (str "cursor " n " " after)
+         (count (first (m/paginate rows {:limit 1000
+                                         :starting_after (str "aadhaar_ide_" after)}))))))
+
+(println "; handlers (status)")
+(let [mk (fn [] (seeded-store 2))]
+  (row "handlers 0" (second (m/handle-create (mk) "Identity" (fixture-data 0))))
+  (row "handlers 1" (second (m/handle-create (mk) "Identity" (fixture-data 1))))
+  (row "handlers 2" (second (m/handle-create (mk) "Identity" (fixture-data 2))))
+  (row "handlers 3" (second (m/handle-list (mk) "Identity" {})))
+  (row "handlers 4" (second (m/handle-get (mk) "Identity" "aadhaar_ide_0" {})))
+  (row "handlers 5" (second (m/handle-get (mk) "Identity" "nope" {})))
+  (row "handlers 6" (second (m/handle-update (mk) "Identity" "aadhaar_ide_0" {:jurisdiction "US"})))
+  (row "handlers 7" (second (m/handle-update (mk) "Identity" "nope" {})))
+  (row "handlers 8" (second (m/handle-delete (mk) "Identity" "aadhaar_ide_0")))
+  (row "handlers 9" (second (m/handle-delete (mk) "Identity" "nope")))
+  (row "handlers 10" (let [st (mk)] (m/handle-delete st "Identity" "aadhaar_ide_0")
+                          (count (m/query st "Identity"))))
+  (row "handlers 11" (let [st (mk)] (m/handle-create st "Identity" (fixture-data 0))
+                          (count (m/query st "Identity"))))
+  (row "handlers 12" (get (first (m/handle-list (mk) "Identity" {})) :total))
+  (row "handlers 13 (hash of jurisdiction)"
+       (str-hash (:jurisdiction (first (m/handle-update (mk) "Identity" "aadhaar_ide_0"
+                                                        {:jurisdiction "US"}))))))
+
+(println "; rfc3339 (hash) -- oracle is the Instant/ofEpochSecond shape")
+(doseq [secs [0 1 1000000000 1757000000]]
+  (row (str "rfc3339 " secs)
+       (str-hash (s/replace (.toISOString (js/Date. (* 1000 secs))) ".000Z" "Z"))))
+
+(println "; expand -- refs is LIVE here: five of six specs carry")
+(println ";           {:identityId \"Identity\"}, so this is the production path")
+(let [st (seeded-both 3)
+      rec (cred-row 1)
+      refs (:refs (spec-for "Credential"))]
+  (row "expand 0 changed?" (if (= rec (m/expand st rec {:expand "identityId"} refs)) 0 1))
+  (row "expand 1 changed?" (if (= rec (m/expand st rec {:expand "other"} refs)) 0 1))
+  (row "expand 2 changed?" (if (= (cred-row 9) (m/expand st (cred-row 9) {:expand "identityId"} refs)) 0 1))
+  (row "expand 3 changed? (Identity, refs {})"
+       (if (= rec (m/expand st rec {:expand "identityId"} (:refs (spec-for "Identity")))) 0 1))
+  (row "expand 0 obj-id" (str-hash (:id (:identityId_obj (m/expand st rec {:expand "identityId"} refs)))))
+  (row "expand 2 obj-is-nil?" (if (nil? (:identityId_obj (m/expand st (cred-row 9)
+                                                                   {:expand "identityId"} refs))) 1 0)))
+
+(println "; emit-facts (hash) and healthz (hash), rendered in this port's JSON shape")
+(doseq [i [0 1 2]]
+  (row (str "facts " i)
+       (str-hash (str "{" (s/join "," (map (fn [[k v]]
+                                             (jkv-raw k (if (string? v) (jstr v) (str v))))
+                                           (m/emit-facts "Identity" (seeded-row i)))) "}"))))
+(let [[body status] (m/healthz)]
+  (row "healthz" (str-hash (str "{" (jkv-raw "status" (str status)) ","
+                                (jkv-raw "body"
+                                         (str "{" (jkv "status" (:status body)) ","
+                                              (jkv "actor" (:actor body)) ","
+                                              (jkv "tier" (:tier body)) ","
+                                              (jkv-raw "entities"
+                                                       (str "[" (s/join "," (map jstr (:entities body))) "]"))
+                                              "}"))
+                                "," (jkv-raw "store" "{}") "}"))))
+
+(println "; --- the as-float gap, measured rather than described ---")
+(println "; aadhaar.main/coerce-field :float vs the .kotoba `float` arm, which")
+(println "; preserves the raw JSON token because :f64 does not lower to aarch64.")
+(println "; Each line prints what the ORACLE stores; the artifact's")
+(println "; oracle-float-divergence prints the hash of what the PORT stores.")
+(doseq [[sel raw v] [[0 "12.5" 12.5] [1 "\"12.5\"" "12.5"] [2 "\"abc\"" "abc"]
+                     [3 "0" 0] [4 "" nil]]]
+  (let [oracle-val (m/coerce-field :float v)
+        oracle-tok (if (nil? oracle-val) "null" (str oracle-val))]
+    (row (str "float " sel " raw=" raw " oracle-stores=" oracle-tok)
+         (str-hash oracle-tok))))

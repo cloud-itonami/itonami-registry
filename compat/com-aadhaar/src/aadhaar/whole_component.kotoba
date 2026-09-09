@@ -547,13 +547,24 @@
 ;; source is NOT a reason to keep a component in Clojure: it crosses as a
 ;; declared capability import, which is what these two are.
 ;;
-;; MEASURED, and not to be read as a working wall clock: on the aarch64
-;; artifact under tools/kexe_loader.c the granted `clock/now` answers 1 and
-;; the granted `entropy/draw` answers 1, and with the grant withdrawn both
-;; TRAP (KEXE_TRAP :SIGTRAP, exit 120). So the grant is doing something,
-;; measured in both directions -- but the number is a stub, and the RFC-3339
-;; rendering below is therefore exercised at epoch 1 by the oracle probes, not
-;; at a real instant.
+;; MEASURED, and not to be read as a working wall clock. The aave sibling's
+;; header says the granted `clock/now` "answers 1"; that is true only at seed
+;; 0. Measured here directly (q9-probes/g24-capability-stub.kotoba, one symbol
+;; per capability, run over five seeds):
+;;
+;;   clock/now(0 1 2 5 100)   grant 7,23 -> 1 2 3 6 101
+;;   entropy/draw(0 1 2 5 100) grant 7,23 -> 1 2 3 6 101
+;;   either, with the grant WITHDRAWN     -> KEXE_TRAP {:kind :signal
+;;                                           :signal :SIGTRAP}, exit 120
+;;
+;; So under tools/kexe_loader.c both capabilities are the stub `seed + 1`, not
+;; a constant and not a real source. The grant is measured in BOTH directions
+;; -- withdrawing it traps rather than silently answering -- so the import is
+;; real even though the value is not. The RFC-3339 rendering below is
+;; therefore exercised at a stub instant by the oracle probes, and
+;; `oracle-clock`/`oracle-entropy` are determinism checks, NOT parity checks
+;; against aadhaar.main (whose `now` reads a real clock and whose `rand-hex16`
+;; reads a real UUID; neither is reproducible here by construction).
 
 (defn clock-seconds [seed :i64] :i64 (clock/now seed))
 
