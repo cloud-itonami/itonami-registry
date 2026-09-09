@@ -1,0 +1,27 @@
+;; aadhaar.main/as-float parses an untrusted string to a double and answers 0.0
+;; on failure. Transaction declares `:coerce {:amount :float}` and `amount` is
+;; one of its two REQUIRED fields, so unlike the aave sibling -- where no spec
+;; coerced to :float -- THIS COMPONENT REACHES THIS ARM on the create/update
+;; path.
+;;
+;; MEASURED, amu 6ffc1d71:
+;;   amu check   --jvm-free                  -> 0
+;;   amu compile --target aarch64-macos      -> 70
+;;   "typed values currently require the kotoba-script web target, typed Wasm
+;;    target, or qualified native string/scalar-record/option-i64/result-i64
+;;    features"
+;;
+;; So `check` is not the gate that matters here: the module is admitted by the
+;; frontend and refused by the backend. A first attempt wrote the return type
+;; as :f64 directly and was refused by CHECK with a different message --
+;; "expression type mismatch: expected f64, got [:option :f64]" -- which is the
+;; parser's failure being representable, not the gap. The gap is the one below.
+(ns g23-f64 (:export [main as-float-i64]))
+
+(defn as-float [s :string] :f64
+  ;; the parser answers [:option :f64] -- the catch arm of as-float, by type
+  (option-value-of [:option :f64] (decimal-f64-parse s) 0.0))
+
+(defn as-float-i64 [s :string] :i64 (f64-to-i64-truncating (as-float s)))
+
+(defn main [] :i64 (f64-to-i64-truncating (as-float "12.5")))

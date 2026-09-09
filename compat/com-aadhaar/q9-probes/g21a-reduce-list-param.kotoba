@@ -1,0 +1,7 @@
+;; Rows 21 and 15. g15c showed `vals` answers [:list :i64] while `reduce` over a
+;; def'd vector literal wanted vector-i64. Which receiver does reduce admit?
+;; This probe hands it a [:list :i64] parameter, CONSUMED by the export.
+(ns g21a (:export [probe]))
+(defn add [a :i64 b :i64] :i64 (+ a b))
+(defn total [v [:list :i64]] :i64 (reduce add 0 v))
+(defn probe [] :i64 (total [1 2 3]))

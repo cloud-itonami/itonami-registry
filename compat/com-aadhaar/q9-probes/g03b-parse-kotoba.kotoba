@@ -1,0 +1,7 @@
+;; Row 3, in Kotoba's vocabulary. frontend.cljc's `string-operations` table has
+;; no integer parser at all; `decimal-operations` has decimal-f64-parse, whose
+;; failure is an [:option :f64]. Truncating it is string -> i64.
+(ns g03b (:export [probe]))
+(defn as-int [s :string] :i64
+  (f64-to-i64-truncating (option-value-of [:option :f64] (decimal-f64-parse s) 0.0)))
+(defn probe [] :i64 (as-int "42"))
