@@ -1,0 +1,351 @@
+;; What was measured on 2026-09-09 while porting the whole of aadhaar.main to
+;; one Kotoba component, and what was NOT. The `:blocked` disposition this
+;; repo's migration-record.edn carried rests on a gap table measured on
+;; 2026-09-03; most of that table does not reproduce, and the part that DOES
+;; reproduce is not the part the table named.
+{:as-of "2026-09-09"
+
+ :amu-which-amu
+ "Measured in a clean worktree of kotoba-lang/amu at 6ffc1d71, which is the
+  west pin 24516340 plus two commits (the pin is an ancestor; verified with
+  git merge-base --is-ancestor). The 2026-09-03 table was measured against
+  57ba0ee0 and a later partial re-measurement against 13acc443, so three
+  different amu shas are in play across the three rounds and the sha is named
+  on every claim below rather than assumed."
+
+ :loader
+ "tools/kexe_loader.c built FROM THE SAME WORKTREE, not from
+  orgs/kotoba-lang/amu. The shared checkout was verified to carry KEXE_FUEL
+  support as well (grep -c KEXE_FUEL = 3 in both), so the two agree here, but
+  the worktree copy is the one that was built and run."
+
+ ;; ------------------------------------------------------------------
+ :what-differs-from-the-com-aave-sibling
+ ;; The task framing was that this is the same generated REST-actor template
+ ;; and the diff should be small. It is NOT small in the way that matters.
+ ;; `diff src/aave/main.cljc src/aadhaar/main.cljc` was run; here is what it
+ ;; actually showed.
+ {:entities-4-vs-6 "aave has four entity specs, aadhaar has six."
+
+  :refs-empty-vs-live
+  "EVERY aave spec is :refs {}. FIVE OF SIX aadhaar specs carry
+   :refs {:identityId \"Identity\"}. In aave the `expand` fold was therefore
+   dead on the production path and its port could only be exercised by handing
+   it a SYNTHETIC refs table. Here `handle-get` reaches it with the real table
+   for Credential, Consent, Transaction, Document and VerificationRequest. This
+   is a layer that is genuinely exercised here and was not there."
+
+  :float-absent-vs-reached
+  "aave coerces nothing to :float, so its missing as-float was a public
+   function of the oracle that NOTHING IN THE COMPONENT REACHED. aadhaar's
+   Transaction spec is :coerce {:amount :float}, and `amount` is also one of
+   Transaction's two REQUIRED fields. So the blocked layer is on the
+   create/update path of one of the six entities. This is the materially
+   bigger gap, and it is stated loudly under :as-float below."
+
+  :kernels-present-vs-absent
+  "aave.main additionally defines as-int-kernel, clamp-limit and
+   has-more-kernel? as public functions, kept beside page-limit for a retired
+   slice. aadhaar.main defines NONE of them. They are therefore absent from
+   this port on purpose: porting them would be inventing a surface the oracle
+   does not have."
+
+  :otherwise-identical
+  "Beyond the ns docstring, ns-prefix, the entity-specs table, the healthz
+   actor string and the start! keyword, the two .cljc files are byte-identical
+   in structure. So the framing was right about the template and wrong about
+   the size of the difference."}
+
+ ;; ------------------------------------------------------------------
+ :capability-imports
+ ;; ADR-q9: a clock or an entropy source crosses as a DECLARED CAPABILITY
+ ;; IMPORT and is not a reason to keep a component in Clojure.
+ {:clock/now {:wire-id 7 :status :pass}
+  :entropy/draw {:wire-id 23 :status :pass}
+  :form "(ns … (:capabilities #{:clock/now :entropy/draw})) then (clock/now x)"
+  :policy "{:allow #{[:cap/call 7] [:cap/call 23]}}"
+  :probe "q9-probes/g24-capability-stub.kotoba"
+
+  :what-the-grant-actually-answers
+  "seed + 1, for BOTH capabilities. Measured over five seeds: 0->1, 1->2,
+   2->3, 5->6, 100->101. The com-aave component header says the granted
+   clock/now 'answers 1'; that is true only at seed 0, and this port's header
+   was corrected rather than carrying the claim forward."
+
+  :measured-in-both-directions
+  "With the grant WITHDRAWN (loader capability argument `-`), both calls answer
+   KEXE_TRAP {:kind :signal :signal :SIGTRAP}, exit 120. This is the control
+   that matters: without it, a stub that ignored the policy entirely would look
+   identical to a capability that is really being granted."
+
+  :consequence
+  "`now` and `rand-hex16` are therefore exercised at a STUB instant.
+   oracle-clock and oracle-entropy are determinism checks on the artifact, NOT
+   parity checks against aadhaar.main, whose `now` reads a real clock and whose
+   `rand-hex16` reads a real UUID. Neither is reproducible by construction."}
+
+ ;; ------------------------------------------------------------------
+ :built
+ {:check {:command "amu check --jvm-free --policy policy.edn" :result :ok :exit 0}
+  :compile {:command "amu compile --target aarch64-macos --policy policy.edn"
+            :result :ok :exit 0 :bytes 236678 :seconds 14}
+  :note "A build is NOT acceptance. A backend can accept a module and return
+         the wrong answer, so every claim under :executed comes from running
+         the artifact, not from the compile succeeding."}
+
+ ;; ------------------------------------------------------------------
+ :executed
+ ;; amu compile … --output aadhaar.kexe
+ ;; amu extract-native aadhaar.kexe --symbol <sym> --output <sym>.bin
+ ;; cc -std=c11 -O2 -Wall -Wextra -Werror tools/kexe_loader.c -o kexe-loader
+ ;; KEXE_FUEL=100000000 ./kexe-loader <sym>.bin <offset> <arity> aarch64 7,23 …
+ {:host "aarch64 (aarch64-macos), 2026-09-09"
+  :fuel 100000000
+  :grant "7,23"
+
+  :main {:call "(route-count)" :native 30 :oracle 30
+         :note "5 routes x 6 entities. The aave sibling's 4 entities give 20."}
+
+  :page-limit-native-equals-oracle-on-all-eight
+  {-5 20, 0 20, 1 1, 20 20, 99 99, 100 100, 101 100, 250 100}
+
+  :as-bool-native-equals-oracle-on-all-nine
+  {"true" 1, "TRUE" 1, "Yes" 1, "on" 1, "1" 1,
+   "0" 0, "false" 0, "" 0, "nope" 0}
+
+  :as-int
+  {"12" 12, " 42 " 42, "-7" -7, "" 0, "true" 0, "null" 0
+   :mismatch "12abc"
+   :see :the-one-mismatch}
+
+  :entity-table-hashes-native-equals-oracle
+  {0 606641388, 1 493984944, 2 920032920,
+   3 912737106, 4 806688006, 5 49995144
+   :note "str-hash of entity|plural|id-prefix|fields|required|coerce, six of six."}
+
+  :refs-hashes-native-equals-oracle
+  {0 7, 1 51785050, 2 51785050, 3 51785050, 4 51785050, 5 51785050
+   :note "7 is str-hash of the empty string (the seed), which is Identity's
+          :refs {}. The other five are identityId:Identity. This table is LIVE
+          data here and was empty in the sibling."}
+
+  :validation-hashes-native-equals-oracle
+  {0 7, 1 167386404, 2 7, 3 84460935, 4 668828864, 5 7
+   :note "7 = no error. 1 is a missing required field, 3 an unknown field,
+          4 an empty body against Identity's two required fields."}
+
+  :store-native-equals-oracle
+  {"count after seeding 3" 3
+   "count after retracting a present id" 2
+   "count after retracting an absent id" 3
+   "count after re-putting an existing id" 3
+   "count of an entity never written" 0}
+
+  :filters-native-equals-oracle
+  {"no filter" 5, "jurisdiction=IN" 3, "jurisdiction=<empty>" 5,
+   "externalId=3" 1, "externalId=99" 0, "notAField=x" 5}
+
+  :paginate-native-equals-oracle
+  {"n=5 limit=2" 21, "n=5 limit=5" 50, "n=5 limit=0" 50,
+   "n=5 limit=200" 50, "n=3 limit=2" 21, "n=0 limit=2" 0
+   :encoding "page-count * 10 + (1 if has_more else 0)"}
+
+  :cursor-native-equals-oracle
+  {"n=5 after=0" 4, "n=5 after=2" 2, "n=5 after=4" 0,
+   "n=5 after=9 (absent cursor)" 5, "n=3 after=0" 2}
+
+  :handler-status-native-equals-oracle
+  {"create valid" 201, "create missing required" 400, "create unknown field" 400,
+   "list" 200, "get present" 200, "get absent" 404,
+   "update present" 200, "update absent" 404,
+   "delete present" 200, "delete absent" 404
+   "rows after delete" 1, "rows after create" 3, "list total" 2
+   "updated field hash" 131345}
+
+  :emit-facts-hashes-native-equals-oracle
+  {0 608815705, 1 924134878, 2 185328250}
+
+  :healthz-hash-native-equals-oracle 433977676
+
+  :rfc3339-hashes-native-equals-oracle
+  {0 150414568, 1 150414699, 1000000000 703727407, 1757000000 765967994}
+
+  :expand-hashes
+  ;; The layer the sibling could not exercise. Verified THREE ways: the native
+  ;; hash, the oracle's changed?/nil? booleans, and an INDEPENDENT recomputation
+  ;; of str-hash over the exact JSON the component builds.
+  {"baseline, unexpanded cred-row 1" 597806217
+   "selector 0: ref present, resolved" 424334403
+   "selector 1: expand asks for another field" 597806217
+   "selector 2: ref names an absent row, null arm" 721605006
+   "selector 3: Identity, whose refs really are empty" 597806217
+   "cred-row 9 unexpanded, for contrast with selector 2" 465553225
+   :why-the-contrast-matters
+   "Selector 2 must differ from cred-row 9's own hash, or the null arm did
+    nothing and the green would be a green that did no work. 721605006 vs
+    465553225: it did work."
+   :oracle-agrees
+   "aadhaar.main answers changed?=1 for selector 0, changed?=0 for 1 and 3,
+    changed?=1 with identityId_obj nil for selector 2. Same four verdicts."}}
+
+ ;; ------------------------------------------------------------------
+ :the-one-mismatch
+ {:layer "as-int"
+  :input "12abc"
+  :native 0
+  :nbb-oracle 12
+  :verdict :oracle-disagrees-with-itself
+  :explanation
+  "aadhaar.main/as-int is a reader conditional. The :clj arm is
+   (Long/parseLong (str/trim v)) inside a try whose catch answers 0, so on the
+   JVM it answers 0. The :cljs arm is (js/parseInt v 10), which truncates at
+   the first non-digit and answers 12. The port matches the :clj arm.
+   This is not a defect introduced by the port -- it is a pre-existing
+   platform split in the oracle that the port made visible."
+  :measured "The :cljs arm, under nbb: js/parseInt gives 12. Confirmed."
+  :not-measured
+  "The :clj arm was NOT executed. This is a JVM-free exercise, so its value of
+   0 is read from the source and from Long/parseLong's documented contract,
+   not run. If that reading is wrong, the port matches neither arm."}
+
+ ;; ------------------------------------------------------------------
+ :as-float
+ ;; The blocked layer, and here -- unlike in the sibling -- it is reached.
+ {:disposition :blocked
+  :probe "q9-probes/g23-f64.kotoba"
+  :check-exit 0
+  :native-compile-exit 70
+  :refusal
+  "typed values currently require the kotoba-script web target, typed Wasm target, or qualified native string/scalar-record/option-i64/result-i64 features"
+
+  :note-on-the-first-probe
+  "A first attempt declared the return type :f64 directly and was refused by
+   CHECK with a different message -- 'expression type mismatch: expected f64,
+   got [:option :f64]'. That is the parser's failure being representable in the
+   type, which is the language working, not the gap. The probe was corrected to
+   thread the option through option-value-of, at which point check passes and
+   the BACKEND is what refuses. Recording the first message as the gap would
+   have been recording my own spelling error as a language finding."
+
+  :why-it-matters-more-here-than-in-aave
+  "aave: no spec coerces to :float, so as-float was missing but unreachable.
+   aadhaar: Transaction is :coerce {:amount :float} and `amount` is one of its
+   two REQUIRED fields. The arm is on the create and update path of one of the
+   six entities."
+
+  :what-the-port-does-instead
+  "coerce-field carries an EXPLICIT `float` arm that preserves the raw JSON
+   token, placed after the empty-token check so an absent field still answers
+   null. It is written out rather than left to fall through :else, so the
+   divergence is visible in the source instead of being an accident of cond
+   ordering."
+
+  :measured-divergence
+  ;; What aadhaar.main stores vs what this port stores, per input.
+  {"JSON number 12.5" {:oracle "12.5" :port "12.5" :agree true}
+   "JSON string \"12.5\"" {:oracle "12.5" :port "\"12.5\"" :agree false}
+   "JSON string \"abc\"" {:oracle "0" :port "\"abc\"" :agree false}
+   "JSON number 0" {:oracle "0" :port "0" :agree true}
+   "absent field" {:oracle "0" :port "null" :agree false}}
+
+  :summary-of-the-divergence
+  "The float arm agrees only when the incoming JSON token is already a decimal
+   literal that round-trips as text. It diverges for a numeric STRING (the port
+   keeps it a string where the oracle makes it a number), for non-numeric input
+   (the oracle coerces to 0, the port keeps the text), and for an absent field
+   (the oracle stores 0, the port stores null). Three of five probed inputs
+   disagree."
+
+  :consequence
+  "This port is PARTIAL, not complete. One field of one of six entities does
+   not store what aadhaar.main stores. That is recorded here rather than being
+   rounded up, and the component is not reshaped to dodge it: the entity table
+   still declares amount:float truthfully."}
+
+ ;; ------------------------------------------------------------------
+ :layers-of-main-cljc
+ ;; Every public layer of src/aadhaar/main.cljc: ported or blocked, and for each
+ ;; ported layer how it was compared against the oracle.
+ {:ns-prefix {:status :ported :compared "constant, in the entity-table hashes"}
+  :tier {:status :ported :compared "constant, in the healthz hash"}
+  :default-limit {:status :ported :compared "page-limit at 0 and -5 answers 20"}
+  :max-limit {:status :ported :compared "page-limit at 101 and 250 answers 100"}
+  :entity-specs {:status :ported :compared "six table hashes, all equal"}
+  :entities {:status :ported :compared "healthz hash carries the six names"}
+  :routes {:status :ported :compared "route-count 30; thirty route-shape hashes"}
+  :now {:status :ported-against-a-stub
+        :compared "rfc3339 hashes equal at four instants; the clock itself is
+                   the loader stub seed+1, so this is not a wall-clock check"}
+  :rand-hex16 {:status :ported-against-a-stub
+               :compared "determinism only; the oracle reads a real UUID"}
+  :new-id {:status :ported-against-a-stub :compared "determinism only"}
+  :as-int {:status :ported-with-one-divergence :compared "6 of 7 inputs equal; see :the-one-mismatch"}
+  :as-float {:status :blocked :compared "not portable; see :as-float"}
+  :as-bool {:status :ported :compared "nine inputs, all equal"}
+  :coerce-field {:status :partial
+                 :compared "int and bool arms equal on seven inputs; the float
+                            arm diverges on three of five, see :as-float"}
+  :page-limit {:status :ported :compared "eight inputs, all equal"}
+  :emit-facts {:status :ported :compared "three record hashes, all equal"}
+  :persist! {:status :ported-as-store-put :compared "store counts, all equal"}
+  :query {:status :ported-as-store-query :compared "store counts and a row hash"}
+  :retract! {:status :ported-as-store-retract :compared "present and absent id"}
+  :fresh-store {:status :ported-as-store-empty
+                :compared "threaded rather than held; the atom is refused by
+                           the language on purpose"}
+  :require-fields {:status :ported :compared "validation hashes 0, 1, 4"}
+  :reject-unknown {:status :ported :compared "validation hashes 2, 3, 5"}
+  :apply-filters {:status :ported :compared "six filter counts, all equal"}
+  :paginate {:status :ported :compared "six paginate encodings and five cursor counts"}
+  :expand {:status :ported :compared "four hashes, independently recomputed;
+                                      LIVE here, dead in the sibling"}
+  :handle-create {:status :ported :compared "201 / 400 / 400 and a row count"}
+  :handle-list {:status :ported :compared "200 and a total"}
+  :handle-get {:status :ported :compared "200 / 404 and the expand path"}
+  :handle-update {:status :ported :compared "200 / 404 and a field hash"}
+  :handle-delete {:status :ported :compared "200 / 404 and a row count"}
+  :healthz {:status :ported :compared "one hash, equal"}
+  :start! {:status :ported :compared "keyword-name length 20"}
+  :spec-for {:status :ported-as-dispatch
+             :compared "inlined into entity-at / plural-of / fields-of etc.;
+                        exercised by every table hash"}}
+
+ ;; ------------------------------------------------------------------
+ :not-measured
+ {:the-clj-arm-of-as-int
+  "The one mismatch rests on Long/parseLong throwing on '12abc'. That arm was
+   NOT executed -- this is a JVM-free exercise. Read from source, not run."
+
+  :fuel-required-by-this-component
+  "Every execution was run at KEXE_FUEL=100000000, chosen for being large. A
+   structured report on one call showed 99986767 remaining of 100000000, so
+   that call used about 13000 -- but the per-layer requirement was not
+   measured, so nothing here says what budget a host would have to grant."
+
+  :the-wasm-and-web-targets
+  "Only aarch64-macos was compiled. The refusal message names kotoba-script web
+   and typed Wasm as targets that DO carry typed values, so a :document-carried
+   version -- and possibly as-float itself -- may well compile there. Not tried,
+   so the as-float gap is a gap in THIS target, not proven to be a gap in the
+   language."
+
+  :the-json-scanner-on-adversarial-input
+  "Escape DECODING is not implemented: a string value containing a backslash is
+   read as its raw bytes. Every fixture here is escape-free ASCII. Behaviour on
+   escaped or non-ASCII input is untested."
+
+  :row-count-ceiling
+  "arr-count-from stops at 64 and key-count-from at 32. No store larger than
+   five rows was executed, so the behaviour at those ceilings is untested."
+
+  :the-other-five-entities-end-to-end
+  "Handler probes drive Identity, and the expand probes drive Credential. The
+   table, refs and route hashes cover all six entities, but Consent,
+   Transaction, Document and VerificationRequest were not driven through
+   create/list/get/update/delete end to end. Notably that means the float arm
+   was probed directly but NOT through handle-create on a Transaction."
+
+  :consumer-cutover
+  "Nothing was cut over. aadhaar.main remains the oracle and nothing requires
+   aadhaar.whole-component. This is a whole-component BUILD that runs, not a
+   completed migration."}}
