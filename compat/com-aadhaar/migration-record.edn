@@ -54,6 +54,53 @@
    :message "this Amu command or target has no JVM-free implementation; refusing to invoke the Clojure/JVM compatibility path"
    :note "wasm32 target reached the source reader and failed on the same source"}}
 
+ :language-subset-gaps-remeasured
+ ;; 2026-09-09, against amu main (13acc443), `amu check --jvm-free`, probes
+ ;; checked in under `q9-probes/`.
+ ;;
+ ;; THE 2026-09-03 TABLE BELOW PROBED CLOJURE'S VOCABULARY AGAINST A LANGUAGE
+ ;; THAT HAS ITS OWN. Three of its rejections do not reproduce:
+ ;;
+ ;;   claim 2026-09-03                measured 2026-09-09
+ ;;   "string literals anywhere"      PASS. (defn label [] :string "hello")
+ ;;                                   compiles. `examples/todo-app.kotoba` has
+ ;;                                   used string literals throughout for
+ ;;                                   longer than this record has existed.
+ ;;   "(str a b) rejected"            true AS SPELLED, and irrelevant: the
+ ;;                                   admitted head is `string-concat`.
+ ;;                                   `string-concat` / `string=?` /
+ ;;                                   `string-substring` all PASS.
+ ;;   "(count v) rejected"            PASS over `[:list :i64]`. The earlier
+ ;;                                   probe used `[:vector ...]`, which is not
+ ;;                                   the collection type -- it answers
+ ;;                                   :hetero-vector-type, a spelling error
+ ;;                                   reported as a language gap.
+ ;;
+ ;; Still rejecting with the spellings tried here, and NOT yet re-derived in
+ ;; the language's own vocabulary: `reduce` and `typed-map-get`. Those are
+ ;; recorded as UNRESOLVED, not as gaps -- the three above are exactly why
+ ;; that distinction now matters.
+ ;;
+ ;; The method error is the finding. `guest-grammar.edn` admits `count`,
+ ;; `keys`, `vals`, `reduce`, `typed-map-*`, `vector-*` and `string-*`; a probe
+ ;; written in `str`/`subs`/`mapv` measures whether Clojure's names resolve,
+ ;; not whether the capability exists. A `:blocked` disposition derived that
+ ;; way understates the language and, left standing, keeps a component out of
+ ;; the migration for a reason that was never true.
+ ;;
+ ;; This does NOT re-dispose the component. Whether aadhaar.main as a whole is
+ ;; expressible needs the surface re-derived head by head, which is the next
+ ;; piece of work and is not done here.
+ {:as-of "2026-09-09"
+  :amu "13acc443"
+  :command "amu check --jvm-free"
+  :probes "q9-probes/"
+  :pass ["string literal with a declared :string return"
+         "string-concat" "string=?" "string-substring"
+         "count over [:list :i64]"]
+  :unresolved ["reduce" "typed-map-get"]
+  :note "unresolved means the spelling tried here was rejected, not that the capability is absent"}
+
  :language-subset-gaps-measured
  "Measured 2026-09-03 against kotoba-lang/amu main 57ba0ee0, amu check
   --jvm-free. Each cell = one minimal probe, one verdict:
