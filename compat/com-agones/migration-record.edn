@@ -61,4 +61,18 @@
    expectation set BEFORE running it: the regeneration rewrites cred-row and
    must move no harness layer, because no layer reads cred-row. A regeneration
    that had moved one would have meant something else changed too."}
+
+ :harness-store-layer-2026-09-11
+ {:added "the store layer, count selectors only"
+  :measured {:store "5 of 5 agreeing, against the component compiled to aarch64-macos and executed"}
+  :what-it-tests
+  "Persistence semantics, which no earlier layer touched: retracting an absent
+   id leaves the count alone, and putting an existing id replaces rather than
+   appends. Every earlier layer reads declarations; this one runs the store."
+  :not-emitted
+  "oracle-store's three str-hash selectors. They hash the component's own JSON
+   convention, so a disagreement would confound behaviour with layout."
+  :controls
+  "The five selectors produce three distinct values (3, 2, 0), and comparing
+   mismatched selectors across the two sides differs in both directions tried."}
 }
