@@ -83,7 +83,7 @@
             oracle-page-limit oracle-as-int oracle-as-bool oracle-coerce
             oracle-route-shape oracle-table oracle-validation oracle-store
             oracle-filters oracle-paginate oracle-cursor oracle-handlers
-            oracle-healthz oracle-start oracle-facts oracle-expand oracle-clock
+            oracle-healthz oracle-start oracle-facts oracle-clock
             oracle-entropy oracle-rfc3339 oracle-float-divergence oracle-refs
             main]))
 
@@ -1194,7 +1194,7 @@
 
 (defn seeded-row [i :i64] :string
   (jobj (jsep (jsep (jkv "id" (string-concat "airtable_bas_" (string-from-i64 i)))
-                    (jkv "name" "v"))
+                    (jkv "_" ""))
               (jsep (jkv "name" "v") (jkv "permissionLevel" "v")))))
 
 
@@ -1205,21 +1205,7 @@
 
 (defn seeded-store [n :i64] :string (seeded-store-from (store-empty) 0 n))
 
-;; A null row pointing at Base `airtable_bas_<i>` through BOTH of its ref
-;; fields. This is where the port stops being a rename of the aadhaar one:
-;; every spec there carried exactly one ref, so `expand`'s fold ran with a
-;; single pair, and a fold over one is not a fold. `:refs {:parentBaseId
-;; "Base" :childBaseId "Base"}` makes it run twice over one row, which is the
-;; first time `refs-of`'s comma-separated list is parsed as a LIST on the
-;; production path.
-(defn cred-row [i :i64] :string
-  (jobj (jsep (jsep (jkv "id" (string-concat "null_" (string-from-i64 i)))
-                    (jkv "parentBaseId" (string-concat "airtable_bas_" (string-from-i64 i))))
-              (jsep (jkv "childBaseId" (string-concat "airtable_bas_" (string-from-i64 i)))
-                    (jkv-raw "quantity" (string-from-i64 i))))))
 
-(defn seeded-both [n :i64] :string
-  (store-put (seeded-store n) "null" (cred-row 1)))
 
 (defn oracle-store [sel :i64] :i64
   (cond
@@ -1233,18 +1219,26 @@
     (= sel 5) (arr-count (store-rows (store-put (seeded-store 3) "Base" (seeded-row 1))
                                      "Base"))
     (= sel 6) (str-hash (seeded-store 2))
-    :else (arr-count (store-rows (seeded-store 3) "null"))))
+    :else (arr-count (store-rows (seeded-store 3) "BOM"))))
 
+;; Selector 1 must return every row and selector 2 none, on the same
+;; field; without that pair a green run cannot be told from a filter
+;; whose key this repository does not have.
+;; There are NO selectors 3 and 4: every field of this entity is
+;; required, so no field carries the row index and a uniqueness case
+;; cannot be derived. Recorded rather than faked with a repeated field.
 (defn oracle-filters [sel :i64] :i64
   (let [rows (store-rows (seeded-store 5) "Base")
         fields (fields-of "Base")]
     (cond
+      ;; no filter at all -- the row count itself
       (= sel 0) (arr-count (apply-filters rows "{}" fields))
-      (= sel 1) (arr-count (apply-filters rows "{\"jurisdiction\":\"IN\"}" fields))
-      (= sel 2) (arr-count (apply-filters rows "{\"jurisdiction\":\"\"}" fields))
-      (= sel 3) (arr-count (apply-filters rows "{\"externalId\":\"3\"}" fields))
-      (= sel 4) (arr-count (apply-filters rows "{\"externalId\":\"99\"}" fields))
+      ;; a required field, the value every seeded row carries
+      (= sel 1) (arr-count (apply-filters rows "{\"name\":\"v\"}" fields))
+      ;; the SAME field, a value no seeded row carries
+      (= sel 2) (arr-count (apply-filters rows "{\"name\":\"zzz\"}" fields))
       :else (arr-count (apply-filters rows "{\"notAField\":\"x\"}" fields)))))
+
 
 (defn oracle-paginate [n :i64 requested :i64] :i64
   (let [rows (store-rows (seeded-store n) "Base")
@@ -1257,6 +1251,10 @@
         params (jobj (jkv "starting_after" (string-concat "airtable_bas_" (string-from-i64 after))))]
     (arr-count (paginate-cursor rows params))))
 
+;; Selector 6 is the update SUCCESS arm and must be 200; 7 is its 404.
+;; Selector 13 hashes the field selector 6 wrote, so it is meaningful
+;; only while 6 succeeds -- if 6 ever returns 400 again, 13 is hashing
+;; an absent field and will read the same in every repository.
 (defn oracle-handlers [sel :i64] :i64
   (let [store (seeded-store 2)]
     (cond
@@ -1267,7 +1265,7 @@
       (= sel 4) (as-int (field (handle-get store "Base" "airtable_bas_0" "{}") "status"))
       (= sel 5) (as-int (field (handle-get store "Base" "nope" "{}") "status"))
       (= sel 6) (as-int (field (handle-update store "Base" "airtable_bas_0"
-                                              "{\"jurisdiction\":\"US\"}" 1) "status"))
+                                              "{\"name\":\"updated\"}" 1) "status"))
       (= sel 7) (as-int (field (handle-update store "Base" "nope" "{}" 1) "status"))
       (= sel 8) (as-int (field (handle-delete store "Base" "airtable_bas_0") "status"))
       (= sel 9) (as-int (field (handle-delete store "Base" "nope") "status"))
@@ -1280,10 +1278,11 @@
                                         "Base"))
       (= sel 12) (as-int (field (raw-field (handle-list store "Base" "{}") "body") "total"))
       (= sel 13) (str-hash (field (raw-field (handle-update store "Base" "airtable_bas_0"
-                                                            "{\"jurisdiction\":\"US\"}" 1)
+                                                            "{\"name\":\"updated\"}" 1)
                                              "body")
-                                  "jurisdiction"))
+                                  "name"))
       :else (str-hash (raw-field (handle-get store "Base" "airtable_bas_1" "{}") "body")))))
+
 
 (defn oracle-healthz [] :i64 (str-hash (healthz)))
 
@@ -1292,34 +1291,6 @@
 (defn oracle-facts [sel :i64] :i64
   (str-hash (emit-facts "Base" (seeded-row sel))))
 
-;; `refs-of` answers a REAL pair for five of the six entities, so selector 0 is
-;; the production path: a Credential row expanded through `refs-of "null"`
-;; against a store that holds the Base it names.
-;;
-;; The field names here are this repository's, and that is not cosmetic. The
-;; aadhaar port asked for `identityId`; carried over unchanged, every selector
-;; below would name a field null does not have, `expand` would fold over
-;; nothing, and all four arms would return the unexpanded record -- four green
-;; assertions measuring an empty fold. Selector 0 asks for ONE of null's two
-;; refs and selector 4 asks for BOTH, which is the arm no earlier pilot had.
-;; Selector 1 asks for a field that is not in `expand`, 2 points at a Base that
-;; is not in the store (the `null` arm), and 3 is an entity whose refs really
-;; are empty.
-(defn oracle-expand [sel :i64] :i64
-  (let [store (seeded-both 3)
-        rec (cred-row 1)]
-    (cond
-      (= sel 0) (str-hash (expand store rec "{\"expand\":\"parentBaseId\"}"
-                                  (refs-of "null")))
-      (= sel 1) (str-hash (expand store rec "{\"expand\":\"other\"}"
-                                  (refs-of "null")))
-      (= sel 2) (str-hash (expand store (cred-row 9) "{\"expand\":\"parentBaseId\"}"
-                                  (refs-of "null")))
-      (= sel 3) (str-hash (expand store rec "{\"expand\":\"parentBaseId\"}"
-                                  (refs-of "Base")))
-      (= sel 4) (str-hash (expand store rec "{\"expand\":\"parentBaseId,childBaseId\"}"
-                                  (refs-of "null")))
-      :else (str-hash rec))))
 
 (defn oracle-clock [seed :i64] :i64 (str-hash (now seed)))
 
