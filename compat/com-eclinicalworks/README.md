@@ -43,12 +43,12 @@ standalone deploy unit):
   (`specialCategoryData` boolean flag + `lawfulBasisArt9` code, validated
   against the fixed ten-point-letter set).
 
-See `src/eclinicalworks/validation.cljc` (pure validators, ported by value
+See `src/eclinicalworks/validation.kotoba` (pure validators, ported by value
 from `hl7-fhir.validation`, with their own docstring caveats about what
 "format valid" does and doesn't guarantee) and
-`test/eclinicalworks/validation_test.cljc` / the `claim-domain-validation`
+`test/eclinicalworks/validation_test.kotoba` / the `claim-domain-validation`
 and `consent-domain-validation` deftests in
-`test/eclinicalworks/main_test.cljc` for pass/fail coverage. `bb test` runs
+`test/eclinicalworks/main_test.kotoba` for pass/fail coverage. `bb test` runs
 both files. `com-epic-fhir` received the same follow-up in the same pass.
 The `manifest.json` capability declaration was intentionally left unchanged
 for the same reason as `com-hl7-fhir`'s: it's paired with a specific built
@@ -91,7 +91,7 @@ challenge) and is archived, with full retrieval-method provenance, at
   validator, `eclinicalworks.validation/valid-ehds-restriction?`, wired
   through a new entity-spec key `:validate-record` (complementing the
   existing single-field `:validate`) and a new `validate-record` fold in
-  `src/eclinicalworks/main.cljc`'s `handle-create`/`handle-update`:
+  `src/eclinicalworks/main.kotoba`'s `handle-create`/`handle-update`:
   `restrictionApplied=true` with a blank/absent `restrictionReason` is
   rejected with 400 on both create and update (update checks the *merged*
   record, so patching only `restrictionApplied` against an existing
@@ -106,11 +106,11 @@ since been retrieved (see the 2026-07-09 maturity note below); Article 4
 (the "electronic health data access services" definition) is still not
 retrieved and no such entity is added.
 
-See `src/eclinicalworks/validation.cljc` (`valid-ehds-access-method?` /
+See `src/eclinicalworks/validation.kotoba` (`valid-ehds-access-method?` /
 `valid-ehds-restriction?`, with the scope caveats inline) and
-`test/eclinicalworks/validation_test.cljc`'s `ehds-access-method-format` /
+`test/eclinicalworks/validation_test.kotoba`'s `ehds-access-method-format` /
 `ehds-restriction-cross-field` deftests /
-`test/eclinicalworks/main_test.cljc`'s
+`test/eclinicalworks/main_test.kotoba`'s
 `patient-access-request-domain-validation` deftest for pass/fail coverage
 (both access methods and case-insensitivity accepted, an out-of-set method
 rejected, a restriction without a reason rejected on both create and merged
@@ -142,10 +142,10 @@ real-browser EUR-Lex method and are archived at
   yet published -- so `accessMethod` continues to only name the format by
   reference, with no exchange-format data structure added.
 
-See `src/eclinicalworks/validation.cljc` (`ehds-priority-categories` /
+See `src/eclinicalworks/validation.kotoba` (`ehds-priority-categories` /
 `valid-ehds-priority-category?`) and
-`test/eclinicalworks/validation_test.cljc`'s
+`test/eclinicalworks/validation_test.kotoba`'s
 `ehds-priority-category-format` deftest /
-`test/eclinicalworks/main_test.cljc`'s
+`test/eclinicalworks/main_test.kotoba`'s
 `patient-access-request-domain-validation` deftest for pass/fail coverage.
 `bb test`: 16 deftests / 438 assertions as of this pass (up from 14/256).
