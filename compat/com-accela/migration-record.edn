@@ -75,4 +75,45 @@
  ["No consumer cutover. main.cljc remains the oracle."
   "No value-by-value parity against the CLJC oracle."
   "wasm32 was not built; only aarch64-macos was compiled and executed."
-  "The float layer is not exercised here, so this pilot says nothing about it."]}
+  "The float layer is not exercised here, so this pilot says nothing about it."]
+
+ ;; --- added 2026-09-10 by building a parity harness for this component ------
+
+ :parity
+ {:harness "q9-oracle.cljs"
+  :command "nbb --classpath src:<kotoba-lang/text>/src q9-oracle.cljs"
+  :measured-against "the SHIPPED component, compiled to aarch64-macos and executed through tools/kexe_loader.c"
+  :agrees {:as-bool "9 of 9" :as-int "5 of 6" :route-count "30 on both sides"}
+  :disagrees
+  {:as-int-trailing-garbage
+   {:input "12abc" :artifact 0 :oracle-under-nbb 12 :oracle-under-jvm 0
+    :reading "The cohort-wide reader-conditional divergence recorded in kotoba-lang/lang/q9-wave1-tranche-1.edn. Not a defect in this port; accela is the fourth independent reproduction."}}}
+
+ :carried-selectors-that-cannot-discriminate
+ {:found "2026-09-10, by running the component's own oracle-expand over every selector"
+  :measured
+  {0 303754089 1 499508843 2 701086944 3 499508843 4 303754089 5 499508843}
+  :finding
+  "Selector 4 is the `expand BOTH refs` case, carried from the abb_robotics
+   sibling whose BOM spec genuinely declares two. No accela spec has two refs,
+   so selector 4 asks for \"projectId,projectId\" and returns EXACTLY selector
+   0's value. It cannot tell a fold that ran twice from one that ran once, and
+   in the sibling that same selector IS distinct (728485347 against 253212778).
+
+   This is the class :generated-not-hand-ported says cannot be carried. The
+   generator does derive the TABLES from entity-specs, and those are right --
+   what it still templates is the oracle SELECTORS, and one of them names a
+   shape this entity table does not have."
+  :also
+  {:cred-row
+   "Emits \"projectId\" twice -- a duplicate JSON key -- and a \"quantity\"
+    field that no accela spec declares. Both survived `amu check :ok true`,
+    because the object is built with `jkv` calls and the compiler has no schema
+    for it. A green check is not evidence that a fixture is well formed."}
+  :not-fixed-here
+  "The file is generated. Hand-patching its output would make the next
+   regeneration silently undo the fix, so the repair belongs in
+   scripts/gen-whole-component.cljs -- derive the expand selectors from the ref
+   arity of the entity being generated, and build cred-row from the spec's own
+   field list."}
+}
