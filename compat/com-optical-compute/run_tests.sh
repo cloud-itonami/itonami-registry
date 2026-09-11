@@ -3,4 +3,4 @@
 # Runs from the actor dir with its own src:tests classpath so it joins the fleet green-check.
 set -euo pipefail
 cd "$(dirname "$0")"
-exec bb --classpath src:tests -e '(require (quote clojure.test) (quote optical_compute.actor-test))(let [r (apply clojure.test/run-tests (quote [optical_compute.actor-test]))](System/exit (if (zero? (+ (:fail r) (:error r))) 0 1)))'
+exec kbb --classpath src:tests -e '(require (quote clojure.test) (quote optical_compute.actor-test))(let [r (apply clojure.test/run-tests (quote [optical_compute.actor-test]))](System/exit (if (zero? (+ (:fail r) (:error r))) 0 1)))'
