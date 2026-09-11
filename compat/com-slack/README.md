@@ -39,6 +39,6 @@ channel list, and the caller would conclude the workspace has no channels.
 `provided` scopes — the scope an operator actually has to grant.
 
 ```sh
-nbb --classpath "src:test:../connector/src" run-connector-tests.cljs   # 12 tests, 34 assertions
-nbb --classpath "src:../connector/src:../fmt/src" emit-connector-edn.cljs
+nbb --classpath "src:test:../connector/src" run-connector-tests.cljk   # 12 tests, 34 assertions
+nbb --classpath "src:../connector/src:../fmt/src" emit-connector-edn.cljk
 ```
