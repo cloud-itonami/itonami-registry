@@ -53,8 +53,8 @@ GitHub's OAuth Apps do not verify PKCE and the descriptor says so rather than
 sending a challenge nobody checks.
 
 ```sh
-nbb --classpath "src:test:../connector/src" run-connector-tests.cljs   # 13 tests, 50 assertions
-nbb --classpath "src:../connector/src" emit-connector-edn.cljs         # regenerate connector.edn
+nbb --classpath "src:test:../connector/src" run-connector-tests.cljk   # 13 tests, 50 assertions
+nbb --classpath "src:../connector/src" emit-connector-edn.cljk         # regenerate connector.edn
 ```
 
 ## Architecture
