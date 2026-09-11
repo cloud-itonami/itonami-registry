@@ -48,7 +48,7 @@ from `hl7-fhir.validation`, with their own docstring caveats about what
 "format valid" does and doesn't guarantee) and
 `test/eclinicalworks/validation_test.kotoba` / the `claim-domain-validation`
 and `consent-domain-validation` deftests in
-`test/eclinicalworks/main_test.kotoba` for pass/fail coverage. `bb test` runs
+`test/eclinicalworks/main_test.kotoba` for pass/fail coverage. `kbb -M:test` runs
 both files. `com-epic-fhir` received the same follow-up in the same pass.
 The `manifest.json` capability declaration was intentionally left unchanged
 for the same reason as `com-hl7-fhir`'s: it's paired with a specific built
@@ -114,7 +114,7 @@ See `src/eclinicalworks/validation.kotoba` (`valid-ehds-access-method?` /
 `patient-access-request-domain-validation` deftest for pass/fail coverage
 (both access methods and case-insensitivity accepted, an out-of-set method
 rejected, a restriction without a reason rejected on both create and merged
-update, a restriction with a reason accepted). `bb test`: 14 deftests / 256
+update, a restriction with a reason accepted). `kbb -M:test`: 14 deftests / 256
 assertions as of this pass (up from 11/203).
 
 ## Maturity note (2026-07-09) -- EU: EHDS Article 14 priority categories (Regulation (EU) 2025/327)
@@ -148,4 +148,4 @@ See `src/eclinicalworks/validation.kotoba` (`ehds-priority-categories` /
 `ehds-priority-category-format` deftest /
 `test/eclinicalworks/main_test.kotoba`'s
 `patient-access-request-domain-validation` deftest for pass/fail coverage.
-`bb test`: 16 deftests / 438 assertions as of this pass (up from 14/256).
+`kbb -M:test`: 16 deftests / 438 assertions as of this pass (up from 14/256).
