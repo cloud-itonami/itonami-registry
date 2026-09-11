@@ -50,6 +50,6 @@ silently reading a different shape). A page's title is found by property
 **type**, never by the name `Name`, which whoever built the database can rename.
 
 ```sh
-nbb --classpath "src:test:../connector/src" run-connector-tests.cljs   # 12 tests, 36 assertions
-nbb --classpath "src:../connector/src" emit-connector-edn.cljs
+nbb --classpath "src:test:../connector/src" run-connector-tests.cljk   # 12 tests, 36 assertions
+nbb --classpath "src:../connector/src" emit-connector-edn.cljk
 ```
