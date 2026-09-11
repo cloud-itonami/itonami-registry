@@ -17,7 +17,7 @@ code runs against a GitHub App, `gh api`, a Worker, or deterministic fixtures.
 Deterministic end-to-end harness:
 
 ```sh
-clojure -M:harness fixtures/demo.edn kotoba-lang demo
+kbb -M:harness fixtures/demo.edn kotoba-lang demo
 ```
 
 Mutating capabilities are named separately from read capabilities. Consumers
@@ -53,8 +53,8 @@ GitHub's OAuth Apps do not verify PKCE and the descriptor says so rather than
 sending a challenge nobody checks.
 
 ```sh
-nbb --classpath "src:test:../connector/src" run-connector-tests.cljk   # 13 tests, 50 assertions
-nbb --classpath "src:../connector/src" emit-connector-edn.cljk         # regenerate connector.edn
+kbb --backend sci --classpath "src:test:../connector/src" run-connector-tests.cljk   # 13 tests, 50 assertions
+kbb --backend sci --classpath "src:../connector/src" emit-connector-edn.cljk         # regenerate connector.edn
 ```
 
 ## Architecture
