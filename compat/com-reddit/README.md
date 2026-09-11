@@ -13,7 +13,7 @@ Clean-room API-compatible implementation of the reddit platform, backed by Datom
 - **Execution:** Runs in `Py Kotodama WASM`, intercepting inbound REST requests.
 - **Not modeled:** Reddit's own auth surface (`POST /api/v1/access_token`,
   OAuth2 script/installed-app flow) isn't a resource, so it isn't one of the
-  generic CRUD routes below — see `src/reddit/main.cljc`'s `routes` comment.
+  generic CRUD routes below — see `src/reddit/main.cljk`'s `routes` comment.
 
 ## Provenance
 
