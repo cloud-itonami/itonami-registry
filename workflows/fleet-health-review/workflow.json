@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "itonami.workflow.v1",
+  "mode": "recipe",
+  "inputs": [
+    "profiles",
+    "evidenceArgv",
+    "window",
+    "outputPath"
+  ],
+  "steps": [
+    {
+      "id": "collect",
+      "action": "Run owner-provided evidence collector over explicitly selected profiles; retain raw evidence and observation time."
+    },
+    {
+      "id": "review",
+      "action": "Apply the cron skill and fleet-health-auditor role; correlate candidate failures with scheduler logs and final outputs.",
+      "uses": [
+        "skill/itonami-cron-health-audit",
+        "agent/fleet-health-auditor"
+      ]
+    },
+    {
+      "id": "report",
+      "action": "Return one evidenced finding or an explicit unmeasured result; honor notification intent; do not repair or reschedule."
+    }
+  ],
+  "stopWhen": [
+    "measurement-unavailable",
+    "scope-or-authority-unbound"
+  ],
+  "automaticExecution": false
+}

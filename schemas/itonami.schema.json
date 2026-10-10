@@ -1,0 +1,626 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://itonami-registry/schemas/itonami.schema.json",
+  "title": "Itonami supplemental discovery contracts",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "itonami.entry.v1"
+        },
+        "sourceRefs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "useWhen": {
+          "type": "string",
+          "minLength": 1
+        },
+        "avoidWhen": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inputs": {
+          "type": "object"
+        },
+        "outputs": {
+          "type": "object"
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "authority": {
+          "type": "object",
+          "properties": {
+            "grants": {
+              "const": false
+            },
+            "default": {
+              "const": "blocked"
+            },
+            "binding": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "grants",
+            "default",
+            "binding"
+          ],
+          "additionalProperties": false
+        },
+        "validation": {
+          "type": "object",
+          "properties": {
+            "catalog": {
+              "const": "schema-checked"
+            },
+            "runtime": {
+              "type": "string",
+              "minLength": 1
+            },
+            "live": {
+              "const": false
+            }
+          },
+          "required": [
+            "catalog",
+            "runtime",
+            "live"
+          ],
+          "additionalProperties": false
+        },
+        "compatibilityNote": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dependsOn": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "roleKind": {
+          "enum": [
+            "agent",
+            "yakuwari",
+            "ao"
+          ]
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "executionNote": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requires": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "launchResolution": {
+          "type": "object",
+          "properties": {
+            "placeholder": {
+              "type": "string",
+              "minLength": 1
+            },
+            "behavior": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "placeholder",
+            "behavior"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "sourceRefs",
+        "useWhen",
+        "avoidWhen",
+        "inputs",
+        "outputs",
+        "effects",
+        "authority",
+        "validation",
+        "compatibilityNote"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "itonami.workflow.v1"
+        },
+        "mode": {
+          "const": "recipe"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "action": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uses": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "required": [
+              "id",
+              "action"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "stopWhen": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "automaticExecution": {
+          "const": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "mode",
+        "inputs",
+        "steps",
+        "stopWhen",
+        "automaticExecution"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "itonami.parameters.v1"
+        },
+        "sourceRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "status": {
+          "const": "reference-only"
+        },
+        "activate": {
+          "const": false
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "sourceRef",
+        "parameters",
+        "status",
+        "activate",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "itonami.tools.v1"
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "provider": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "mcp",
+                      "hermes-plugin"
+                    ]
+                  },
+                  "sourceRef": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "entry": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "kind",
+                  "sourceRef",
+                  "path"
+                ],
+                "additionalProperties": false,
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "kind": {
+                          "const": "mcp"
+                        }
+                      }
+                    },
+                    "then": {
+                      "required": [
+                        "entry"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "inputSchema": {
+                "type": "object"
+              },
+              "outputContract": {
+                "type": "string",
+                "minLength": 1
+              },
+              "effects": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "authority": {
+                "type": "string",
+                "minLength": 1
+              },
+              "validation": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "provider",
+              "description",
+              "inputSchema",
+              "outputContract",
+              "effects",
+              "authority",
+              "validation"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "tools"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "itonami.sources.v1"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "repository": {
+                "type": "string",
+                "minLength": 1
+              },
+              "commit": {
+                "type": "string",
+                "minLength": 1
+              },
+              "files": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "url": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "sha256",
+                    "url"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "id",
+              "repository",
+              "commit",
+              "files"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "sources"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "itonami.federation.v1"
+        },
+        "registries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "repository": {
+                "type": "string",
+                "minLength": 1
+              },
+              "commit": {
+                "type": "string",
+                "minLength": 1
+              },
+              "index": {
+                "type": "string",
+                "minLength": 1
+              },
+              "entries": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "usage": {
+                "type": "string",
+                "minLength": 1
+              },
+              "consumerSupport": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "id",
+              "repository",
+              "commit",
+              "index",
+              "entries",
+              "usage",
+              "consumerSupport"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "registries"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "itonami.validation.v1"
+        },
+        "date": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceFilesVerifiedAgainstGitHub": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "hermesSchemasPinned": {
+          "const": true
+        },
+        "catalogChecks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "mcp": {
+          "type": "object",
+          "properties": {
+            "entry": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceScriptSha256": {
+              "type": "string",
+              "minLength": 1
+            },
+            "checks": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "liveCalls": {
+              "const": 0
+            },
+            "limits": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "entry",
+            "sourceScriptSha256",
+            "checks",
+            "liveCalls",
+            "limits"
+          ],
+          "additionalProperties": false
+        },
+        "agents": {
+          "type": "object",
+          "properties": {
+            "runtimeInstallationTested": {
+              "const": false
+            },
+            "partialScaffoldsOnly": {
+              "const": true
+            }
+          },
+          "required": [
+            "runtimeInstallationTested",
+            "partialScaffoldsOnly"
+          ],
+          "additionalProperties": false
+        },
+        "workflows": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "minLength": 1
+            },
+            "hermesExecutorTested": {
+              "const": false
+            }
+          },
+          "required": [
+            "mode",
+            "hermesExecutorTested"
+          ],
+          "additionalProperties": false
+        },
+        "pluginTools": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer"
+            },
+            "validation": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "count",
+            "validation"
+          ],
+          "additionalProperties": false
+        },
+        "existingProfilesModified": {
+          "const": false
+        },
+        "clientSettingsModified": {
+          "const": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "date",
+        "sourceFilesVerifiedAgainstGitHub",
+        "hermesSchemasPinned",
+        "catalogChecks",
+        "mcp",
+        "agents",
+        "workflows",
+        "pluginTools",
+        "existingProfilesModified",
+        "clientSettingsModified"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

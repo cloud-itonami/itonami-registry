@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "itonami.entry.v1",
+  "sourceRefs": [
+    "web"
+  ],
+  "useWhen": "Murakumo web-plane MCP inspection or explicitly authorized web operations",
+  "avoidWhen": "Treating all advertised tools as read-only",
+  "inputs": {
+    "MURAKUMO_REPO": "owner-installed pinned checkout"
+  },
+  "outputs": {
+    "protocol": "newline-delimited JSON-RPC stdio"
+  },
+  "effects": [
+    "network",
+    "process",
+    "filesystem-read",
+    "remote-artifact-write",
+    "remote-config-write"
+  ],
+  "authority": {
+    "grants": false,
+    "default": "blocked",
+    "binding": "owner-reviewed target repository policy"
+  },
+  "validation": {
+    "catalog": "schema-checked",
+    "runtime": "initialize-and-tools-list-only",
+    "live": false
+  },
+  "compatibilityNote": "Hermes storage format only; client installation and execution are not qualified. Wildcard versions do not establish runtime compatibility.",
+  "requires": [
+    "Node.js",
+    "kbb",
+    "Owner-managed Murakumo web-plane configuration and any operation-specific access"
+  ],
+  "launchResolution": {
+    "placeholder": "${MURAKUMO_REPO}",
+    "behavior": "Replace the placeholder with the chosen absolute path before adding this configuration to a client. Generic MCP clients do not necessarily interpolate argv."
+  }
+}
