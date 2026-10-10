@@ -1,0 +1,292 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Public organization structural inventory; no runtime qualification",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "itonami.inventory.v1"
+    },
+    "observedOn": {
+      "type": "string",
+      "format": "date"
+    },
+    "scope": {
+      "const": [
+        "kotoba-lang",
+        "cloud-itonami"
+      ]
+    },
+    "method": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "kotoba-lang": {
+          "type": "object",
+          "properties": {
+            "totalRepositories": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "publicRepositories": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "privateRepositoriesOmitted": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "scanStatus": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "dispositions": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "required": [
+            "totalRepositories",
+            "publicRepositories",
+            "privateRepositoriesOmitted",
+            "scanStatus",
+            "dispositions"
+          ],
+          "additionalProperties": false
+        },
+        "cloud-itonami": {
+          "type": "object",
+          "properties": {
+            "totalRepositories": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "publicRepositories": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "privateRepositoriesOmitted": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "scanStatus": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "dispositions": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "required": [
+            "totalRepositories",
+            "publicRepositories",
+            "privateRepositoriesOmitted",
+            "scanStatus",
+            "dispositions"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "kotoba-lang",
+        "cloud-itonami"
+      ],
+      "additionalProperties": false
+    },
+    "repositories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "repository": {
+            "type": "string",
+            "pattern": "^(kotoba-lang|cloud-itonami)/[^/]+$"
+          },
+          "defaultBranch": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "commit": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{40}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "fork": {
+            "type": "boolean"
+          },
+          "scanBasis": {
+            "enum": [
+              "github-recursive-default-tree",
+              "local-committed-tree-equals-github-default-head",
+              "github-root-and-profile-directory-only"
+            ]
+          },
+          "scanStatus": {
+            "enum": [
+              "recursive-tree-scanned",
+              "empty-default-branch",
+              "root-only",
+              "truncated",
+              "unreadable"
+            ]
+          },
+          "markers": {
+            "type": "object",
+            "properties": {
+              "blueprint": {
+                "type": "boolean"
+              },
+              "physics": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "blueprint",
+              "physics"
+            ],
+            "additionalProperties": false
+          },
+          "candidates": {
+            "type": "object",
+            "properties": {
+              "skills": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+              "profiles": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+              "mcp": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+              "plugins": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+              "toolContracts": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "skills",
+              "profiles",
+              "mcp",
+              "plugins",
+              "toolContracts"
+            ],
+            "additionalProperties": false
+          },
+          "disposition": {
+            "enum": [
+              "curated-reference-added",
+              "external-registry-owner",
+              "deferred-source-contract",
+              "upstream-or-archived-reference",
+              "candidate-owner-review-required",
+              "profile-or-domain-instance-retained",
+              "no-selected-registry-marker"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "registrations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "entry": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sourceCommit": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                }
+              },
+              "required": [
+                "entry",
+                "sourceCommit"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "repository",
+          "defaultBranch",
+          "commit",
+          "archived",
+          "fork",
+          "scanBasis",
+          "scanStatus",
+          "markers",
+          "candidates",
+          "disposition",
+          "reason",
+          "registrations"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "observedOn",
+    "scope",
+    "method",
+    "summary",
+    "repositories"
+  ],
+  "additionalProperties": false
+}

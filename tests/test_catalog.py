@@ -26,8 +26,39 @@ class IntegrityTests(unittest.TestCase):
         p.write_text(json.dumps(value))
 
     def test_published_catalog(self):
-        self.assertEqual(validate(self.root), (6, 11))
+        self.assertEqual(validate(self.root), (24, 15))
         build(self.root, check=True)
+
+    def test_nonpublic_source_refused(self):
+        def change(v):
+            source = v['sources'][-1]
+            source['repository'] = 'kotoba-lang/not-in-public-survey'
+            for f in source['files']:
+                f['url'] = "https://github.com/" + source['repository'] + "/blob/" + source['commit'] + "/" + f['path']
+            # This unused provenance still must not expose a private source.
+            source['id'] = 'unused-source'
+        # Add an unused source, so reference resolution still passes first.
+        def append(v):
+            import copy
+            temporary = {'sources': [copy.deepcopy(v['sources'][0])]}
+            change(temporary)
+            v['sources'].append(temporary['sources'][0])
+        self.mutate('catalogs/sources.json', append)
+        with self.assertRaisesRegex(ValueError, 'Non-public'):
+            validate(self.root)
+
+    def test_inventory_count_mismatch_fails(self):
+        self.mutate('catalogs/inventory.json', lambda v: v['summary']['kotoba-lang'].update(publicRepositories=0))
+        with self.assertRaisesRegex(ValueError, 'Inventory coverage'):
+            validate(self.root)
+
+    def test_inventory_registration_provenance_fails(self):
+        def change(v):
+            row = next(r for r in v['repositories'] if r['registrations'])
+            row['registrations'][0]['sourceCommit'] = '0' * 40
+        self.mutate('catalogs/inventory.json', change)
+        with self.assertRaisesRegex(ValueError, 'Inventory registration provenance'):
+            validate(self.root)
 
     def test_checksum_matches_hermes_vectors(self):
         folder = Path(self.temp.name) / 'vector'
