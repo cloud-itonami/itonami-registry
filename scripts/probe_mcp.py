@@ -36,7 +36,7 @@ if __name__ == '__main__':
     assert replies[1]['result']['protocolVersion'] == '2024-11-05'
     assert replies[3]['result'] == {} and replies[4]['error']['code'] == -32602
     assert replies[5]['result']['isError'] is True
-    expected = {t['name']: t for t in json.loads((ROOT / 'catalogs/tools.json').read_text())['tools'] if t['provider']['kind'] == 'mcp'}
+    expected = {t['name']: t for t in json.loads((ROOT / 'catalogs/tools.json').read_text())['tools'] if t['provider'].get('entry') == 'mcp/murakumo-web'}
     observed = {t['name']: t for t in replies[2]['result']['tools']}
     assert expected.keys() == observed.keys()
     for name, descriptor in observed.items():

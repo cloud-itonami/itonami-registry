@@ -115,6 +115,27 @@ def validate(root=ROOT):
         if identities.intersection(r['entries']):
             raise ValueError('Duplicates an externally owned entry')
     ext_validator.validate(read(root / 'docs/validation.json'))
+    inventory = read(root / 'catalogs/inventory.json')
+    inventory_schema = read(root / 'schemas/inventory.schema.json')
+    Draft202012Validator.check_schema(inventory_schema)
+    Draft202012Validator(inventory_schema).validate(inventory)
+    repo_names = [r['repository'] for r in inventory['repositories']]
+    if any(source['repository'] not in repo_names for source in refs.values()):
+        raise ValueError('Non-public or unsurveyed registry source refused')
+    if len(set(repo_names)) != len(repo_names):
+        raise ValueError('Duplicate inventory repository')
+    from collections import Counter
+    for org in inventory['scope']:
+        rows = [r for r in inventory['repositories'] if r['repository'].startswith(org + '/')]
+        summary = inventory['summary'][org]
+        if summary['publicRepositories'] != len(rows) or summary['totalRepositories'] != len(rows) + summary['privateRepositoriesOmitted']:
+            raise ValueError('Inventory coverage count mismatch')
+        if summary['scanStatus'] != dict(Counter(r['scanStatus'] for r in rows)) or summary['dispositions'] != dict(Counter(r['disposition'] for r in rows)):
+            raise ValueError('Inventory disposition count mismatch')
+    expected_registrations = {(refs[r]['repository'], refs[r]['commit'], e['type'] + '/' + e['id']) for e in catalog for r in read(root / e['path'] / 'itonami.json')['sourceRefs']}
+    observed_registrations = {(r['repository'], e['sourceCommit'], e['entry']) for r in inventory['repositories'] for e in r['registrations']}
+    if expected_registrations != observed_registrations:
+        raise ValueError('Inventory registration provenance mismatch')
     return len(catalog), len(tools['tools'])
 
 
