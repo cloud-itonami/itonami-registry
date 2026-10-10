@@ -136,6 +136,28 @@ def validate(root=ROOT):
     observed_registrations = {(r['repository'], e['sourceCommit'], e['entry']) for r in inventory['repositories'] for e in r['registrations']}
     if expected_registrations != observed_registrations:
         raise ValueError('Inventory registration provenance mismatch')
+    reviews = read(root / 'catalogs/candidate-reviews.json')
+    review_schema = read(root / 'schemas/candidate-reviews.schema.json')
+    Draft202012Validator.check_schema(review_schema)
+    Draft202012Validator(review_schema).validate(reviews)
+    if reviews['counts'] != dict(Counter(r['decision'] for r in reviews['reviews'])):
+        raise ValueError('Candidate review decision count mismatch')
+    review_repos = [r['repository'] for r in reviews['reviews']]
+    if len(set(review_repos)) != len(review_repos):
+        raise ValueError('Duplicate candidate review owner')
+    for review in reviews['reviews']:
+        if review['repository'] not in repo_names:
+            raise ValueError('Non-public candidate review refused')
+        if review['reviewedOn'] != reviews['reviewedOn']:
+            raise ValueError('Candidate review date mismatch')
+        for file in review['evidence']:
+            if Path(file['path']).is_absolute() or '..' in Path(file['path']).parts:
+                raise ValueError('Unsafe candidate evidence path')
+            expected = f"https://github.com/{review['repository']}/blob/{review['commit']}/{file['path']}"
+            if file['url'] != expected:
+                raise ValueError('Candidate evidence URL differs from pinned identity')
+        if review['decision'] == 'registered' and not any(s['repository'] == review['repository'] and s['commit'] == review['commit'] for s in refs.values()):
+            raise ValueError('Registered candidate lacks matching source provenance')
     return len(catalog), len(tools['tools'])
 
 

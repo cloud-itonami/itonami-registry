@@ -477,6 +477,144 @@
       ],
       "authority": "caller supplies authorized study/run data; registration grants no participant or host capability",
       "validation": "source-inspected native descriptors; startup/live execution not tested"
+    },
+    {
+      "id": "itonami-fleet-catalog/fleet_search",
+      "name": "fleet_search",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/itonami-fleet-catalog",
+        "sourceRef": "app-fleet",
+        "path": "bin/itonami-mcp"
+      },
+      "description": "Query the bundled actor catalog. No network. fleet_call is not on this nbb host — leftover JVM.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "isic": {
+            "type": "string"
+          },
+          "iso3166": {
+            "type": "string"
+          },
+          "maturity": {
+            "type": "string"
+          },
+          "execution": {
+            "type": "string"
+          },
+          "callable": {
+            "type": "boolean"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        }
+      },
+      "outputContract": "Native MCP text JSON matched/returned/actors; limit is clamped by the implementation; catalog data is not a health or grant receipt.",
+      "effects": [
+        "filesystem-read",
+        "in-process-directory-query"
+      ],
+      "authority": "caller-bound; directory presence grants no remote invocation or profile authority",
+      "validation": "source-inspected native launcher descriptor; compiled guest startup not tested"
+    },
+    {
+      "id": "zap-plugin/zap_scan",
+      "name": "zap_scan",
+      "provider": {
+        "kind": "hermes-plugin",
+        "sourceRef": "zap-plugin",
+        "path": "plugin/schemas.py"
+      },
+      "description": "Run a passive (non-intrusive) DAST scan of a target URL using the kotoba-lang/zap-proxy decision core (independent implementation; does not include or call OWASP ZAP). Checks security headers, cookie flags, and sensitive-info disclosure. Only targets recorded in zap_proxy_targets config are allowed — third-party hosts are refused. Returns a findings list with rule ids, severities, and evidence.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "URL to scan, e.g. http://localhost:8080. Must be in zap_proxy_targets."
+          },
+          "max_pages": {
+            "type": "integer",
+            "description": "Spider page cap (default 50)."
+          }
+        },
+        "required": [
+          "target"
+        ]
+      },
+      "outputContract": "Native JSON string: refused/error or owner EDN findings/rules. A configured origin is not proof of caller authorization or target ownership.",
+      "effects": [
+        "filesystem-read",
+        "process",
+        "network",
+        "passive-http-probing"
+      ],
+      "authority": "caller-authorized owned target and page budget; scans require plugin target configuration; active requires allow_active as well; registration grants nothing",
+      "validation": "pinned Python AST literal schema extraction; no plugin execution, subprocess or scan performed"
+    },
+    {
+      "id": "zap-plugin/zap_scan_active",
+      "name": "zap_scan_active",
+      "provider": {
+        "kind": "hermes-plugin",
+        "sourceRef": "zap-plugin",
+        "path": "plugin/schemas.py"
+      },
+      "description": "Run an ACTIVE (intrusive) DAST scan — injects detection payloads (SQLi, XSS, command injection, path traversal, CRLF) into query parameters. Only for targets explicitly allowed, and only with allow_active=true in the target's config entry. Detection is evidence-based (error reflection, marker arithmetic) — no destructive payloads. This is a defense-side diagnostic tool for hosts you control.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "URL to scan. Must be in zap_proxy_targets with allow_active: true."
+          },
+          "max_pages": {
+            "type": "integer",
+            "description": "Spider page cap (default 50)."
+          }
+        },
+        "required": [
+          "target"
+        ]
+      },
+      "outputContract": "Native JSON string: refused/error or owner EDN findings/rules. A configured origin is not proof of caller authorization or target ownership.",
+      "effects": [
+        "filesystem-read",
+        "process",
+        "network",
+        "active-diagnostic-payloads"
+      ],
+      "authority": "caller-authorized owned target and page budget; scans require plugin target configuration; active requires allow_active as well; registration grants nothing",
+      "validation": "pinned Python AST literal schema extraction; no plugin execution, subprocess or scan performed"
+    },
+    {
+      "id": "zap-plugin/zap_scan_rules",
+      "name": "zap_scan_rules",
+      "provider": {
+        "kind": "hermes-plugin",
+        "sourceRef": "zap-plugin",
+        "path": "plugin/schemas.py"
+      },
+      "description": "List the zap-proxy rule registry: rule id, kind (passive/active), severity, and the IPA「ウェブ健康診断仕様」/ OWASP WSTG item each rule maps to. Use this to explain what a scan covers before running one.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "outputContract": "Native JSON string: refused/error or owner EDN findings/rules. A configured origin is not proof of caller authorization or target ownership.",
+      "effects": [
+        "filesystem-read"
+      ],
+      "authority": "caller-authorized owned target and page budget; scans require plugin target configuration; active requires allow_active as well; registration grants nothing",
+      "validation": "pinned Python AST literal schema extraction; no plugin execution, subprocess or scan performed"
     }
   ]
 }

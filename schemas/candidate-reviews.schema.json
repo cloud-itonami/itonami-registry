@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Source-scoped candidate review decisions, not runtime qualification",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "itonami.candidate-reviews.v1"
+    },
+    "reviewedOn": {
+      "type": "string",
+      "format": "date"
+    },
+    "previousInventory": {
+      "const": "catalogs/inventory.json"
+    },
+    "counts": {
+      "type": "object",
+      "properties": {
+        "registered": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "deduplicated": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source-only": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "deferred": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "already-owned": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "registered",
+        "deduplicated",
+        "source-only",
+        "deferred",
+        "already-owned"
+      ],
+      "additionalProperties": false
+    },
+    "reviews": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "repository": {
+            "type": "string",
+            "pattern": "^(kotoba-lang|cloud-itonami)/[^/]+$"
+          },
+          "commit": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "reviewedOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "scope": {
+            "type": "string",
+            "minLength": 1
+          },
+          "decision": {
+            "enum": [
+              "registered",
+              "deduplicated",
+              "source-only",
+              "deferred",
+              "already-owned"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "url": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "path",
+                "sha256",
+                "url"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "liveOperations": {
+            "const": false
+          },
+          "profilesModified": {
+            "const": false
+          }
+        },
+        "required": [
+          "repository",
+          "commit",
+          "reviewedOn",
+          "scope",
+          "decision",
+          "reason",
+          "evidence",
+          "liveOperations",
+          "profilesModified"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "reviewedOn",
+    "previousInventory",
+    "counts",
+    "reviews"
+  ],
+  "additionalProperties": false
+}

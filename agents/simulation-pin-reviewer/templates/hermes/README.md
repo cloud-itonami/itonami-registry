@@ -1,0 +1,1 @@
+Partial role scaffold only. Bind a fresh target profile, owner policy, model/provider and effective tool allowlist in the owner repository. No enabled tools, credentials, schedules or installer are supplied.
