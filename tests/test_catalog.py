@@ -26,7 +26,7 @@ class IntegrityTests(unittest.TestCase):
         p.write_text(json.dumps(value))
 
     def test_published_catalog(self):
-        self.assertEqual(validate(self.root), (24, 15))
+        self.assertEqual(validate(self.root), (39, 19))
         build(self.root, check=True)
 
     def test_nonpublic_source_refused(self):
@@ -45,6 +45,16 @@ class IntegrityTests(unittest.TestCase):
             v['sources'].append(temporary['sources'][0])
         self.mutate('catalogs/sources.json', append)
         with self.assertRaisesRegex(ValueError, 'Non-public'):
+            validate(self.root)
+
+    def test_candidate_review_count_mismatch_fails(self):
+        self.mutate('catalogs/candidate-reviews.json', lambda v: v['counts'].update(registered=0))
+        with self.assertRaisesRegex(ValueError, 'Candidate review decision count'):
+            validate(self.root)
+
+    def test_candidate_evidence_cannot_use_mutable_url(self):
+        self.mutate('catalogs/candidate-reviews.json', lambda v: v['reviews'][0]['evidence'][0].update(url='https://example.invalid/main'))
+        with self.assertRaisesRegex(ValueError, 'Candidate evidence URL'):
             validate(self.root)
 
     def test_inventory_count_mismatch_fails(self):
@@ -78,7 +88,7 @@ class IntegrityTests(unittest.TestCase):
             validate(self.root)
 
     def test_missing_tool_provider_fails(self):
-        self.mutate('catalogs/tools.json', lambda v: v['tools'][-1]['provider'].update(entry='mcp/missing'))
+        self.mutate('catalogs/tools.json', lambda v: next(t for t in v['tools'] if t['provider']['kind'] == 'mcp')['provider'].update(entry='mcp/missing'))
         with self.assertRaisesRegex(ValueError, 'Unresolved MCP provider'):
             validate(self.root)
 

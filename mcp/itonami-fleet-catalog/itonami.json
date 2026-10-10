@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "itonami.entry.v1",
+  "sourceRefs": [
+    "app-fleet"
+  ],
+  "useWhen": "Search the bundled actor directory through the current native stdio host",
+  "avoidWhen": "Calling remote actors or assuming an entry is deployed/healthy",
+  "inputs": {
+    "checkout": "owner-prepared pinned app checkout",
+    "guestArtifact": "owner-built target/amu/mcp_main.wasm and dependency receipt",
+    "catalog": "bundled actor catalog"
+  },
+  "outputs": {
+    "result": "matched/returned actor metadata; not live health or authority"
+  },
+  "effects": [
+    "filesystem-read",
+    "process"
+  ],
+  "authority": {
+    "grants": false,
+    "default": "blocked",
+    "binding": "caller-authorized target scope and owner-reviewed effective runtime policy"
+  },
+  "validation": {
+    "catalog": "schema-checked",
+    "runtime": "current native launcher and descriptor source-inspected; compiled-guest startup and client integration not tested",
+    "live": false
+  },
+  "compatibilityNote": "Hermes storage format only; client installation, target runtime and live behavior are not qualified. Bind current owner commands and permissions separately.",
+  "requires": [
+    "Owner-installed kbb/Node host dependencies",
+    "Owner-built target/amu/mcp_main.wasm with positive guest main",
+    "resources/itonami-fleet-catalog.edn"
+  ],
+  "launchResolution": {
+    "placeholder": "ITONAMI_APP_REPO",
+    "behavior": "Resolve the absolute owner-prepared checkout before native client config; launcher resolves its own bin dependencies from its file path."
+  }
+}

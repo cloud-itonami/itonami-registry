@@ -21,7 +21,7 @@ Start at [llms.txt](llms.txt), then [llms-full.txt](llms-full.txt). The public d
 
 Skills use SKILL.md frontmatter; MCPs, agents and workflows use Hermes manifest shapes. itonami.json contains supplemental inputs, effects and authority requirements. Wildcard Hermes/desktop version fields express no declared version filter; only catalog format has been checked. Runtime installation compatibility has not been qualified. workflow.json uses an Itonami recipe schema and requires a compatible reader; it is not a proven Hermes executable workflow.
 
-[catalogs/tools.json](catalogs/tools.json) indexes eight Murakumo MCP tools, four portable user-test MCP tools and three plugin-hermes tools, with provider identity and input contracts. [catalogs/sources.json](catalogs/sources.json) records pinned derivation inputs and file hashes. Tool discovery is not a successful live invocation.
+[catalogs/tools.json](catalogs/tools.json) indexes eight Murakumo MCP tools, four portable user-test MCP tools, one native fleet catalog tool, three plugin-hermes tools and three ZAP plugin tools, with provider identity and input contracts. [catalogs/sources.json](catalogs/sources.json) records pinned derivation inputs and file hashes. Tool discovery is not a successful live invocation.
 
 ## Ownership and federation
 
@@ -50,6 +50,12 @@ See [ADR 0001](docs/adr/0001-registry-ownership.md) and [validation receipt](doc
 
 The 2026-10-10 inventory covers 4,710 GitHub repositories across both organizations. The public [machine-readable inventory](catalogs/inventory.json) contains 4,614 repositories: every nonempty public default branch has a complete recursive filename survey; one repository has an empty default branch. Private repositories are counted only (96); their names and contents are omitted. Filename markers are candidates, not semantic or runtime qualification. See [coverage and selection decisions](docs/inventory-2026-10-10.md).
 
-The catalog now has **24 entries**: 12 skills, 8 agent templates, 2 MCP connections and 2 inert workflows, plus **15 provider-qualified tool references**. Added roles cover repository maturity, provider capabilities, research corpora, sealed inbox observation, learning material drafts and independent evidence review. Added skills also cover portable user tests, content-addressed receipts, host connector contracts, definition inspection, guest admission and system-dynamics evidence. These are Itonami operational adaptations; upstream implementation and generic language skills retain their owners.
+The catalog now has **39 entries**: 21 skills, 13 agent templates, 3 MCP connections and 2 inert workflows, plus **19 provider-qualified tool references**. Added roles cover repository maturity, provider capabilities, research corpora, sealed inbox observation, learning material drafts and independent evidence review. Added skills also cover portable user tests, content-addressed receipts, host connector contracts, definition inspection, guest admission and system-dynamics evidence. These are Itonami operational adaptations; upstream implementation and generic language skills retain their owners.
 
 The user-test connection is source-inspected and has a checked fail-closed launcher; its target runtime is not qualified. The Murakumo discovery probe sends zero valid tool calls and performs no live network operation. The inventory includes candidate and deferred decisions; neither these records nor publication enables a profile or tool.
+
+## Remaining candidate review
+
+The [2026-10-11 review](docs/candidate-review-2026-10-11.md) resolves all 37 previously pending/deferred candidate owners into explicit source-scoped decisions: registered, deduplicated, source-only, deferred or already-owned. Nine additional operational skills, five role scaffolds, the current guest-Wasm fleet catalog MCP and four native tool references were added. [catalogs/candidate-reviews.json](catalogs/candidate-reviews.json) preserves reviewed commits, evidence hashes and reasons. Existing profiles remain in their owner repos; initial registry entries and external kotoba-registry ownership are retained.
+
+The fleet catalog connection is source-inspected and publishes fleet_search only. Its owner-built guest and startup are untested. ZAP plugin descriptors are discovered by literal AST, with no scans or configured targets. Catalog publication neither installs an adapter nor enables effects.
