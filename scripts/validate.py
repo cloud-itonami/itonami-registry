@@ -120,7 +120,17 @@ def validate(root=ROOT):
     Draft202012Validator.check_schema(inventory_schema)
     Draft202012Validator(inventory_schema).validate(inventory)
     repo_names = [r['repository'] for r in inventory['repositories']]
-    if any(source['repository'] not in repo_names for source in refs.values()):
+    # Targeted public-source reviews do not rewrite the dated full-org survey.
+    targeted = read(root / 'catalogs/targeted-public-sources.json')
+    Draft202012Validator(read(root / 'schemas/targeted-public-sources.schema.json')).validate(targeted)
+    targeted_rows = targeted['sources']
+    targeted_names = [r['repository'] for r in targeted_rows]
+    if len(set(targeted_names)) != len(targeted_names) or set(targeted_names) & set(repo_names):
+        raise ValueError('Duplicate targeted public source')
+    for row in targeted_rows:
+        if not any(s['repository'] == row['repository'] and s['commit'] == row['commit'] for s in refs.values()):
+            raise ValueError('Targeted source lacks matching pinned provenance')
+    if any(source['repository'] not in repo_names + targeted_names for source in refs.values()):
         raise ValueError('Non-public or unsurveyed registry source refused')
     if len(set(repo_names)) != len(repo_names):
         raise ValueError('Duplicate inventory repository')
@@ -134,6 +144,7 @@ def validate(root=ROOT):
             raise ValueError('Inventory disposition count mismatch')
     expected_registrations = {(refs[r]['repository'], refs[r]['commit'], e['type'] + '/' + e['id']) for e in catalog for r in read(root / e['path'] / 'itonami.json')['sourceRefs']}
     observed_registrations = {(r['repository'], e['sourceCommit'], e['entry']) for r in inventory['repositories'] for e in r['registrations']}
+    observed_registrations.update((r['repository'], e['sourceCommit'], e['entry']) for r in targeted_rows for e in r['registrations'])
     if expected_registrations != observed_registrations:
         raise ValueError('Inventory registration provenance mismatch')
     reviews = read(root / 'catalogs/candidate-reviews.json')
