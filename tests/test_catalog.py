@@ -26,7 +26,7 @@ class IntegrityTests(unittest.TestCase):
         p.write_text(json.dumps(value))
 
     def test_published_catalog(self):
-        self.assertEqual(validate(self.root), (39, 19))
+        self.assertEqual(validate(self.root), (40, 19))
         build(self.root, check=True)
 
     def test_nonpublic_source_refused(self):
@@ -45,6 +45,21 @@ class IntegrityTests(unittest.TestCase):
             v['sources'].append(temporary['sources'][0])
         self.mutate('catalogs/sources.json', append)
         with self.assertRaisesRegex(ValueError, 'Non-public'):
+            validate(self.root)
+
+    def test_targeted_source_cannot_claim_private_visibility(self):
+        self.mutate('catalogs/targeted-public-sources.json', lambda v: v['sources'][0].update(visibility='private'))
+        with self.assertRaises(Exception):
+            validate(self.root)
+
+    def test_targeted_source_must_pin_registered_owner(self):
+        self.mutate('catalogs/targeted-public-sources.json', lambda v: v['sources'][0].update(commit='0'*40))
+        with self.assertRaisesRegex(ValueError, 'matching pinned'):
+            validate(self.root)
+
+    def test_targeted_registration_must_match_entry_provenance(self):
+        self.mutate('catalogs/targeted-public-sources.json', lambda v: v['sources'][0]['registrations'][0].update(sourceCommit='0'*40))
+        with self.assertRaisesRegex(ValueError, 'registration provenance'):
             validate(self.root)
 
     def test_candidate_review_count_mismatch_fails(self):
