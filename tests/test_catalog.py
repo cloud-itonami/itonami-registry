@@ -26,7 +26,7 @@ class IntegrityTests(unittest.TestCase):
         p.write_text(json.dumps(value))
 
     def test_published_catalog(self):
-        self.assertEqual(validate(self.root), (40, 19))
+        self.assertEqual(validate(self.root), (46, 19))
         build(self.root, check=True)
 
     def test_nonpublic_source_refused(self):
@@ -132,6 +132,41 @@ class IntegrityTests(unittest.TestCase):
         (self.root / 'agents/fleet-health-auditor/escape').symlink_to(self.root / 'README.md')
         with self.assertRaisesRegex(ValueError, 'Symlinks'):
             build(self.root, check=True)
+
+    # ADR 0002: Itonami profiles are pinned references, never copies.
+    def test_profile_files_are_never_copied(self):
+        (self.root / 'profiles/itonami-eng/SOUL.md').write_text('# copied\n')
+        with self.assertRaisesRegex(ValueError, 'must not copy profile files'):
+            validate(self.root)
+
+    def test_profile_tree_checksum_is_checked(self):
+        self.mutate('profiles/itonami-eng/manifest.json',
+                    lambda v: v['profile']['files'][0].update(sha256='0' * 64))
+        with self.assertRaisesRegex(ValueError, 'tree checksum'):
+            validate(self.root)
+
+    def test_profile_cannot_carry_owner_memory(self):
+        def change(v):
+            v['profile']['files'].append({'path': 'MEMORY.md', 'sha256': '0' * 64, 'bytes': 1})
+        self.mutate('profiles/itonami-eng/manifest.json', change)
+        with self.assertRaisesRegex(ValueError, 'Not a registry profile file'):
+            validate(self.root)
+
+    def test_profile_files_must_be_pinned_in_sources(self):
+        from profile_tree import tree_checksum
+
+        def change(v):
+            v['profile']['files'][0]['sha256'] = '1' * 64
+            v['profile']['checksum'] = tree_checksum(v['profile']['files'])
+        self.mutate('profiles/itonami-eng/manifest.json', change)
+        with self.assertRaisesRegex(ValueError, 'not pinned'):
+            validate(self.root)
+
+    def test_categories_and_models_follow_the_hermes_shape(self):
+        categories = json.loads((self.root / 'categories.json').read_text())
+        self.assertIn('profile', [t['type'] for t in categories['types']])
+        models = json.loads((self.root / 'models.json').read_text())
+        self.assertEqual(['murakumo'], [p['id'] for p in models['providers']])
 
 
 if __name__ == '__main__':

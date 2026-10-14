@@ -60,11 +60,66 @@ def entries(root=ROOT):
                     entry[key] = meta[key]
             entry.update(path=file.parent.relative_to(root).as_posix(), checksum=checksum(file.parent))
             result.append(entry)
+    # Itonami profiles (ADR 0002): a catalog entry over a profile folder owned
+    # by another repository. The folder checksum covers the catalog entry; the
+    # profile's own files are pinned by profile.checksum inside the manifest.
+    for file in sorted((root / 'profiles').glob('*/manifest.json')):
+        meta = json.loads(file.read_text())
+        if meta['type'] != 'profile' or meta['id'] != file.parent.name:
+            raise ValueError(f'Manifest type or folder differs from identity: {file}')
+        entry = {key: meta[key] for key in ['id', 'type', 'name', 'version', 'description', 'author', 'source', 'compatibility']}
+        for key in ['license', 'tags']:
+            if key in meta:
+                entry[key] = meta[key]
+        entry.update(path=file.parent.relative_to(root).as_posix(), checksum=checksum(file.parent),
+                     profileChecksum=meta['profile']['checksum'])
+        result.append(entry)
     result.sort(key=lambda e: (e['type'], e['id']))
     identities = [e['type'] + '/' + e['id'] for e in result]
     if len(set(identities)) != len(identities):
         raise ValueError('Duplicate entry identity')
     return result
+
+
+def categories(catalog):
+    """categories.json in the Hermes registry shape: per type, a count and (for
+    skills) per-category counts."""
+    types = []
+    for kind in sorted({e['type'] for e in catalog}):
+        rows = [e for e in catalog if e['type'] == kind]
+        cats = {}
+        for e in rows:
+            if e.get('category'):
+                cats[e['category']] = cats.get(e['category'], 0) + 1
+        types.append({'type': kind, 'count': len(rows),
+                      'categories': [{'name': n, 'count': c} for n, c in sorted(cats.items())]})
+    return types
+
+
+def models(root=ROOT):
+    """models.json: every models/<provider>.json, Hermes registry shape."""
+    providers = [json.loads(p.read_text()) for p in sorted((root / 'models').glob('*.json'))]
+    return providers
+
+
+def write_if_changed(path, value, check, label):
+    text = json.dumps(value, ensure_ascii=False, indent=2) + '\n'
+    if check:
+        if not path.exists() or path.read_text() != text:
+            raise ValueError(f'Stale {label}; run python scripts/build_index.py')
+    else:
+        path.write_text(text)
+
+
+def build_aux(root, catalog, generated, check):
+    write_if_changed(root / 'categories.json',
+                     {'schemaVersion': '1', 'generated': generated, 'types': categories(catalog)},
+                     check, 'categories.json')
+    providers = models(root)
+    write_if_changed(root / 'models.json',
+                     {'schemaVersion': '1', 'generated': generated, 'providerCount': len(providers),
+                      'modelCount': sum(len(p['models']) for p in providers), 'providers': providers},
+                     check, 'models.json')
 
 
 def build(root=ROOT, check=False):
@@ -74,10 +129,12 @@ def build(root=ROOT, check=False):
     if check:
         if not prior or prior.get('schemaVersion') != '1' or prior.get('count') != len(catalog) or prior.get('entries') != catalog:
             raise ValueError('Stale index; run python scripts/build_index.py')
+        build_aux(root, catalog, prior['generated'], True)
         return prior
     generated = prior['generated'] if prior and prior.get('entries') == catalog else datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
     output = {'schemaVersion': '1', 'generated': generated, 'count': len(catalog), 'entries': catalog}
     target.write_text(json.dumps(output, ensure_ascii=False, indent=2) + '\n')
+    build_aux(root, catalog, generated, False)
     return output
 
 

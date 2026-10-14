@@ -7,10 +7,44 @@ from pathlib import Path
 from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 from build_index import ROOT, entries, frontmatter
+from profile_tree import allowed, tree_checksum
 
 
 def read(path):
     return json.loads(path.read_text())
+
+
+def validate_profile(root, folder, e, side, refs):
+    """An Itonami profile entry (ADR 0002): schema, pinned owner files only,
+    no credential/memory/state files, and a tree checksum that matches."""
+    m = read(folder / 'manifest.json')
+    Draft202012Validator(read(root / 'schemas/itonami/profile.schema.json')).validate(m)
+    extra = sorted(p.name for p in folder.iterdir() if p.name not in ('manifest.json', 'itonami.json', 'README.md'))
+    if extra:
+        raise ValueError(f'Profile entry must not copy profile files: {extra}')
+    prof = m['profile']
+    if m['source'] != f"https://github.com/{prof['repository']}/tree/{prof['commit']}":
+        raise ValueError('Profile source differs from its pinned profile commit')
+    if side.get('roleKind') != 'profile':
+        raise ValueError('Profile itonami.json must declare roleKind profile')
+    names = [f['path'] for f in prof['files']]
+    if len(set(names)) != len(names):
+        raise ValueError('Duplicate profile file')
+    if 'SOUL.md' not in names:
+        raise ValueError('Profile has no SOUL.md')
+    for f in prof['files']:
+        if not allowed(f['path']) or '..' in f['path'].split('/'):
+            raise ValueError(f"Not a registry profile file: {f['path']}")
+    if tree_checksum(prof['files']) != prof['checksum']:
+        raise ValueError('Profile tree checksum mismatch')
+    pinned = {}
+    for ref in side['sourceRefs']:
+        src = refs[ref]
+        if (src['repository'], src['commit']) == (prof['repository'], prof['commit']):
+            pinned.update({f['path']: f['sha256'] for f in src['files']})
+    for f in prof['files']:
+        if pinned.get(f"{prof['path']}/{f['path']}") != f['sha256']:
+            raise ValueError(f"Profile file not pinned in catalogs/sources.json: {f['path']}")
 
 
 def validate(root=ROOT):
@@ -63,7 +97,9 @@ def validate(root=ROOT):
             raise ValueError('Registry must not grant runtime authority')
         if side['validation']['live'] is not False:
             raise ValueError('Initial entries must not claim live qualification')
-        if e['type'] == 'skill':
+        if e['type'] == 'profile':
+            validate_profile(root, folder, e, side, refs)
+        elif e['type'] == 'skill':
             meta = frontmatter(folder / 'SKILL.md')
             for k in ['name', 'description']:
                 if not isinstance(meta.get(k), str) or not meta[k]:
@@ -94,6 +130,12 @@ def validate(root=ROOT):
                     ext_validator.validate(read(folder / example))
         if any(dep not in identities for dep in side.get('dependsOn', [])):
             raise ValueError('Unresolved supplemental dependency')
+    models_schema = read(root / 'schemas/hermes/models.schema.json')
+    for path in sorted((root / 'models').glob('*.json')):
+        provider = read(path)
+        Draft202012Validator(models_schema).validate(provider)
+        if provider['id'] != path.stem:
+            raise ValueError(f'Model provider id differs from file: {path}')
     tools = read(root / 'catalogs/tools.json')
     ext_validator.validate(tools)
     seen = set()
@@ -114,6 +156,23 @@ def validate(root=ROOT):
             raise ValueError('External registry must be pinned')
         if identities.intersection(r['entries']):
             raise ValueError('Duplicates an externally owned entry')
+    # Federated index snapshots (ADR 0002): pinned to the registration's commit,
+    # metadata only, registry-qualified identities, upstream checksums kept.
+    registered = {r['id']: r for r in external['registries']}
+    for path in sorted((root / 'catalogs/federated').glob('*.json')):
+        snap = read(path)
+        reg = snap.get('registry', {})
+        if snap.get('schemaVersion') != 'itonami.federated-index.v1' or reg.get('id') != path.stem:
+            raise ValueError(f'Malformed federated index: {path.name}')
+        if registered.get(path.stem, {}).get('commit') != reg.get('commit'):
+            raise ValueError(f'Federated index not pinned to its registration: {path.name}')
+        if snap['count'] != len(snap['entries']):
+            raise ValueError(f'Federated index count mismatch: {path.name}')
+        for e in snap['entries']:
+            if e['qualifiedId'] != f"{path.stem}/{e['type']}/{e['id']}":
+                raise ValueError(f"Federated identity not qualified: {e['qualifiedId']}")
+            if not re.fullmatch(r'sha256:[0-9a-f]{64}', e.get('checksum', '')):
+                raise ValueError(f"Federated entry without upstream checksum: {e['qualifiedId']}")
     ext_validator.validate(read(root / 'docs/validation.json'))
     inventory = read(root / 'catalogs/inventory.json')
     inventory_schema = read(root / 'schemas/inventory.schema.json')

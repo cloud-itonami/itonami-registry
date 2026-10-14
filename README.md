@@ -2,6 +2,30 @@
 
 Reusable bot role templates, operational skills, MCP connection definitions and workflow recipes for Itonami agents. Actual bot profiles remain owned by their existing GitHub repositories. Registry publication grants no execution authority, changes no running profile and activates no scheduler.
 
+## What is in it
+
+The Itonami Registry is the Hermes registry's equivalent for Itonami (ADR 0002). Same entry shapes, plus Itonami profiles, with the Hermes registry federated in.
+
+| Type | Folder | What it is |
+|---|---|---|
+| **Itonami profile** | `profiles/` | A Hermes-layout profile (SOUL.md, profile.yaml, config.yaml, skills/) owned by another repository, pinned to a commit with per-file sha256. Install it as an Itonami Bot or a Hermes profile |
+| Agent | `agents/` | Bot role templates |
+| Skill | `skills/<category>/` | `SKILL.md` (agentskills.io frontmatter) |
+| MCP | `mcp/` | MCP connection definitions |
+| Workflow | `workflows/` | Itonami recipes |
+| Model | `models/` | Provider model catalogs (murakumo) |
+
+**Terms are Hermes's own.**
+- A profile is the persistent home; an Itonami profile is a Hermes profile.
+- A Bot is a profile presented in a roster with one canonical Bot Chat. Every Bot is a profile; not every profile is a Bot.
+- Messaging bots and subagents are different things.
+
+**Site and API.**
+- `scripts/build_site.py` builds a static site and JSON API (`api/v1/index.json`, `categories.json`, `models.json`, `registries.json`, `entries/<registry>/<type>/<id>.json`), published by GitHub Pages.
+- The Hermes registry (fathah/hermes-registry) is federated as `hermes-registry/<type>/<id>`: metadata only, pinned commit, upstream checksums.
+
+**Contributing.** See [CONTRIBUTING.md](CONTRIBUTING.md); profiles are registered with `scripts/add_profile.py`.
+
 ## Initial entries (retained)
 
 | Type | ID | Purpose |

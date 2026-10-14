@@ -16,3 +16,8 @@ jobs:
       - run: python scripts/validate.py
       - run: python scripts/build_index.py --check
       - run: python -m unittest discover -s tests -v
+      - name: Federated snapshot matches upstream at its pinned commit
+        run: |
+          git clone --quiet https://github.com/fathah/hermes-registry.git "$RUNNER_TEMP/hermes-registry"
+          python scripts/federate.py --checkout "$RUNNER_TEMP/hermes-registry" --id hermes-registry --repository fathah/hermes-registry --check
+      - run: python scripts/build_site.py --out "$RUNNER_TEMP/site"
