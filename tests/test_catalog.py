@@ -169,5 +169,22 @@ class IntegrityTests(unittest.TestCase):
         self.assertEqual(['murakumo'], [p['id'] for p in models['providers']])
 
 
+class ProfileFilePolicyTests(unittest.TestCase):
+    def test_itonami_definition_files_allowed(self):
+        from profile_tree import allowed
+        for rel in ['SOUL.md', 'profile.yaml', 'config.yaml', 'cron/jobs.json',
+                    'skills/itonami-x/SKILL.md', 'scripts/run.py', 'README.md',
+                    'itonami.edn', 'yakuwari.edn']:
+            self.assertTrue(allowed(rel), rel)
+
+    def test_secret_and_state_files_refused(self):
+        from profile_tree import allowed
+        for rel in ['.env', 'auth.json', 'secrets.edn', 'MEMORY.md', 'USER.md',
+                    'state.db', 'gateway_state.json', 'workspace/x.json',
+                    'memories/note.md', 'sessions/run.json', 'logs/run.log',
+                    'cache/x', 'cron/executions.db', 'cron/itonami-runs.jsonl']:
+            self.assertFalse(allowed(rel), rel)
+
+
 if __name__ == '__main__':
     unittest.main()
