@@ -4,8 +4,10 @@ import hashlib
 # A profile is a Hermes profile home. Only these are registry material: the
 # definitions an owner commits. Credentials, memories, sessions, logs and
 # state never are (AGENTS.md), so anything else in the folder is refused.
+# itonami.edn and yakuwari.edn are Itonami definitions (profile manifest and
+# authority declarations, ADR 0002/0003), not state or secrets.
 PROFILE_FILE_PATTERNS = ('SOUL.md', 'profile.yaml', 'config.yaml', 'cron/jobs.json',
-                         'skills/', 'scripts/', 'README.md')
+                         'skills/', 'scripts/', 'README.md', 'itonami.edn', 'yakuwari.edn')
 FORBIDDEN_NAMES = ('.env', 'auth.json', 'state.db', 'USER.md', 'MEMORY.md', 'secrets.edn',
                    'gateway_state.json')
 
