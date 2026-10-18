@@ -28,11 +28,13 @@ def git(checkout, *args):
     return subprocess.run(['git', '-C', str(checkout), *args], check=True, capture_output=True).stdout
 
 
-def profile_files(checkout, commit, path):
+def profile_files(checkout, commit, path, exclude=()):
     names = git(checkout, 'ls-tree', '-r', '-z', '--name-only', commit, '--', path).decode().split('\0')
     files, refused = [], []
     for name in filter(None, names):
         rel = name[len(path) + 1:]
+        if rel.rsplit('/', 1)[-1] in exclude:
+            continue
         if not allowed(rel):
             refused.append(rel)
             continue
@@ -54,11 +56,13 @@ def main():
     p.add_argument('--id')
     p.add_argument('--source-ref', default=None)
     p.add_argument('--version', default='0.1.0')
+    p.add_argument('--exclude', action='append', default=[],
+                   help='file basename to drop from the pin (e.g. secrets.edn); stays in the owning repository unpinned')
     a = p.parse_args()
     checkout = Path(a.checkout).expanduser()
     commit = git(checkout, 'rev-parse', a.commit + '^{commit}').decode().strip()
     pid = a.id or a.path.rstrip('/').rsplit('/', 1)[-1]
-    files = profile_files(checkout, commit, a.path.rstrip('/'))
+    files = profile_files(checkout, commit, a.path.rstrip('/'), exclude=set(a.exclude))
     meta = {}
     for f in files:
         if f['path'] == 'profile.yaml':

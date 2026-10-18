@@ -26,7 +26,7 @@ class IntegrityTests(unittest.TestCase):
         p.write_text(json.dumps(value))
 
     def test_published_catalog(self):
-        self.assertEqual(validate(self.root), (51, 19))
+        self.assertEqual(validate(self.root), (52, 19))
         build(self.root, check=True)
 
     def test_nonpublic_source_refused(self):
@@ -184,6 +184,42 @@ class ProfileFilePolicyTests(unittest.TestCase):
                     'memories/note.md', 'sessions/run.json', 'logs/run.log',
                     'cache/x', 'cron/executions.db', 'cron/itonami-runs.jsonl']:
             self.assertFalse(allowed(rel), rel)
+
+
+class ExcludeTests(unittest.TestCase):
+    """--exclude drops named files from the pin; unlisted unknown files still abort."""
+
+    def setUp(self):
+        import subprocess
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.repo = Path(self.temp.name) / 'owner'
+        self.repo.mkdir()
+        self.folder = self.repo / 'hermes' / 'profiles' / 'demo'
+        (self.folder / 'cron').mkdir(parents=True)
+        (self.folder / 'SOUL.md').write_text('# demo\n')
+        (self.folder / 'secrets.edn').write_text('{:refs []}')
+        (self.folder / 'cron' / 'jobs.json').write_text('[]')
+        (self.folder / 'stray.txt').write_text('x')
+        for c in [['init', '-q'], ['add', '-A'],
+                  ['-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-qm', 'x']]:
+            subprocess.run(['git', '-C', str(self.repo), *c], check=True, capture_output=True)
+        self.sha = subprocess.run(['git', '-C', str(self.repo), 'rev-parse', 'HEAD'],
+                                  check=True, capture_output=True, text=True).stdout.strip()
+
+    def files(self, exclude=()):
+        import sys
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        from add_profile import profile_files
+        return sorted(f['path'] for f in profile_files(self.repo, self.sha, 'hermes/profiles/demo', exclude=set(exclude)))
+
+    def test_excluded_basename_is_dropped_from_the_pin(self):
+        self.assertEqual(self.files(exclude={'secrets.edn', 'stray.txt'}),
+                         ['SOUL.md', 'cron/jobs.json'])
+
+    def test_unlisted_unknown_file_still_aborts(self):
+        with self.assertRaisesRegex(SystemExit, 'refused non-profile files'):
+            self.files(exclude={'secrets.edn'})
 
 
 if __name__ == '__main__':
