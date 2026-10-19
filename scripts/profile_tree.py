@@ -8,6 +8,11 @@ import hashlib
 # authority declarations, ADR 0002/0003), not state or secrets.
 PROFILE_FILE_PATTERNS = ('SOUL.md', 'profile.yaml', 'config.yaml', 'cron/jobs.json',
                          'skills/', 'scripts/', 'README.md', 'itonami.edn', 'yakuwari.edn')
+# Languages the itonami agent CLI executes (kbb .cljk, amu .kotoba, nbb .cljs,
+# hy, python, node) plus host hooks and definition EDN are profile material and
+# are pinned as-is, wherever they sit in the folder.
+CODE_EXTENSIONS = ('.cljk', '.kotoba', '.cljc', '.cljs', '.hy', '.py', '.mjs', '.cjs',
+                   '.sh', '.edn', '.plist')
 FORBIDDEN_NAMES = ('.env', 'auth.json', 'state.db', 'USER.md', 'MEMORY.md', 'secrets.edn',
                    'gateway_state.json')
 
@@ -16,6 +21,8 @@ def allowed(rel):
     name = rel.rsplit('/', 1)[-1]
     if name in FORBIDDEN_NAMES or rel.startswith(('memories/', 'sessions/', 'logs/', 'cache/')):
         return False
+    if rel.lower().endswith(CODE_EXTENSIONS):
+        return True
     return any(rel == p or (p.endswith('/') and rel.startswith(p)) for p in PROFILE_FILE_PATTERNS)
 
 

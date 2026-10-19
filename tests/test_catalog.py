@@ -174,7 +174,10 @@ class ProfileFilePolicyTests(unittest.TestCase):
         from profile_tree import allowed
         for rel in ['SOUL.md', 'profile.yaml', 'config.yaml', 'cron/jobs.json',
                     'skills/itonami-x/SKILL.md', 'scripts/run.py', 'README.md',
-                    'itonami.edn', 'yakuwari.edn']:
+                    'itonami.edn', 'yakuwari.edn',
+                    'run-tests.cljk', 'main.kotoba', 'src/a.cljk', 'lib/b.cljc',
+                    'bin/helper.sh', 'x.py', 'node.mjs', 'cljk-origin.edn',
+                    'kotoba.lock.edn', 'launchd.plist']:
             self.assertTrue(allowed(rel), rel)
 
     def test_secret_and_state_files_refused(self):
@@ -182,7 +185,8 @@ class ProfileFilePolicyTests(unittest.TestCase):
         for rel in ['.env', 'auth.json', 'secrets.edn', 'MEMORY.md', 'USER.md',
                     'state.db', 'gateway_state.json', 'workspace/x.json',
                     'memories/note.md', 'sessions/run.json', 'logs/run.log',
-                    'cache/x', 'cron/executions.db', 'cron/itonami-runs.jsonl']:
+                    'cache/x', 'cron/executions.db', 'cron/itonami-runs.jsonl',
+                    'jobs.json', 'deploy.json', 'run.jsonl', 'store.sqlite']:
             self.assertFalse(allowed(rel), rel)
 
 
