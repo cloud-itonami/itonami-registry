@@ -47,6 +47,31 @@ def profile_files(checkout, commit, path, exclude=()):
     return files
 
 
+def register_targeted(repository, commit, entry):
+    """Record a registration on a targeted public source row (ADR 0002 profile
+    type); the row is created at this commit when absent. Public repositories
+    only — private sources are refused by validate.py."""
+    import time
+    path = ROOT / 'catalogs/targeted-public-sources.json'
+    data = json.loads(path.read_text())
+    reg = {'entry': entry, 'sourceCommit': commit}
+    row = next((r for r in data['sources'] if r['repository'] == repository), None)
+    if row is None:
+        row = {'repository': repository, 'commit': commit, 'visibility': 'public',
+               'reviewedOn': time.strftime('%Y-%m-%d'),
+               'reviewBasis': 'Targeted review: GitHub repository metadata confirms public '
+                              'visibility; the profile folder was inspected for registration '
+                              'material. Targeted review, not an organization-wide survey.',
+               'registrations': []}
+        data['sources'].append(row)
+    if row['commit'] != commit:
+        raise SystemExit(f'{repository} is a targeted source pinned to {row["commit"]}; use the same commit')
+    if reg not in row['registrations']:
+        row['registrations'].append(reg)
+        row['registrations'].sort(key=lambda r: (r['entry'], r['sourceCommit']))
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument('--checkout', required=True)
@@ -127,7 +152,9 @@ def main():
     prefix = f'    {{"repository": "{a.repository}"'
     at = next((i for i, l in enumerate(lines) if l.startswith(prefix)), None)
     if at is None:
-        raise SystemExit(f'{a.repository} is not in catalogs/inventory.json; survey it first')
+        register_targeted(a.repository, commit, f'profile/{pid}')
+        print(f'registered profile {pid} ({len(files)} files) from {a.repository}@{commit[:7]}')
+        return
     # Rows are one line each (separators ',' and ': '); rewrite only this one.
     body = lines[at].strip()
     comma = body.endswith(',')
