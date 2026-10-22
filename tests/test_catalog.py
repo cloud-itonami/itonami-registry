@@ -26,7 +26,7 @@ class IntegrityTests(unittest.TestCase):
         p.write_text(json.dumps(value))
 
     def test_published_catalog(self):
-        self.assertEqual(validate(self.root), (943, 31))
+        self.assertEqual(validate(self.root), (944, 34))
         build(self.root, check=True)
 
     def test_nonpublic_source_refused(self):

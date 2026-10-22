@@ -974,7 +974,7 @@
       "provider": {
         "kind": "mcp",
         "entry": "mcp/kaikei",
-        "sourceRef": "kaikei-d1c7377d",
+        "sourceRef": "kaikei-723f8530",
         "path": "bin/kaikei-mcp"
       },
       "description": "Read a journal export (MoneyForward 仕訳帳 CSV, freee 仕訳 CSV, 弥生インポート形式, QuickBooks Online Account/JournalEntry JSON or journal CSV, Xero Accounts/Journals/ManualJournals JSON or manual journal CSV, or a kaikei ledger) into a kaikei ledger with checks. Pure: nothing is sent, stored or fetched; it does not call any accounting API.",
@@ -1000,7 +1000,18 @@
               "mf",
               "freee",
               "qbo-csv",
-              "xero-csv"
+              "xero-csv",
+              "xero-invoices-json",
+              "qbo-invoices-json",
+              "xero-invoice-csv",
+              "xero-bill-csv",
+              "qbo-invoice-csv",
+              "freee-invoice-csv",
+              "freee-invoice-json",
+              "mf-invoice-csv",
+              "mf-invoice-json",
+              "zoho-invoice-json",
+              "freshbooks-invoice-json"
             ],
             "default": "auto"
           },
@@ -1089,7 +1100,7 @@
       "provider": {
         "kind": "mcp",
         "entry": "mcp/kaikei",
-        "sourceRef": "kaikei-d1c7377d",
+        "sourceRef": "kaikei-723f8530",
         "path": "bin/kaikei-mcp"
       },
       "description": "Check a kaikei ledger: whether the balance sheet balances, which accounts have no class (they are left out of P/L and B/S, never guessed), and which entries are invalid (unbalanced, negative, missing account, bad date).",
@@ -1117,7 +1128,7 @@
       "provider": {
         "kind": "mcp",
         "entry": "mcp/kaikei",
-        "sourceRef": "kaikei-d1c7377d",
+        "sourceRef": "kaikei-723f8530",
         "path": "bin/kaikei-mcp"
       },
       "description": "Trial balance, profit and loss or balance sheet for a period, as kaikei JSON or shaped like the QuickBooks Online Report or Xero Reports API responses. Class mapping and the staged-profit and retained-earnings rules are kaikei's, not a vendor's internal calculation.",
@@ -1173,7 +1184,7 @@
       "provider": {
         "kind": "mcp",
         "entry": "mcp/kaikei",
-        "sourceRef": "kaikei-d1c7377d",
+        "sourceRef": "kaikei-723f8530",
         "path": "bin/kaikei-mcp"
       },
       "description": "Write a kaikei ledger in one of the import formats. Shift_JIS output comes back as bytes_base64, UTF-8 as text. Fields the format cannot hold are listed in notes. Pure: writes no file.",
@@ -1194,7 +1205,16 @@
               "mf",
               "freee",
               "qbo-csv",
-              "xero-csv"
+              "xero-csv",
+              "xero-invoices-json",
+              "qbo-invoices-json",
+              "xero-invoice-csv",
+              "xero-bill-csv",
+              "qbo-invoice-csv",
+              "freee-invoice-csv",
+              "freee-invoice-json",
+              "mf-invoice-csv",
+              "mf-invoice-json"
             ]
           },
           "encoding": {
@@ -1233,7 +1253,7 @@
       "provider": {
         "kind": "mcp",
         "entry": "mcp/kaikei",
-        "sourceRef": "kaikei-d1c7377d",
+        "sourceRef": "kaikei-723f8530",
         "path": "bin/kaikei-mcp"
       },
       "description": "kaikei_import followed by kaikei_export in one call: convert a journal file from one format to another.",
@@ -1329,7 +1349,18 @@
               "mf",
               "freee",
               "qbo-csv",
-              "xero-csv"
+              "xero-csv",
+              "xero-invoices-json",
+              "qbo-invoices-json",
+              "xero-invoice-csv",
+              "xero-bill-csv",
+              "qbo-invoice-csv",
+              "freee-invoice-csv",
+              "freee-invoice-json",
+              "mf-invoice-csv",
+              "mf-invoice-json",
+              "zoho-invoice-json",
+              "freshbooks-invoice-json"
             ],
             "default": "auto"
           },
@@ -1350,7 +1381,16 @@
               "mf",
               "freee",
               "qbo-csv",
-              "xero-csv"
+              "xero-csv",
+              "xero-invoices-json",
+              "qbo-invoices-json",
+              "xero-invoice-csv",
+              "xero-bill-csv",
+              "qbo-invoice-csv",
+              "freee-invoice-csv",
+              "freee-invoice-json",
+              "mf-invoice-csv",
+              "mf-invoice-json"
             ]
           },
           "input_encoding": {
@@ -1365,6 +1405,214 @@
         },
         "required": [
           "to"
+        ],
+        "additionalProperties": false
+      },
+      "outputContract": "MCP content[0].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
+      "effects": [],
+      "authority": "caller-bound; tools/list grants nothing",
+      "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input (2026-10-22); live-agent-turn-not-tested"
+    },
+    {
+      "id": "kaikei/kaikei_invoice_totals",
+      "name": "kaikei_invoice_totals",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/kaikei",
+        "sourceRef": "kaikei-723f8530",
+        "path": "bin/kaikei-mcp"
+      },
+      "description": "Per-rate totals of an invoice: for each tax rate, the consideration, the consumption tax rounded once per invoice per rate (as a Japanese qualified invoice requires, 消費税法施行令 70 条の 10) and the total, plus each line's share of the tax. No ledger needed; use it to draft an invoice.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "description": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": [
+                    "number",
+                    "string"
+                  ],
+                  "description": "Line amount in currency units (tax-exclusive or inclusive per tax_mode)."
+                },
+                "rate": {
+                  "type": [
+                    "number",
+                    "string"
+                  ],
+                  "description": "Tax rate in percent, e.g. 10 or 8."
+                },
+                "reduced": {
+                  "type": "boolean",
+                  "description": "Japanese reduced rate (軽減税率)."
+                },
+                "category": {
+                  "type": "string",
+                  "enum": [
+                    "taxable",
+                    "zero-rated",
+                    "exempt",
+                    "out-of-scope"
+                  ],
+                  "default": "taxable"
+                }
+              },
+              "required": [
+                "amount"
+              ]
+            }
+          },
+          "tax_mode": {
+            "type": "string",
+            "enum": [
+              "exclusive",
+              "inclusive",
+              "none"
+            ],
+            "default": "exclusive"
+          },
+          "rounding": {
+            "type": "string",
+            "enum": [
+              "floor",
+              "half-up",
+              "ceil"
+            ],
+            "default": "floor"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "AED",
+              "AUD",
+              "BHD",
+              "BRL",
+              "CAD",
+              "CHF",
+              "CLP",
+              "CNY",
+              "CZK",
+              "DKK",
+              "EUR",
+              "FJD",
+              "GBP",
+              "HKD",
+              "HUF",
+              "IDR",
+              "ILS",
+              "INR",
+              "IQD",
+              "ISK",
+              "JOD",
+              "JPY",
+              "KRW",
+              "KWD",
+              "LYD",
+              "MXN",
+              "MYR",
+              "NOK",
+              "NZD",
+              "OMR",
+              "PGK",
+              "PHP",
+              "PLN",
+              "PYG",
+              "SAR",
+              "SEK",
+              "SGD",
+              "THB",
+              "TND",
+              "TOP",
+              "TRY",
+              "TWD",
+              "UGX",
+              "USD",
+              "VND",
+              "WST",
+              "ZAR"
+            ],
+            "default": "JPY",
+            "description": "Ledger currency when the file does not say (Xero responses, QBO without CurrencyRef, Xero/QBO CSV)."
+          }
+        },
+        "required": [
+          "lines"
+        ],
+        "additionalProperties": false
+      },
+      "outputContract": "MCP content[0].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
+      "effects": [],
+      "authority": "caller-bound; tools/list grants nothing",
+      "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input (2026-10-22); live-agent-turn-not-tested"
+    },
+    {
+      "id": "kaikei/kaikei_invoice_check",
+      "name": "kaikei_invoice_check",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/kaikei",
+        "sourceRef": "kaikei-723f8530",
+        "path": "bin/kaikei-mcp"
+      },
+      "description": "Check the invoices in a kaikei ledger: missing qualified-invoice contents (issuer name and registration number form, date, description, tax rate, per-rate tax, recipient), differences between the stated tax and one rounding per rate, the transitional deduction percent for purchases from unregistered sellers, and whether each invoice can be posted. Does not query the NTA or certify anything.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ledger": {
+            "type": "object",
+            "description": "A kaikei.ledger.v1 object, as returned by kaikei_import."
+          }
+        },
+        "required": [
+          "ledger"
+        ],
+        "additionalProperties": false
+      },
+      "outputContract": "MCP content[0].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
+      "effects": [],
+      "authority": "caller-bound; tools/list grants nothing",
+      "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input (2026-10-22); live-agent-turn-not-tested"
+    },
+    {
+      "id": "kaikei/kaikei_invoice_post",
+      "name": "kaikei_invoice_post",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/kaikei",
+        "sourceRef": "kaikei-723f8530",
+        "path": "bin/kaikei-mcp"
+      },
+      "description": "Post invoices in a kaikei ledger as journal entries (accounts receivable / sales / output tax, or the purchase side) and return the updated ledger. Posts every issued or paid invoice not yet posted, or only invoice_ids. Skips drafts, voids, invoices with withholding, and invoices already in the ledger (e.g. from Xero Journals). Pure: returns a new ledger; nothing is stored.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ledger": {
+            "type": "object",
+            "description": "A kaikei.ledger.v1 object, as returned by kaikei_import."
+          },
+          "invoice_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "accounting": {
+            "type": "string",
+            "enum": [
+              "tax-excluded",
+              "tax-included"
+            ],
+            "description": "Overrides the ledger's setting (default tax-excluded: tax goes to 仮受消費税・仮払消費税)."
+          }
+        },
+        "required": [
+          "ledger"
         ],
         "additionalProperties": false
       },
