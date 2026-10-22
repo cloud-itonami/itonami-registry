@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "itonami.entry.v1",
+  "sourceRefs": [
+    "app-dandori"
+  ],
+  "useWhen": "Normalize a Linear export an operator already holds, convert it between CSV and GraphQL JSON, or check cycle progress, estimates and SLA risk with dandori rules",
+  "avoidWhen": "Reading from or writing to a live Linear workspace, or assuming the results match Linear's own calculations",
+  "inputs": {
+    "text": "Linear CSV or GraphQL JSON export (<= 5 MiB)",
+    "issues": "normalized issues from dandori_import",
+    "rules": "estimate scale, SLA timestamps"
+  },
+  "outputs": {
+    "issues": "Linear GraphQL-shaped issue nodes and teams",
+    "decisions": "cycle progress permille, estimate validity, SLA status",
+    "export": "CSV or GraphQL JSON text"
+  },
+  "effects": [
+    "process",
+    "filesystem-read",
+    "dependency-fetch-on-first-launch"
+  ],
+  "authority": {
+    "grants": false,
+    "default": "blocked",
+    "binding": "caller-authorized profile mcp_servers entry and owner-reviewed effective tool allowlist"
+  },
+  "validation": {
+    "catalog": "schema-checked",
+    "runtime": "protocol-tested 2026-10-22: tools/list and tools/call over stdio with the itonami-agent MCP client (kotoba-lang/itonami-agent 709c948, itonami.agent.mcp discover/call) on synthetic fixtures; no model-driven agent turn, no deployed profile",
+    "live": false
+  },
+  "compatibilityNote": "Hermes storage format only. itonami-agent exposes the tools as mcp__dandori__<tool> and does not start MCP subprocesses on peer runs. Data-format compatibility only; no connection to linear.app.",
+  "requires": [
+    "Owner-installed kbb (Node) host",
+    "cloud-itonami/app-itonami-dandori checkout at the pinned commit"
+  ],
+  "launchResolution": {
+    "placeholder": "DANDORI_REPO",
+    "behavior": "Resolve the absolute checkout before writing the client config. The launcher finds nbb.edn from its own path and resolves the pinned kotoba-lang/text git dependency into ~/.gitlibs; no cwd is required."
+  }
+}

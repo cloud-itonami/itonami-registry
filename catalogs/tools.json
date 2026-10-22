@@ -615,6 +615,358 @@
       ],
       "authority": "caller-authorized owned target and page budget; scans require plugin target configuration; active requires allow_active as well; registration grants nothing",
       "validation": "pinned Python AST literal schema extraction; no plugin execution, subprocess or scan performed"
+    },
+    {
+      "id": "mihari/mihari_ingest_events",
+      "name": "mihari_ingest_events",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/mihari",
+        "sourceRef": "app-mihari",
+        "path": "bin/mihari-mcp"
+      },
+      "description": "Group Sentry data into Sentry-shaped issues: accepts an envelope (the body an SDK posts to /api/{project}/envelope/), event JSON (one object or an array) or a Sentry API /events/ response. Runs locally on the given text only: sends nothing, stores nothing, drops IP addresses, request headers, cookies and emails before grouping.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Envelope or event JSON text, at most 5 MiB of UTF-8."
+          },
+          "project": {
+            "type": "string",
+            "description": "Project slug to file every event under. Defaults to the envelope DSN's project, the event's project, or \"mihari\"."
+          },
+          "include_events": {
+            "type": "boolean",
+            "description": "Also return each issue's events in Sentry /events/ shape. Default false."
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "outputContract": "MCP content[0].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
+      "effects": [],
+      "authority": "caller-bound; tools/list grants nothing",
+      "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input (2026-10-22); live-agent-turn-not-tested"
+    },
+    {
+      "id": "mihari/mihari_decide",
+      "name": "mihari_decide",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/mihari",
+        "sourceRef": "app-mihari",
+        "path": "bin/mihari-mcp"
+      },
+      "description": "Apply mihari's triage rules: the priority (low/medium/high) for a level and its event and user counts, and optionally the next status for a status plus an action, with the regression flag. These are mihari's documented rules on Sentry's vocabulary, not Sentry's internal algorithm.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "debug",
+              "info",
+              "warning",
+              "error",
+              "fatal"
+            ]
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Events in the issue. Default 1."
+          },
+          "user_count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Distinct users affected. Default 0."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "unresolved",
+              "resolved",
+              "ignored"
+            ],
+            "description": "Current issue status; give together with action."
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "resolve",
+              "ignore",
+              "unresolve",
+              "event"
+            ],
+            "description": "What happens next; \"event\" means a new event arrived. Give together with status."
+          }
+        },
+        "required": [
+          "level"
+        ],
+        "additionalProperties": false
+      },
+      "outputContract": "MCP content[0].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
+      "effects": [],
+      "authority": "caller-bound; tools/list grants nothing",
+      "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input (2026-10-22); live-agent-turn-not-tested"
+    },
+    {
+      "id": "dandori/dandori_import",
+      "name": "dandori_import",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/dandori",
+        "sourceRef": "app-dandori",
+        "path": "bin/dandori-mcp"
+      },
+      "description": "Parse a Linear CSV export or Linear GraphQL issues JSON into teams and Linear-shaped issue nodes. Pure: nothing is sent, stored or fetched; it does not call the Linear API.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "The export text (CSV or GraphQL JSON), up to 5 MiB."
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "csv",
+              "graphql-json"
+            ],
+            "default": "auto"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "outputContract": "MCP content[0].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
+      "effects": [],
+      "authority": "caller-bound; tools/list grants nothing",
+      "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input (2026-10-22); live-agent-turn-not-tested"
+    },
+    {
+      "id": "dandori/dandori_export",
+      "name": "dandori_export",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/dandori",
+        "sourceRef": "app-dandori",
+        "path": "bin/dandori-mcp"
+      },
+      "description": "Write issues (the dandori_import issue nodes) as a Linear-style CSV or Linear GraphQL issues JSON; importing the result again gives the same issues. Pure: returns text only, writes no file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Issue nodes as returned by dandori_import."
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "csv",
+              "graphql-json"
+            ]
+          }
+        },
+        "required": [
+          "issues",
+          "format"
+        ],
+        "additionalProperties": false
+      },
+      "outputContract": "MCP content[0].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
+      "effects": [],
+      "authority": "caller-bound; tools/list grants nothing",
+      "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input (2026-10-22); live-agent-turn-not-tested"
+    },
+    {
+      "id": "dandori/dandori_cycle_progress",
+      "name": "dandori_cycle_progress",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/dandori",
+        "sourceRef": "app-dandori",
+        "path": "bin/dandori-mcp"
+      },
+      "description": "Completed share of a cycle in permille: canceled issues leave the scope and unestimated issues count as unestimated_weight. This is dandori's documented rule, not Linear's internal calculation.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "state_type": {
+                  "type": "string",
+                  "enum": [
+                    "triage",
+                    "backlog",
+                    "unstarted",
+                    "started",
+                    "completed",
+                    "canceled"
+                  ]
+                },
+                "estimate": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "state_type"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "unestimated_weight": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 1
+          }
+        },
+        "required": [
+          "issues"
+        ],
+        "additionalProperties": false
+      },
+      "outputContract": "MCP content[0].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
+      "effects": [],
+      "authority": "caller-bound; tools/list grants nothing",
+      "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input (2026-10-22); live-agent-turn-not-tested"
+    },
+    {
+      "id": "dandori/dandori_check_estimate",
+      "name": "dandori_check_estimate",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/dandori",
+        "sourceRef": "app-dandori",
+        "path": "bin/dandori-mcp"
+      },
+      "description": "Whether an estimate value is allowed by a team's Linear estimate settings (scale, allow zero, extended), and which values are allowed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "scale": {
+            "type": "string",
+            "enum": [
+              "notUsed",
+              "exponential",
+              "fibonacci",
+              "linear",
+              "tShirt"
+            ]
+          },
+          "value": {
+            "type": "integer"
+          },
+          "allow_zero": {
+            "type": "boolean",
+            "default": false
+          },
+          "extended": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "scale",
+          "value"
+        ],
+        "additionalProperties": false
+      },
+      "outputContract": "MCP content[0].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
+      "effects": [],
+      "authority": "caller-bound; tools/list grants nothing",
+      "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input (2026-10-22); live-agent-turn-not-tested"
+    },
+    {
+      "id": "dandori/dandori_sla_status",
+      "name": "dandori_sla_status",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/dandori",
+        "sourceRef": "app-dandori",
+        "path": "bin/dandori-mcp"
+      },
+      "description": "SLA stage of an issue at time now from its medium-risk, high-risk and breach timestamps (Linear slaMediumRiskAt / slaHighRiskAt / slaBreachesAt). Missing timestamps are not set.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "now": {
+            "description": "Epoch milliseconds or an ISO-8601 timestamp.",
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "medium_at": {
+            "description": "Epoch milliseconds or an ISO-8601 timestamp.",
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "high_at": {
+            "description": "Epoch milliseconds or an ISO-8601 timestamp.",
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "breach_at": {
+            "description": "Epoch milliseconds or an ISO-8601 timestamp.",
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "required": [
+          "now"
+        ],
+        "additionalProperties": false
+      },
+      "outputContract": "MCP content[0].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
+      "effects": [],
+      "authority": "caller-bound; tools/list grants nothing",
+      "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input (2026-10-22); live-agent-turn-not-tested"
     }
   ]
 }

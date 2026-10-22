@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "itonami.entry.v1",
+  "sourceRefs": [
+    "app-mihari"
+  ],
+  "useWhen": "An operator hands over Sentry envelopes, event exports or /events/ responses and asks which errors to look at first",
+  "avoidWhen": "Resolving or muting issues in a live Sentry project, or treating mihari priority as Sentry priority",
+  "inputs": {
+    "text": "Sentry data the operator provided",
+    "context": "release and environment the operator cares about"
+  },
+  "outputs": {
+    "triage": "grouped issues with priority, regression flags and the evidence counts behind them"
+  },
+  "effects": [
+    "process"
+  ],
+  "authority": {
+    "grants": false,
+    "default": "blocked",
+    "binding": "caller authorization; the mcp server must be enabled in the profile by its owner"
+  },
+  "validation": {
+    "catalog": "schema-checked",
+    "runtime": "protocol-tested 2026-10-22: tools/list and tools/call over stdio with the itonami-agent MCP client (kotoba-lang/itonami-agent 709c948, itonami.agent.mcp discover/call) on synthetic fixtures; no model-driven agent turn, no deployed profile",
+    "live": false
+  },
+  "compatibilityNote": "Hermes storage format only. The steps call MCP tools by their itonami-agent names (mcp__<server>__<tool>) and assume the server key in mcp_servers matches the entry id.",
+  "dependsOn": [
+    "mcp/mihari"
+  ]
+}
