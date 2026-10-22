@@ -228,7 +228,37 @@ def validate(root=ROOT):
                 raise ValueError('Candidate evidence URL differs from pinned identity')
         if review['decision'] == 'registered' and not any(s['repository'] == review['repository'] and s['commit'] == review['commit'] for s in refs.values()):
             raise ValueError('Registered candidate lacks matching source provenance')
+    validate_datasets(root)
     return len(catalog), len(tools['tools'])
+
+
+def validate_datasets(root):
+    """Dataset source catalogs (ADR 0004): references only, pinned, never a Hermes entry."""
+    schema = read(root / 'schemas/dataset-sources.schema.json')
+    Draft202012Validator.check_schema(schema)
+    validator = Draft202012Validator(schema)
+    paths = sorted((root / 'catalogs/datasets').glob('*.json'))
+    if not paths:
+        raise ValueError('Dataset catalogs missing')
+    seen_repos = set()
+    for path in paths:
+        doc = read(path)
+        validator.validate(doc)
+        if doc['family'] != path.stem or doc['count'] != len(doc['entries']):
+            raise ValueError(f'Dataset catalog family or count mismatch: {path.name}')
+        for e in doc['entries']:
+            if not e['id'].startswith(doc['family'] + '/'):
+                raise ValueError(f"Dataset entry outside its family: {e['id']}")
+            if e['repository'] in seen_repos:
+                raise ValueError(f"Duplicate dataset repository: {e['repository']}")
+            seen_repos.add(e['repository'])
+            if (e['digestStatus'] == 'verified') != bool(e['payload']):
+                raise ValueError(f"Dataset digest status disagrees with payload: {e['id']}")
+            if len({p['path'] for p in e['payload']}) != len(e['payload']):
+                raise ValueError(f"Duplicate dataset payload path: {e['id']}")
+        ids = [e['id'] for e in doc['entries']]
+        if len(set(ids)) != len(ids):
+            raise ValueError(f'Duplicate dataset id: {path.name}')
 
 
 if __name__ == '__main__':
