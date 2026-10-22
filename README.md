@@ -45,7 +45,7 @@ Start at [llms.txt](llms.txt), then [llms-full.txt](llms-full.txt). The public d
 
 Skills use SKILL.md frontmatter; MCPs, agents and workflows use Hermes manifest shapes. itonami.json contains supplemental inputs, effects and authority requirements. Wildcard Hermes/desktop version fields express no declared version filter; only catalog format has been checked. Runtime installation compatibility has not been qualified. workflow.json uses an Itonami recipe schema and requires a compatible reader; it is not a proven Hermes executable workflow.
 
-[catalogs/tools.json](catalogs/tools.json) indexes eight Murakumo MCP tools, four portable user-test MCP tools, one native fleet catalog tool, two mihari and five dandori itonami dapp tools, three plugin-hermes tools and three ZAP plugin tools, with provider identity and input contracts. [catalogs/sources.json](catalogs/sources.json) records pinned derivation inputs and file hashes. Tool discovery is not a successful live invocation.
+[catalogs/tools.json](catalogs/tools.json) indexes eight Murakumo MCP tools, four portable user-test MCP tools, one native fleet catalog tool, two mihari, five dandori and five kaikei itonami dapp tools, three plugin-hermes tools and three ZAP plugin tools, with provider identity and input contracts. [catalogs/sources.json](catalogs/sources.json) records pinned derivation inputs and file hashes. Tool discovery is not a successful live invocation.
 
 ## Itonami dapps for agents
 
@@ -55,8 +55,10 @@ Skills use SKILL.md frontmatter; MCPs, agents and workflows use Hermes manifest 
 | mcp | dandori | Linear-compatible export conversion, cycle progress, estimate and SLA checks ([app-itonami-dandori](https://github.com/cloud-itonami/app-itonami-dandori)) |
 | skill | itonami-sentry-error-triage | Triage Sentry data an operator already holds with the mihari tools |
 | skill | itonami-linear-issue-planning | Check Linear exports an operator already holds with the dandori tools |
+| mcp | kaikei | MoneyForward / freee / Yayoi / QuickBooks Online / Xero-compatible journal import, checks, trial balance, P&L and balance sheet, and format conversion ([kaikei](https://github.com/cloud-itonami/kaikei)) |
+| skill | itonami-ledger-statements | Build statements from journal exports an operator already holds with the kaikei tools |
 
-Both servers are stdio MCP servers whose tools are pure functions over the passed text: they do not contact sentry.io or linear.app and store nothing. They are recorded in catalogs/targeted-public-sources.json because the repositories postdate the 2026-10-10 inventory. Registration adds them to no profile.
+The three servers are stdio MCP servers whose tools are pure functions over the passed text. They contact no vendor (sentry.io, linear.app, MoneyForward, freee, Yayoi, QuickBooks Online or Xero) and store nothing. mihari and dandori are recorded in catalogs/targeted-public-sources.json because those repositories postdate the 2026-10-10 inventory. kaikei's registrations sit on its existing inventory row, with their own source commit. Registration adds none of them to a profile.
 
 ## Ownership and federation
 
@@ -85,7 +87,7 @@ See [ADR 0001](docs/adr/0001-registry-ownership.md) and [validation receipt](doc
 
 The 2026-10-10 inventory covers 4,710 GitHub repositories across both organizations. The public [machine-readable inventory](catalogs/inventory.json) contains 4,614 repositories: every nonempty public default branch has a complete recursive filename survey; one repository has an empty default branch. Private repositories are counted only (96); their names and contents are omitted. Filename markers are candidates, not semantic or runtime qualification. See [coverage and selection decisions](docs/inventory-2026-10-10.md).
 
-The catalog now has **43 entries**: 23 skills, 13 agent templates, 5 MCP connections and 2 inert workflows, plus **26 provider-qualified tool references**. Added roles cover repository maturity, provider capabilities, research corpora, sealed inbox observation, learning material drafts and independent evidence review. Added skills also cover portable user tests, content-addressed receipts, host connector contracts, definition inspection, guest admission and system-dynamics evidence. These are Itonami operational adaptations; upstream implementation and generic language skills retain their owners.
+The catalog now has **45 entries**: 24 skills, 13 agent templates, 6 MCP connections and 2 inert workflows, plus **31 provider-qualified tool references**. Added roles cover repository maturity, provider capabilities, research corpora, sealed inbox observation, learning material drafts and independent evidence review. Added skills also cover portable user tests, content-addressed receipts, host connector contracts, definition inspection, guest admission and system-dynamics evidence. These are Itonami operational adaptations; upstream implementation and generic language skills retain their owners.
 
 The user-test connection is source-inspected and has a checked fail-closed launcher; its target runtime is not qualified. The Murakumo discovery probe sends zero valid tool calls and performs no live network operation. The inventory includes candidate and deferred decisions; neither these records nor publication enables a profile or tool.
 
