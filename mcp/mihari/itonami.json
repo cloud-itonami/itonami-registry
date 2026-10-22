@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "itonami.entry.v1",
+  "sourceRefs": [
+    "app-mihari"
+  ],
+  "useWhen": "Group Sentry envelopes, event JSON or /events/ responses an operator already holds into issues, or decide priority and status transitions with mihari rules",
+  "avoidWhen": "Reading from or writing to a live Sentry organization, or assuming the result matches Sentry's own priority algorithm",
+  "inputs": {
+    "text": "Sentry envelope, event JSON or /events/ response text (<= 5 MiB)",
+    "decision": "level, counts, status and action in Sentry vocabulary"
+  },
+  "outputs": {
+    "issues": "Sentry API-shaped issue objects with counts and first/last seen",
+    "decision": "priority, next status and regression flag"
+  },
+  "effects": [
+    "process",
+    "filesystem-read",
+    "dependency-fetch-on-first-launch"
+  ],
+  "authority": {
+    "grants": false,
+    "default": "blocked",
+    "binding": "caller-authorized profile mcp_servers entry and owner-reviewed effective tool allowlist"
+  },
+  "validation": {
+    "catalog": "schema-checked",
+    "runtime": "protocol-tested 2026-10-22: tools/list and tools/call over stdio with the itonami-agent MCP client (kotoba-lang/itonami-agent 709c948, itonami.agent.mcp discover/call) on synthetic fixtures; no model-driven agent turn, no deployed profile",
+    "live": false
+  },
+  "compatibilityNote": "Hermes storage format only. itonami-agent exposes the tools as mcp__mihari__<tool> and does not start MCP subprocesses on peer runs. Data-format compatibility only; no connection to sentry.io.",
+  "requires": [
+    "Owner-installed kbb (Node) host",
+    "cloud-itonami/app-itonami-mihari checkout at the pinned commit"
+  ],
+  "launchResolution": {
+    "placeholder": "MIHARI_REPO",
+    "behavior": "Resolve the absolute checkout before writing the client config. The launcher finds nbb.edn from its own path and resolves the pinned kotoba-lang/text git dependency into ~/.gitlibs; no cwd is required."
+  }
+}
