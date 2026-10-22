@@ -967,6 +967,411 @@
       "effects": [],
       "authority": "caller-bound; tools/list grants nothing",
       "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input (2026-10-22); live-agent-turn-not-tested"
+    },
+    {
+      "id": "kaikei/kaikei_import",
+      "name": "kaikei_import",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/kaikei",
+        "sourceRef": "kaikei-d1c7377d",
+        "path": "bin/kaikei-mcp"
+      },
+      "description": "Read a journal export (MoneyForward 仕訳帳 CSV, freee 仕訳 CSV, 弥生インポート形式, QuickBooks Online Account/JournalEntry JSON or journal CSV, Xero Accounts/Journals/ManualJournals JSON or manual journal CSV, or a kaikei ledger) into a kaikei ledger with checks. Pure: nothing is sent, stored or fetched; it does not call any accounting API.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "The file as text (UTF-8), up to 5 MiB."
+          },
+          "bytes_base64": {
+            "type": "string",
+            "description": "The file's bytes in base64 (use this for Shift_JIS files), up to 5 MiB decoded."
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "kaikei-json",
+              "xero-json",
+              "qbo-json",
+              "yayoi",
+              "mf",
+              "freee",
+              "qbo-csv",
+              "xero-csv"
+            ],
+            "default": "auto"
+          },
+          "encoding": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "utf-8",
+              "shift_jis"
+            ],
+            "default": "auto"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "AED",
+              "AUD",
+              "BHD",
+              "BRL",
+              "CAD",
+              "CHF",
+              "CLP",
+              "CNY",
+              "CZK",
+              "DKK",
+              "EUR",
+              "FJD",
+              "GBP",
+              "HKD",
+              "HUF",
+              "IDR",
+              "ILS",
+              "INR",
+              "IQD",
+              "ISK",
+              "JOD",
+              "JPY",
+              "KRW",
+              "KWD",
+              "LYD",
+              "MXN",
+              "MYR",
+              "NOK",
+              "NZD",
+              "OMR",
+              "PGK",
+              "PHP",
+              "PLN",
+              "PYG",
+              "SAR",
+              "SEK",
+              "SGD",
+              "THB",
+              "TND",
+              "TOP",
+              "TRY",
+              "TWD",
+              "UGX",
+              "USD",
+              "VND",
+              "WST",
+              "ZAR"
+            ],
+            "default": "JPY",
+            "description": "Ledger currency when the file does not say (Xero responses, QBO without CurrencyRef, Xero/QBO CSV)."
+          },
+          "date_order": {
+            "type": "string",
+            "enum": [
+              "mdy",
+              "dmy"
+            ],
+            "description": "Numeric date order in QBO/Xero CSV; guessed when omitted."
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputContract": "MCP content[0].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
+      "effects": [],
+      "authority": "caller-bound; tools/list grants nothing",
+      "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input (2026-10-22); live-agent-turn-not-tested"
+    },
+    {
+      "id": "kaikei/kaikei_validate",
+      "name": "kaikei_validate",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/kaikei",
+        "sourceRef": "kaikei-d1c7377d",
+        "path": "bin/kaikei-mcp"
+      },
+      "description": "Check a kaikei ledger: whether the balance sheet balances, which accounts have no class (they are left out of P/L and B/S, never guessed), and which entries are invalid (unbalanced, negative, missing account, bad date).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ledger": {
+            "type": "object",
+            "description": "A kaikei.ledger.v1 object, as returned by kaikei_import."
+          }
+        },
+        "required": [
+          "ledger"
+        ],
+        "additionalProperties": false
+      },
+      "outputContract": "MCP content[0].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
+      "effects": [],
+      "authority": "caller-bound; tools/list grants nothing",
+      "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input (2026-10-22); live-agent-turn-not-tested"
+    },
+    {
+      "id": "kaikei/kaikei_report",
+      "name": "kaikei_report",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/kaikei",
+        "sourceRef": "kaikei-d1c7377d",
+        "path": "bin/kaikei-mcp"
+      },
+      "description": "Trial balance, profit and loss or balance sheet for a period, as kaikei JSON or shaped like the QuickBooks Online Report or Xero Reports API responses. Class mapping and the staged-profit and retained-earnings rules are kaikei's, not a vendor's internal calculation.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ledger": {
+            "type": "object",
+            "description": "A kaikei.ledger.v1 object, as returned by kaikei_import."
+          },
+          "report": {
+            "type": "string",
+            "enum": [
+              "trial-balance",
+              "profit-and-loss",
+              "balance-sheet"
+            ]
+          },
+          "shape": {
+            "type": "string",
+            "enum": [
+              "kaikei",
+              "qbo",
+              "xero"
+            ],
+            "default": "kaikei"
+          },
+          "from": {
+            "type": "string",
+            "description": "Period start, YYYY-MM-DD."
+          },
+          "to": {
+            "type": "string",
+            "description": "Period end (balance sheet date), YYYY-MM-DD."
+          }
+        },
+        "required": [
+          "ledger",
+          "report",
+          "from",
+          "to"
+        ],
+        "additionalProperties": false
+      },
+      "outputContract": "MCP content[0].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
+      "effects": [],
+      "authority": "caller-bound; tools/list grants nothing",
+      "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input (2026-10-22); live-agent-turn-not-tested"
+    },
+    {
+      "id": "kaikei/kaikei_export",
+      "name": "kaikei_export",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/kaikei",
+        "sourceRef": "kaikei-d1c7377d",
+        "path": "bin/kaikei-mcp"
+      },
+      "description": "Write a kaikei ledger in one of the import formats. Shift_JIS output comes back as bytes_base64, UTF-8 as text. Fields the format cannot hold are listed in notes. Pure: writes no file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ledger": {
+            "type": "object",
+            "description": "A kaikei.ledger.v1 object, as returned by kaikei_import."
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "kaikei-json",
+              "xero-json",
+              "qbo-json",
+              "yayoi",
+              "mf",
+              "freee",
+              "qbo-csv",
+              "xero-csv"
+            ]
+          },
+          "encoding": {
+            "type": "string",
+            "enum": [
+              "utf-8",
+              "utf-8-bom",
+              "shift_jis"
+            ],
+            "description": "Defaults per format (Shift_JIS for 弥生・MF・freee)."
+          },
+          "output_date_order": {
+            "type": "string",
+            "enum": [
+              "ymd",
+              "mdy",
+              "dmy"
+            ],
+            "description": "Date order for QBO/Xero CSV (default mdy for QBO, dmy for Xero)."
+          }
+        },
+        "required": [
+          "ledger",
+          "format"
+        ],
+        "additionalProperties": false
+      },
+      "outputContract": "MCP content[0].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
+      "effects": [],
+      "authority": "caller-bound; tools/list grants nothing",
+      "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input (2026-10-22); live-agent-turn-not-tested"
+    },
+    {
+      "id": "kaikei/kaikei_convert",
+      "name": "kaikei_convert",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/kaikei",
+        "sourceRef": "kaikei-d1c7377d",
+        "path": "bin/kaikei-mcp"
+      },
+      "description": "kaikei_import followed by kaikei_export in one call: convert a journal file from one format to another.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "enum": [
+              "AED",
+              "AUD",
+              "BHD",
+              "BRL",
+              "CAD",
+              "CHF",
+              "CLP",
+              "CNY",
+              "CZK",
+              "DKK",
+              "EUR",
+              "FJD",
+              "GBP",
+              "HKD",
+              "HUF",
+              "IDR",
+              "ILS",
+              "INR",
+              "IQD",
+              "ISK",
+              "JOD",
+              "JPY",
+              "KRW",
+              "KWD",
+              "LYD",
+              "MXN",
+              "MYR",
+              "NOK",
+              "NZD",
+              "OMR",
+              "PGK",
+              "PHP",
+              "PLN",
+              "PYG",
+              "SAR",
+              "SEK",
+              "SGD",
+              "THB",
+              "TND",
+              "TOP",
+              "TRY",
+              "TWD",
+              "UGX",
+              "USD",
+              "VND",
+              "WST",
+              "ZAR"
+            ],
+            "default": "JPY",
+            "description": "Ledger currency when the file does not say (Xero responses, QBO without CurrencyRef, Xero/QBO CSV)."
+          },
+          "encoding": {
+            "type": "string",
+            "enum": [
+              "utf-8",
+              "utf-8-bom",
+              "shift_jis"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "description": "The file as text (UTF-8), up to 5 MiB."
+          },
+          "bytes_base64": {
+            "type": "string",
+            "description": "The file's bytes in base64 (use this for Shift_JIS files), up to 5 MiB decoded."
+          },
+          "output_date_order": {
+            "type": "string",
+            "enum": [
+              "ymd",
+              "mdy",
+              "dmy"
+            ]
+          },
+          "from": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "kaikei-json",
+              "xero-json",
+              "qbo-json",
+              "yayoi",
+              "mf",
+              "freee",
+              "qbo-csv",
+              "xero-csv"
+            ],
+            "default": "auto"
+          },
+          "date_order": {
+            "type": "string",
+            "enum": [
+              "mdy",
+              "dmy"
+            ]
+          },
+          "to": {
+            "type": "string",
+            "enum": [
+              "kaikei-json",
+              "xero-json",
+              "qbo-json",
+              "yayoi",
+              "mf",
+              "freee",
+              "qbo-csv",
+              "xero-csv"
+            ]
+          },
+          "input_encoding": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "utf-8",
+              "shift_jis"
+            ],
+            "default": "auto"
+          }
+        },
+        "required": [
+          "to"
+        ],
+        "additionalProperties": false
+      },
+      "outputContract": "MCP content[0].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
+      "effects": [],
+      "authority": "caller-bound; tools/list grants nothing",
+      "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input (2026-10-22); live-agent-turn-not-tested"
     }
   ]
 }

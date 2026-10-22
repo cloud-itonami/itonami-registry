@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "itonami.entry.v1",
+  "sourceRefs": [
+    "kaikei-d1c7377d"
+  ],
+  "useWhen": "Read a journal export an operator already holds (MoneyForward, freee, Yayoi, QuickBooks Online or Xero), check that entries balance and accounts are classified, build a trial balance, P&L or balance sheet, or convert the journal to another of these formats",
+  "avoidWhen": "Reading from or writing to a live accounting company, bank or tax authority; treating kaikei's class mapping, staged profit or retained-earnings rules as a vendor's calculation; passing a real ledger to an agent whose inference rail is remote (the tools are pure, but the agent turn is not local)",
+  "inputs": {
+    "text": "journal export as text, or bytes_base64 for Shift_JIS files (<= 5 MiB)",
+    "ledger": "kaikei.ledger.v1 object returned by kaikei_import",
+    "period": "from / to dates (YYYY-MM-DD) for reports"
+  },
+  "outputs": {
+    "ledger": "kaikei.ledger.v1 (integer minor units, one currency per ledger)",
+    "checks": "balance-sheet difference, unclassified accounts, invalid entries",
+    "report": "trial balance, P&L or balance sheet in kaikei, QuickBooks Report or Xero Reports shape",
+    "export": "text, or bytes_base64 for Shift_JIS, plus notes on fields the format cannot hold"
+  },
+  "effects": [
+    "process",
+    "filesystem-read",
+    "dependency-fetch-on-first-launch"
+  ],
+  "authority": {
+    "grants": false,
+    "default": "blocked",
+    "binding": "caller-authorized profile mcp_servers entry and owner-reviewed effective tool allowlist"
+  },
+  "validation": {
+    "catalog": "schema-checked",
+    "runtime": "protocol-tested 2026-10-22: tools/list and tools/call over stdio with the itonami-agent MCP client (kotoba-lang/itonami-agent 0c05574, itonami.agent.mcp discover/call) on synthetic fixtures; no model-driven agent turn, no deployed profile",
+    "live": false
+  },
+  "compatibilityNote": "Hermes storage format only. itonami-agent exposes the tools as mcp__kaikei__<tool> and does not start MCP subprocesses on peer runs. Data-format compatibility only; no connection to MoneyForward, freee, Yayoi, QuickBooks Online or Xero.",
+  "requires": [
+    "Owner-installed kbb (Node) host",
+    "cloud-itonami/kaikei checkout at the pinned commit"
+  ],
+  "launchResolution": {
+    "placeholder": "KAIKEI_REPO",
+    "behavior": "Resolve the absolute checkout before writing the client config. The launcher finds nbb.edn from its own path and resolves the pinned kotoba-lang/text git dependency into ~/.gitlibs; no cwd is required."
+  }
+}
