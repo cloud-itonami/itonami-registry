@@ -1,0 +1,480 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "un_locode-compat",
+  "did": "did:web:etzhayyim.com:actor:un_locode-compat",
+  "kind": "compat",
+  "title": "un_locode clean-room actor",
+  "description": "Clean-room, API-compatible physical benchmarks / classifications actor (un_locode); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreiauaghvq5rzecl7lsus5wzr3o23z4p5iu4mkcy4cihuoz2ci6ujia",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreiauaghvq5rzecl7lsus5wzr3o23z4p5iu4mkcy4cihuoz2ci6ujia",
+  "schema": "schema/un_locode.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://unece.org/trade/cefact/codesfortrade/codes-locode",
+    "verifiedAt": "2026-06-10",
+    "resources": [
+      "Location",
+      "FunctionClassifier",
+      "StatusCode"
+    ],
+    "enums": {
+      "Location": {
+        "function": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "B"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Location",
+    "FunctionClassifier",
+    "StatusCode"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 15,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/locations",
+          "op": "create Location"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/locations",
+          "op": "list Location"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/locations/{id}",
+          "op": "get Location"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/locations/{id}",
+          "op": "update Location"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/locations/{id}",
+          "op": "delete Location"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/functionclassifiers",
+          "op": "create FunctionClassifier"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/functionclassifiers",
+          "op": "list FunctionClassifier"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/functionclassifiers/{id}",
+          "op": "get FunctionClassifier"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/functionclassifiers/{id}",
+          "op": "update FunctionClassifier"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/functionclassifiers/{id}",
+          "op": "delete FunctionClassifier"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/statuscodes",
+          "op": "create StatusCode"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/statuscodes",
+          "op": "list StatusCode"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/statuscodes/{id}",
+          "op": "get StatusCode"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/statuscodes/{id}",
+          "op": "update StatusCode"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/statuscodes/{id}",
+          "op": "delete StatusCode"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "un_locode-compat",
+            "purl": "pkg:etzhayyim/un_locode-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "un_locode.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 15,
+      "tools": [
+        {
+          "name": "create_location",
+          "description": "Create a Location.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "countryCode": {
+                "type": "string"
+              },
+              "locationCode": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "nameWoDiacritics": {
+                "type": "string"
+              },
+              "function": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "subdivision": {
+                "type": "string"
+              },
+              "iataCode": {
+                "type": "string"
+              },
+              "latitude": {
+                "type": "number"
+              },
+              "longitude": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "countryCode",
+              "locationCode"
+            ]
+          }
+        },
+        {
+          "name": "list_locations",
+          "description": "List Locations.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_location",
+          "description": "Get a Location by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_location",
+          "description": "Update a Location.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "countryCode": {
+                "type": "string"
+              },
+              "locationCode": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "nameWoDiacritics": {
+                "type": "string"
+              },
+              "function": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "subdivision": {
+                "type": "string"
+              },
+              "iataCode": {
+                "type": "string"
+              },
+              "latitude": {
+                "type": "number"
+              },
+              "longitude": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_location",
+          "description": "Delete a Location.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_function_classifier",
+          "description": "Create a FunctionClassifier.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "definition": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "definition"
+            ]
+          }
+        },
+        {
+          "name": "list_function_classifiers",
+          "description": "List FunctionClassifiers.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_function_classifier",
+          "description": "Get a FunctionClassifier by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_function_classifier",
+          "description": "Update a FunctionClassifier.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              },
+              "definition": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_function_classifier",
+          "description": "Delete a FunctionClassifier.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_status_code",
+          "description": "Create a StatusCode.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "definition": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "definition"
+            ]
+          }
+        },
+        {
+          "name": "list_status_codes",
+          "description": "List StatusCodes.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_status_code",
+          "description": "Get a StatusCode by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_status_code",
+          "description": "Update a StatusCode.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              },
+              "definition": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_status_code",
+          "description": "Delete a StatusCode.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

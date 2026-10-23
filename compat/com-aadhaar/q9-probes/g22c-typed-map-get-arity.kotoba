@@ -1,0 +1,9 @@
+;; Row 22, with the arity frontend.cljc actually desugars:
+;;   typed-map-get requires type, value, and key   (type FIRST, no default)
+;; The 3-arg (map key default) spelling used by the earlier round answers
+;; "value type is outside the safe profile" because the MAP lands in the type
+;; slot. typed-map-get answers an option, so option-value-of supplies the default.
+(ns g22c (:export [probe]))
+(defn m [] [:map :keyword :i64] (typed-map-new [:map :keyword :i64] :a 1 :b 2))
+(defn probe [] :i64
+  (option-value-of [:option :i64] (typed-map-get [:map :keyword :i64] (m) :b) 0))

@@ -1,0 +1,770 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "monzo-compat",
+  "did": "did:web:etzhayyim.com:actor:monzo-compat",
+  "kind": "compat",
+  "title": "monzo clean-room actor",
+  "description": "Clean-room, API-compatible payments / money movement actor (monzo); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreihp4ja3v64wxi2itzdzip2ebdlyyqypgtvxatak2ivrq7hnb6x62a",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreihp4ja3v64wxi2itzdzip2ebdlyyqypgtvxatak2ivrq7hnb6x62a",
+  "schema": "schema/monzo.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://docs.monzo.com/",
+    "verifiedAt": "2026-06-09",
+    "resources": [
+      "Account",
+      "Balance",
+      "Transaction",
+      "Pot",
+      "Attachment"
+    ],
+    "enums": {
+      "Account": {
+        "type": [
+          "uk_retail",
+          "uk_retail_joint"
+        ]
+      },
+      "Transaction": {
+        "category": [
+          "general",
+          "eating_out",
+          "expenses",
+          "transport",
+          "cash",
+          "bills",
+          "entertainment",
+          "shopping",
+          "holidays",
+          "groceries",
+          "mondo"
+        ],
+        "declineReason": [
+          "INSUFFICIENT_FUNDS",
+          "CARD_INACTIVE",
+          "CARD_BLOCKED",
+          "INVALID_CVC",
+          "OTHER"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Account",
+    "Balance",
+    "Transaction",
+    "Pot",
+    "Attachment"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 25,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/accounts",
+          "op": "create Account"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/accounts",
+          "op": "list Account"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/accounts/{id}",
+          "op": "get Account"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/accounts/{id}",
+          "op": "update Account"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/accounts/{id}",
+          "op": "delete Account"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/balances",
+          "op": "create Balance"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/balances",
+          "op": "list Balance"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/balances/{id}",
+          "op": "get Balance"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/balances/{id}",
+          "op": "update Balance"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/balances/{id}",
+          "op": "delete Balance"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/transactions",
+          "op": "create Transaction"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/transactions",
+          "op": "list Transaction"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/transactions/{id}",
+          "op": "get Transaction"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/transactions/{id}",
+          "op": "update Transaction"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/transactions/{id}",
+          "op": "delete Transaction"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/pots",
+          "op": "create Pot"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/pots",
+          "op": "list Pot"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/pots/{id}",
+          "op": "get Pot"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/pots/{id}",
+          "op": "update Pot"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/pots/{id}",
+          "op": "delete Pot"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/attachments",
+          "op": "create Attachment"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/attachments",
+          "op": "list Attachment"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/attachments/{id}",
+          "op": "get Attachment"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/attachments/{id}",
+          "op": "update Attachment"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/attachments/{id}",
+          "op": "delete Attachment"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "monzo-compat",
+            "purl": "pkg:etzhayyim/monzo-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "monzo.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 25,
+      "tools": [
+        {
+          "name": "create_account",
+          "description": "Create a Account.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "description"
+            ]
+          }
+        },
+        {
+          "name": "list_accounts",
+          "description": "List Accounts.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_account",
+          "description": "Get a Account by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_account",
+          "description": "Update a Account.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_account",
+          "description": "Delete a Account.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_balance",
+          "description": "Create a Balance.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "balance": {
+                "type": "integer"
+              },
+              "totalBalance": {
+                "type": "integer"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "spendToday": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "balance",
+              "totalBalance"
+            ]
+          }
+        },
+        {
+          "name": "list_balances",
+          "description": "List Balances.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_balance",
+          "description": "Get a Balance by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_balance",
+          "description": "Update a Balance.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "balance": {
+                "type": "integer"
+              },
+              "totalBalance": {
+                "type": "integer"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "spendToday": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_balance",
+          "description": "Delete a Balance.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_transaction",
+          "description": "Create a Transaction.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "integer"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "declineReason": {
+                "type": "string"
+              },
+              "isLoad": {
+                "type": "boolean"
+              },
+              "merchant": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              },
+              "settled": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "amount"
+            ]
+          }
+        },
+        {
+          "name": "list_transactions",
+          "description": "List Transactions.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_transaction",
+          "description": "Get a Transaction by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_transaction",
+          "description": "Update a Transaction.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "integer"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "declineReason": {
+                "type": "string"
+              },
+              "isLoad": {
+                "type": "boolean"
+              },
+              "merchant": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              },
+              "settled": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_transaction",
+          "description": "Delete a Transaction.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_pot",
+          "description": "Create a Pot.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "balance": {
+                "type": "integer"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "created": {
+                "type": "string"
+              },
+              "updated": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          }
+        },
+        {
+          "name": "list_pots",
+          "description": "List Pots.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_pot",
+          "description": "Get a Pot by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_pot",
+          "description": "Update a Pot.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "balance": {
+                "type": "integer"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "created": {
+                "type": "string"
+              },
+              "updated": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_pot",
+          "description": "Delete a Pot.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_attachment",
+          "description": "Create a Attachment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "userId": {
+                "type": "string"
+              },
+              "externalId": {
+                "type": "string"
+              },
+              "fileUrl": {
+                "type": "string"
+              },
+              "fileType": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "fileUrl"
+            ]
+          }
+        },
+        {
+          "name": "list_attachments",
+          "description": "List Attachments.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_attachment",
+          "description": "Get a Attachment by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_attachment",
+          "description": "Update a Attachment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "userId": {
+                "type": "string"
+              },
+              "externalId": {
+                "type": "string"
+              },
+              "fileUrl": {
+                "type": "string"
+              },
+              "fileType": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_attachment",
+          "description": "Delete a Attachment.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

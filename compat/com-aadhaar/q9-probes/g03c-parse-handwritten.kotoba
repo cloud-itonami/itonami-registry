@@ -1,0 +1,11 @@
+;; Row 3, hand-written: the digit walk aave/whole_component.kotoba uses for as-int.
+(ns g03c (:export [probe]))
+(defn digits [s :string i :i64 len :i64 acc :i64] :i64
+  (if (>= i len)
+    acc
+    (let [cp (string-code-point-at s i)]
+      (if (or (< cp 48) (> cp 57))
+        acc
+        (digits s (+ i 1) len (+ (* acc 10) (- cp 48)))))))
+(defn as-int [s :string] :i64 (digits s 0 (string-byte-length s) 0))
+(defn probe [] :i64 (as-int "42"))

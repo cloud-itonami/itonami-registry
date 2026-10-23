@@ -1,0 +1,639 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "docker-compat",
+  "did": "did:web:etzhayyim.com:actor:docker-compat",
+  "kind": "compat",
+  "title": "docker clean-room actor",
+  "description": "Clean-room, API-compatible DevOps / CI-CD actor (docker); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreibrglytkq324ezeamsdswizhld6iyivtwdy465rmtncvwtvg6ix5u",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreibrglytkq324ezeamsdswizhld6iyivtwdy465rmtncvwtvg6ix5u",
+  "schema": "schema/docker.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://github.com/moby/moby/blob/master/api/swagger.yaml",
+    "verifiedAt": "2026-06-09",
+    "resources": [
+      "Container",
+      "Image",
+      "Network",
+      "Volume"
+    ],
+    "enums": {
+      "Container": {
+        "state": [
+          "created",
+          "running",
+          "paused",
+          "restarting",
+          "removing",
+          "exited",
+          "dead"
+        ]
+      },
+      "Volume": {
+        "scope": [
+          "local",
+          "global"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Container",
+    "Image",
+    "Network",
+    "Volume"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 20,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/containers",
+          "op": "create Container"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/containers",
+          "op": "list Container"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/containers/{id}",
+          "op": "get Container"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/containers/{id}",
+          "op": "update Container"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/containers/{id}",
+          "op": "delete Container"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/images",
+          "op": "create Image"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/images",
+          "op": "list Image"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/images/{id}",
+          "op": "get Image"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/images/{id}",
+          "op": "update Image"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/images/{id}",
+          "op": "delete Image"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/networks",
+          "op": "create Network"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/networks",
+          "op": "list Network"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/networks/{id}",
+          "op": "get Network"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/networks/{id}",
+          "op": "update Network"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/networks/{id}",
+          "op": "delete Network"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/volumes",
+          "op": "create Volume"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/volumes",
+          "op": "list Volume"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/volumes/{id}",
+          "op": "get Volume"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/volumes/{id}",
+          "op": "update Volume"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/volumes/{id}",
+          "op": "delete Volume"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "docker-compat",
+            "purl": "pkg:etzhayyim/docker-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "docker.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 20,
+      "tools": [
+        {
+          "name": "create_container",
+          "description": "Create a Container.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "image": {
+                "type": "string"
+              },
+              "imageID": {
+                "type": "string"
+              },
+              "command": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "created": {
+                "type": "integer"
+              },
+              "sizeRw": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "image"
+            ]
+          }
+        },
+        {
+          "name": "list_containers",
+          "description": "List Containers.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_container",
+          "description": "Get a Container by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_container",
+          "description": "Update a Container.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "image": {
+                "type": "string"
+              },
+              "imageID": {
+                "type": "string"
+              },
+              "command": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "created": {
+                "type": "integer"
+              },
+              "sizeRw": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_container",
+          "description": "Delete a Container.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_image",
+          "description": "Create a Image.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "parent": {
+                "type": "string"
+              },
+              "comment": {
+                "type": "string"
+              },
+              "container": {
+                "type": "string"
+              },
+              "size": {
+                "type": "integer"
+              },
+              "created": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "parent"
+            ]
+          }
+        },
+        {
+          "name": "list_images",
+          "description": "List Images.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_image",
+          "description": "Get a Image by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_image",
+          "description": "Update a Image.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "parent": {
+                "type": "string"
+              },
+              "comment": {
+                "type": "string"
+              },
+              "container": {
+                "type": "string"
+              },
+              "size": {
+                "type": "integer"
+              },
+              "created": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_image",
+          "description": "Delete a Image.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_network",
+          "description": "Create a Network.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "scope": {
+                "type": "string"
+              },
+              "driver": {
+                "type": "string"
+              },
+              "enableIPv6": {
+                "type": "boolean"
+              },
+              "internal": {
+                "type": "boolean"
+              },
+              "attachable": {
+                "type": "boolean"
+              },
+              "created": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          }
+        },
+        {
+          "name": "list_networks",
+          "description": "List Networks.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_network",
+          "description": "Get a Network by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_network",
+          "description": "Update a Network.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "scope": {
+                "type": "string"
+              },
+              "driver": {
+                "type": "string"
+              },
+              "enableIPv6": {
+                "type": "boolean"
+              },
+              "internal": {
+                "type": "boolean"
+              },
+              "attachable": {
+                "type": "boolean"
+              },
+              "created": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_network",
+          "description": "Delete a Network.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_volume",
+          "description": "Create a Volume.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "driver": {
+                "type": "string"
+              },
+              "mountpoint": {
+                "type": "string"
+              },
+              "scope": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "driver"
+            ]
+          }
+        },
+        {
+          "name": "list_volumes",
+          "description": "List Volumes.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_volume",
+          "description": "Get a Volume by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_volume",
+          "description": "Update a Volume.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "driver": {
+                "type": "string"
+              },
+              "mountpoint": {
+                "type": "string"
+              },
+              "scope": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_volume",
+          "description": "Delete a Volume.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

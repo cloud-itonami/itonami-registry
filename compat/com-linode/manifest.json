@@ -1,0 +1,977 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "linode-compat",
+  "did": "did:web:etzhayyim.com:actor:linode-compat",
+  "kind": "compat",
+  "title": "linode clean-room actor",
+  "description": "Clean-room, API-compatible cloud infrastructure (IaaS) actor (linode); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreidxoepgun3rftxe43fzln5wkqsa4fjnlyvqdqyeliglkg3qdrfice",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreidxoepgun3rftxe43fzln5wkqsa4fjnlyvqdqyeliglkg3qdrfice",
+  "schema": "schema/linode.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://github.com/linode/linode-api-openapi/blob/main/openapi.json",
+    "verifiedAt": "2026-06-09",
+    "resources": [
+      "Instance",
+      "Volume",
+      "Domain",
+      "NodeBalancer",
+      "LKECluster",
+      "Image"
+    ],
+    "enums": {
+      "Instance": {
+        "status": [
+          "running",
+          "offline",
+          "booting",
+          "busy",
+          "rebooting",
+          "shutting_down",
+          "provisioning",
+          "deleting",
+          "migrating",
+          "rebuilding",
+          "cloning",
+          "restoring",
+          "stopped",
+          "billing_suspension"
+        ]
+      },
+      "Volume": {
+        "status": [
+          "creating",
+          "active",
+          "resizing",
+          "key_rotating"
+        ],
+        "encryption": [
+          "enabled",
+          "disabled"
+        ]
+      },
+      "Domain": {
+        "type": [
+          "master",
+          "slave"
+        ],
+        "status": [
+          "disabled",
+          "active"
+        ]
+      },
+      "NodeBalancer": {
+        "type": [
+          "common",
+          "premium"
+        ]
+      },
+      "LKECluster": {
+        "tier": [
+          "standard",
+          "enterprise"
+        ]
+      },
+      "Image": {
+        "status": [
+          "available",
+          "creating",
+          "pending_upload"
+        ],
+        "type": [
+          "manual",
+          "automatic",
+          "shared"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Instance",
+    "Volume",
+    "Domain",
+    "NodeBalancer",
+    "LKECluster",
+    "Image"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 30,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/instances",
+          "op": "create Instance"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/instances",
+          "op": "list Instance"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/instances/{id}",
+          "op": "get Instance"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/instances/{id}",
+          "op": "update Instance"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/instances/{id}",
+          "op": "delete Instance"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/volumes",
+          "op": "create Volume"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/volumes",
+          "op": "list Volume"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/volumes/{id}",
+          "op": "get Volume"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/volumes/{id}",
+          "op": "update Volume"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/volumes/{id}",
+          "op": "delete Volume"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/domains",
+          "op": "create Domain"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/domains",
+          "op": "list Domain"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/domains/{id}",
+          "op": "get Domain"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/domains/{id}",
+          "op": "update Domain"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/domains/{id}",
+          "op": "delete Domain"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/nodebalancers",
+          "op": "create NodeBalancer"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/nodebalancers",
+          "op": "list NodeBalancer"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/nodebalancers/{id}",
+          "op": "get NodeBalancer"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/nodebalancers/{id}",
+          "op": "update NodeBalancer"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/nodebalancers/{id}",
+          "op": "delete NodeBalancer"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/lkeclusters",
+          "op": "create LKECluster"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/lkeclusters",
+          "op": "list LKECluster"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/lkeclusters/{id}",
+          "op": "get LKECluster"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/lkeclusters/{id}",
+          "op": "update LKECluster"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/lkeclusters/{id}",
+          "op": "delete LKECluster"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/images",
+          "op": "create Image"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/images",
+          "op": "list Image"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/images/{id}",
+          "op": "get Image"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/images/{id}",
+          "op": "update Image"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/images/{id}",
+          "op": "delete Image"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "linode-compat",
+            "purl": "pkg:etzhayyim/linode-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "linode.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 30,
+      "tools": [
+        {
+          "name": "create_instance",
+          "description": "Create a Instance.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "label": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "region": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "image": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              },
+              "updated": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "label"
+            ]
+          }
+        },
+        {
+          "name": "list_instances",
+          "description": "List Instances.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_instance",
+          "description": "Get a Instance by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_instance",
+          "description": "Update a Instance.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "label": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "region": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "image": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              },
+              "updated": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_instance",
+          "description": "Delete a Instance.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_volume",
+          "description": "Create a Volume.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "label": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "size": {
+                "type": "integer"
+              },
+              "region": {
+                "type": "string"
+              },
+              "encryption": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              },
+              "updated": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "label"
+            ]
+          }
+        },
+        {
+          "name": "list_volumes",
+          "description": "List Volumes.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_volume",
+          "description": "Get a Volume by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_volume",
+          "description": "Update a Volume.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "label": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "size": {
+                "type": "integer"
+              },
+              "region": {
+                "type": "string"
+              },
+              "encryption": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              },
+              "updated": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_volume",
+          "description": "Delete a Volume.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_domain",
+          "description": "Create a Domain.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "domain": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "soaEmail": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "domain"
+            ]
+          }
+        },
+        {
+          "name": "list_domains",
+          "description": "List Domains.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_domain",
+          "description": "Get a Domain by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_domain",
+          "description": "Update a Domain.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "domain": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "soaEmail": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_domain",
+          "description": "Delete a Domain.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_node_balancer",
+          "description": "Create a NodeBalancer.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "label": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "region": {
+                "type": "string"
+              },
+              "ipv4": {
+                "type": "string"
+              },
+              "ipv6": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              },
+              "updated": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "label"
+            ]
+          }
+        },
+        {
+          "name": "list_node_balancers",
+          "description": "List NodeBalancers.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_node_balancer",
+          "description": "Get a NodeBalancer by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_node_balancer",
+          "description": "Update a NodeBalancer.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "label": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "region": {
+                "type": "string"
+              },
+              "ipv4": {
+                "type": "string"
+              },
+              "ipv6": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              },
+              "updated": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_node_balancer",
+          "description": "Delete a NodeBalancer.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_l_k_e_cluster",
+          "description": "Create a LKECluster.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "label": {
+                "type": "string"
+              },
+              "region": {
+                "type": "string"
+              },
+              "k8sVersion": {
+                "type": "string"
+              },
+              "tier": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              },
+              "updated": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "label"
+            ]
+          }
+        },
+        {
+          "name": "list_l_k_e_clusters",
+          "description": "List LKEClusters.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_l_k_e_cluster",
+          "description": "Get a LKECluster by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_l_k_e_cluster",
+          "description": "Update a LKECluster.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "label": {
+                "type": "string"
+              },
+              "region": {
+                "type": "string"
+              },
+              "k8sVersion": {
+                "type": "string"
+              },
+              "tier": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              },
+              "updated": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_l_k_e_cluster",
+          "description": "Delete a LKECluster.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_image",
+          "description": "Create a Image.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "size": {
+                "type": "integer"
+              },
+              "isPublic": {
+                "type": "boolean"
+              },
+              "created": {
+                "type": "string"
+              },
+              "updated": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "label"
+            ]
+          }
+        },
+        {
+          "name": "list_images",
+          "description": "List Images.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_image",
+          "description": "Get a Image by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_image",
+          "description": "Update a Image.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "size": {
+                "type": "integer"
+              },
+              "isPublic": {
+                "type": "boolean"
+              },
+              "created": {
+                "type": "string"
+              },
+              "updated": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_image",
+          "description": "Delete a Image.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

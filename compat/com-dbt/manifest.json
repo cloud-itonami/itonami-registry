@@ -1,0 +1,585 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "dbt-compat",
+  "did": "did:web:etzhayyim.com:actor:dbt-compat",
+  "kind": "compat",
+  "title": "dbt clean-room actor",
+  "description": "Clean-room, API-compatible modern data stack actor (dbt); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreid2qxa4r5ofb6dachkd7aezffj3fcab2ooaqlagkcca6fsk42qqta",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreid2qxa4r5ofb6dachkd7aezffj3fcab2ooaqlagkcca6fsk42qqta",
+  "schema": "schema/dbt.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://schemas.getdbt.com/dbt/manifest/v12.json + https://schemas.getdbt.com/dbt/run-results/v6.json",
+    "verifiedAt": "2026-06-11",
+    "resources": [
+      "Node",
+      "Source",
+      "RunResult"
+    ],
+    "enums": {
+      "Node": {
+        "resourceType": [
+          "model",
+          "analysis",
+          "test",
+          "snapshot",
+          "operation",
+          "seed",
+          "rpc",
+          "sql_operation",
+          "doc",
+          "source",
+          "macro",
+          "exposure",
+          "metric",
+          "group",
+          "saved_query",
+          "semantic_model",
+          "unit_test",
+          "fixture",
+          "function"
+        ]
+      },
+      "Source": {
+        "resourceType": [
+          "source"
+        ]
+      },
+      "RunResult": {
+        "status": [
+          "success",
+          "error",
+          "skipped",
+          "partial success",
+          "no-op",
+          "pass",
+          "fail",
+          "warn",
+          "runtime error"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Node",
+    "Source",
+    "RunResult"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 15,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/nodes",
+          "op": "create Node"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/nodes",
+          "op": "list Node"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/nodes/{id}",
+          "op": "get Node"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/nodes/{id}",
+          "op": "update Node"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/nodes/{id}",
+          "op": "delete Node"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/sources",
+          "op": "create Source"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/sources",
+          "op": "list Source"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/sources/{id}",
+          "op": "get Source"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/sources/{id}",
+          "op": "update Source"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/sources/{id}",
+          "op": "delete Source"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/runresults",
+          "op": "create RunResult"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/runresults",
+          "op": "list RunResult"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/runresults/{id}",
+          "op": "get RunResult"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/runresults/{id}",
+          "op": "update RunResult"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/runresults/{id}",
+          "op": "delete RunResult"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "dbt-compat",
+            "purl": "pkg:etzhayyim/dbt-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "dbt.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 15,
+      "tools": [
+        {
+          "name": "create_node",
+          "description": "Create a Node.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "database": {
+                "type": "string"
+              },
+              "schema": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "packageName": {
+                "type": "string"
+              },
+              "uniqueId": {
+                "type": "string"
+              },
+              "alias": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "compiled": {
+                "type": "boolean"
+              },
+              "rawCode": {
+                "type": "string"
+              },
+              "resourceType": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "database",
+              "schema"
+            ]
+          }
+        },
+        {
+          "name": "list_nodes",
+          "description": "List Nodes.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_node",
+          "description": "Get a Node by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_node",
+          "description": "Update a Node.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "database": {
+                "type": "string"
+              },
+              "schema": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "packageName": {
+                "type": "string"
+              },
+              "uniqueId": {
+                "type": "string"
+              },
+              "alias": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "compiled": {
+                "type": "boolean"
+              },
+              "rawCode": {
+                "type": "string"
+              },
+              "resourceType": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_node",
+          "description": "Delete a Node.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_source",
+          "description": "Create a Source.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "database": {
+                "type": "string"
+              },
+              "schema": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "sourceName": {
+                "type": "string"
+              },
+              "sourceDescription": {
+                "type": "string"
+              },
+              "loader": {
+                "type": "string"
+              },
+              "identifier": {
+                "type": "string"
+              },
+              "uniqueId": {
+                "type": "string"
+              },
+              "resourceType": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "database",
+              "schema"
+            ]
+          }
+        },
+        {
+          "name": "list_sources",
+          "description": "List Sources.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_source",
+          "description": "Get a Source by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_source",
+          "description": "Update a Source.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "database": {
+                "type": "string"
+              },
+              "schema": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "sourceName": {
+                "type": "string"
+              },
+              "sourceDescription": {
+                "type": "string"
+              },
+              "loader": {
+                "type": "string"
+              },
+              "identifier": {
+                "type": "string"
+              },
+              "uniqueId": {
+                "type": "string"
+              },
+              "resourceType": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_source",
+          "description": "Delete a Source.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_run_result",
+          "description": "Create a RunResult.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "threadId": {
+                "type": "string"
+              },
+              "executionTime": {
+                "type": "number"
+              },
+              "message": {
+                "type": "string"
+              },
+              "failures": {
+                "type": "integer"
+              },
+              "uniqueId": {
+                "type": "string"
+              },
+              "compiled": {
+                "type": "boolean"
+              },
+              "compiledCode": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "executionTime",
+              "message"
+            ]
+          }
+        },
+        {
+          "name": "list_run_results",
+          "description": "List RunResults.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_run_result",
+          "description": "Get a RunResult by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_run_result",
+          "description": "Update a RunResult.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "threadId": {
+                "type": "string"
+              },
+              "executionTime": {
+                "type": "number"
+              },
+              "message": {
+                "type": "string"
+              },
+              "failures": {
+                "type": "integer"
+              },
+              "uniqueId": {
+                "type": "string"
+              },
+              "compiled": {
+                "type": "boolean"
+              },
+              "compiledCode": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_run_result",
+          "description": "Delete a RunResult.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

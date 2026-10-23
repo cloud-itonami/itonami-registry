@@ -1,0 +1,16 @@
+== gate 1: kotoba check --safe
+{:kotoba.cli/ok? false, :kotoba.cli/code :runtime/rejected, :kotoba.cli/diagnostic {:format :kotoba.diagnostic/v1, :code :kotoba/runtime-rejected, :severity :error, :exception-class "clojure.lang.ExceptionInfo"}}
+
+== gate 2: kotoba compile
+k? false, :kotoba.cli/code :compile/failed, :kotoba.cli/message "constant value must be closed bounded integer/string/keyword/boolean/nil/vector/map or non-empty keyword-set data", :kotoba.cli/data {:phase :subset, :exception-chain [{:class "clojure.lang.ExceptionInfo", :message "constant value must be closed bounded integer/string/keyword/boolean/nil/vector/map or non-empty keyword-set data"}]}}
+
+== gate 4a: amu check --jvm-free
+{:format :kotoba.cli-error/v1, :ok false, :error :read, :diagnostic {:format :kotoba.diagnostic/v1, :code :kotoba/source-read-failed, :severity :error, :source "whole-component.kotoba"}, :message "source reader rejected input"}
+
+== gate 4b: amu compile --jvm-free
+error: this Amu command or target has no JVM-free implementation; refusing to invoke the Clojure/JVM compatibility path
+== gate 3: kotoba rad build --profile release
+:argv ["wasm" "emit" "./src/kotoba_app.kotoba" "--package-lock" "./kotoba.lock.edn" "--output" "./target/kotoba_app.wasm"], :ok? false, :result {:kotoba.cli/ok? false, :kotoba.cli/code :wasm/package-rejected, :kotoba.cli/data {:kotoba.package/admission-code :package/lock-not-readable, :kotoba.package/error {:kotoba.package/path "./kotoba.lock.edn", :kotoba.package/error "file not readable"}}}}]}}
+
+== gate 4b retry: amu compile --target wasm32 --jvm-free
+{:format :kotoba.cli-error/v1, :ok false, :error :read, :diagnostic {:format :kotoba.diagnostic/v1, :code :kotoba/source-read-failed, :severity :error, :source "whole-component.kotoba"}, :message "source reader rejected input"}

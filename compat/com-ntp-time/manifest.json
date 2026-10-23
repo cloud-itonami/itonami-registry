@@ -1,0 +1,532 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "ntp_time-compat",
+  "did": "did:web:etzhayyim.com:actor:ntp_time-compat",
+  "kind": "compat",
+  "title": "ntp_time clean-room actor",
+  "description": "Clean-room, API-compatible deep internet / core routing actor (ntp_time); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreiden5tcdmomr67ulrbnmuqwui6cf7rq6xy6lmzsie7fbrqpviqhoq",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreiden5tcdmomr67ulrbnmuqwui6cf7rq6xy6lmzsie7fbrqpviqhoq",
+  "schema": "schema/ntp_time.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://datatracker.ietf.org/doc/html/rfc5905",
+    "verifiedAt": "2026-06-10",
+    "resources": [
+      "Packet",
+      "Header",
+      "KissCode"
+    ],
+    "enums": {
+      "Packet": {
+        "leapIndicator": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "mode": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "version": [
+          1,
+          2,
+          3,
+          4
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Packet",
+    "Header",
+    "KissCode"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 15,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/packets",
+          "op": "create Packet"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/packets",
+          "op": "list Packet"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/packets/{id}",
+          "op": "get Packet"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/packets/{id}",
+          "op": "update Packet"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/packets/{id}",
+          "op": "delete Packet"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/headers",
+          "op": "create Header"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/headers",
+          "op": "list Header"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/headers/{id}",
+          "op": "get Header"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/headers/{id}",
+          "op": "update Header"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/headers/{id}",
+          "op": "delete Header"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/kisscodes",
+          "op": "create KissCode"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/kisscodes",
+          "op": "list KissCode"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/kisscodes/{id}",
+          "op": "get KissCode"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/kisscodes/{id}",
+          "op": "update KissCode"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/kisscodes/{id}",
+          "op": "delete KissCode"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "ntp_time-compat",
+            "purl": "pkg:etzhayyim/ntp_time-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "ntp_time.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 15,
+      "tools": [
+        {
+          "name": "create_packet",
+          "description": "Create a Packet.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "leapIndicator": {
+                "type": "integer"
+              },
+              "version": {
+                "type": "integer"
+              },
+              "mode": {
+                "type": "integer"
+              },
+              "stratum": {
+                "type": "integer"
+              },
+              "poll": {
+                "type": "integer"
+              },
+              "precision": {
+                "type": "integer"
+              },
+              "rootDelay": {
+                "type": "number"
+              },
+              "rootDispersion": {
+                "type": "number"
+              },
+              "referenceId": {
+                "type": "string"
+              },
+              "referenceTimestamp": {
+                "type": "string"
+              },
+              "originTimestamp": {
+                "type": "string"
+              },
+              "receiveTimestamp": {
+                "type": "string"
+              },
+              "transmitTimestamp": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "leapIndicator",
+              "version"
+            ]
+          }
+        },
+        {
+          "name": "list_packets",
+          "description": "List Packets.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_packet",
+          "description": "Get a Packet by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_packet",
+          "description": "Update a Packet.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "leapIndicator": {
+                "type": "integer"
+              },
+              "version": {
+                "type": "integer"
+              },
+              "mode": {
+                "type": "integer"
+              },
+              "stratum": {
+                "type": "integer"
+              },
+              "poll": {
+                "type": "integer"
+              },
+              "precision": {
+                "type": "integer"
+              },
+              "rootDelay": {
+                "type": "number"
+              },
+              "rootDispersion": {
+                "type": "number"
+              },
+              "referenceId": {
+                "type": "string"
+              },
+              "referenceTimestamp": {
+                "type": "string"
+              },
+              "originTimestamp": {
+                "type": "string"
+              },
+              "receiveTimestamp": {
+                "type": "string"
+              },
+              "transmitTimestamp": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_packet",
+          "description": "Delete a Packet.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_header",
+          "description": "Create a Header.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "leapIndicator": {
+                "type": "integer"
+              },
+              "version": {
+                "type": "integer"
+              },
+              "mode": {
+                "type": "integer"
+              },
+              "stratum": {
+                "type": "integer"
+              },
+              "poll": {
+                "type": "integer"
+              },
+              "precision": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "leapIndicator",
+              "version"
+            ]
+          }
+        },
+        {
+          "name": "list_headers",
+          "description": "List Headers.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_header",
+          "description": "Get a Header by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_header",
+          "description": "Update a Header.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "leapIndicator": {
+                "type": "integer"
+              },
+              "version": {
+                "type": "integer"
+              },
+              "mode": {
+                "type": "integer"
+              },
+              "stratum": {
+                "type": "integer"
+              },
+              "poll": {
+                "type": "integer"
+              },
+              "precision": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_header",
+          "description": "Delete a Header.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_kiss_code",
+          "description": "Create a KissCode.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "meaning": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "meaning"
+            ]
+          }
+        },
+        {
+          "name": "list_kiss_codes",
+          "description": "List KissCodes.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_kiss_code",
+          "description": "Get a KissCode by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_kiss_code",
+          "description": "Update a KissCode.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              },
+              "meaning": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_kiss_code",
+          "description": "Delete a KissCode.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

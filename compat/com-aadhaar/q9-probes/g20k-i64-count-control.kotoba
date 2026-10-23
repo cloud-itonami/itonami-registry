@@ -1,0 +1,10 @@
+;; Tightest control for row 20. g20i used `nth` as its consumer while g20b used
+;; `count`, so the two differed in TWO ways (element type and consumer) and the
+;; comparison did not isolate one. This is g20b with the element type changed
+;; and NOTHING else: same consumer, same shape.
+;;   g20b  (def specs [{:a 1 :b 2} {:a 3 :b 4}])  (count specs) -> 65
+;;   g20k  (def specs [1 2])                      (count specs) -> ?
+;; If this passes, the refusal is the map ELEMENT, isolated.
+(ns g20k (:export [probe]))
+(def specs [1 2])
+(defn probe [] :i64 (count specs))

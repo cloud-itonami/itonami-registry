@@ -1,0 +1,1572 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "mambu clean-room API",
+    "version": "1.0.0",
+    "description": "Clean-room, API-compatible core banking / InsurTech actor (mambu); runs browser-local on IPFS + kotoba-WASM.",
+    "x-etzhayyim-did": "did:web:etzhayyim.com:actor:mambu-compat",
+    "x-wasm-cid": "bafkreihywg2dv7gqwdlga75s7xfsp5qwcyy23u6r7llo75rh2oofw6cgva",
+    "x-runtime": "kotoba-wasm",
+    "x-exec": "browser-local|donated-mesh",
+    "x-tier": "L5"
+  },
+  "servers": [
+    {
+      "url": "ipfs://bafkreihywg2dv7gqwdlga75s7xfsp5qwcyy23u6r7llo75rh2oofw6cgva",
+      "description": "browser-local kotoba-wasm component"
+    }
+  ],
+  "paths": {
+    "/v1/loanaccounts": {
+      "get": {
+        "summary": "List LoanAccounts",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/LoanAccount"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a LoanAccount",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoanAccountCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoanAccount"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/loanaccounts/{id}": {
+      "get": {
+        "summary": "Get a LoanAccount",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoanAccount"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a LoanAccount",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoanAccountCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoanAccount"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a LoanAccount",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/v1/depositaccounts": {
+      "get": {
+        "summary": "List DepositAccounts",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/DepositAccount"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a DepositAccount",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepositAccountCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepositAccount"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/depositaccounts/{id}": {
+      "get": {
+        "summary": "Get a DepositAccount",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepositAccount"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a DepositAccount",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepositAccountCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepositAccount"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a DepositAccount",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/v1/clients": {
+      "get": {
+        "summary": "List Clients",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Client"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a Client",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Client"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/clients/{id}": {
+      "get": {
+        "summary": "Get a Client",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Client"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a Client",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Client"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a Client",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/v1/groups": {
+      "get": {
+        "summary": "List Groups",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Group"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a Group",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/groups/{id}": {
+      "get": {
+        "summary": "Get a Group",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a Group",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a Group",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/v1/loantransactions": {
+      "get": {
+        "summary": "List LoanTransactions",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/LoanTransaction"
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a LoanTransaction",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoanTransactionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoanTransaction"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "/v1/loantransactions/{id}": {
+      "get": {
+        "summary": "Get a LoanTransaction",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoanTransaction"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a LoanTransaction",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoanTransactionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoanTransaction"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a LoanTransaction",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "404": {
+            "description": "not_found"
+          }
+        }
+      }
+    },
+    "/healthz": {
+      "get": {
+        "summary": "Health probe",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "LoanAccount": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "encodedKey": {
+            "type": "string"
+          },
+          "accountState": {
+            "type": "string",
+            "enum": [
+              "PARTIAL_APPLICATION",
+              "PENDING_APPROVAL",
+              "APPROVED",
+              "ACTIVE",
+              "ACTIVE_IN_ARREARS",
+              "CLOSED",
+              "CLOSED_WRITTEN_OFF",
+              "CLOSED_REJECTED"
+            ]
+          },
+          "accountSubState": {
+            "type": "string",
+            "enum": [
+              "PARTIALLY_DISBURSED",
+              "LOCKED",
+              "LOCKED_CAPPING",
+              "REFINANCED",
+              "RESCHEDULED",
+              "WITHDRAWN",
+              "REPAID",
+              "REJECTED",
+              "WRITTEN_OFF",
+              "TERMINATED"
+            ]
+          },
+          "accountHolderType": {
+            "type": "string",
+            "enum": [
+              "CLIENT",
+              "GROUP"
+            ]
+          },
+          "accountHolderKey": {
+            "type": "string"
+          },
+          "loanAmount": {
+            "type": "number"
+          },
+          "loanName": {
+            "type": "string"
+          },
+          "daysInArrears": {
+            "type": "integer"
+          },
+          "creationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "approvedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "closedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "LoanAccountCreate": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "encodedKey": {
+            "type": "string"
+          },
+          "accountState": {
+            "type": "string",
+            "enum": [
+              "PARTIAL_APPLICATION",
+              "PENDING_APPROVAL",
+              "APPROVED",
+              "ACTIVE",
+              "ACTIVE_IN_ARREARS",
+              "CLOSED",
+              "CLOSED_WRITTEN_OFF",
+              "CLOSED_REJECTED"
+            ]
+          },
+          "accountSubState": {
+            "type": "string",
+            "enum": [
+              "PARTIALLY_DISBURSED",
+              "LOCKED",
+              "LOCKED_CAPPING",
+              "REFINANCED",
+              "RESCHEDULED",
+              "WITHDRAWN",
+              "REPAID",
+              "REJECTED",
+              "WRITTEN_OFF",
+              "TERMINATED"
+            ]
+          },
+          "accountHolderType": {
+            "type": "string",
+            "enum": [
+              "CLIENT",
+              "GROUP"
+            ]
+          },
+          "accountHolderKey": {
+            "type": "string"
+          },
+          "loanAmount": {
+            "type": "number"
+          },
+          "loanName": {
+            "type": "string"
+          },
+          "daysInArrears": {
+            "type": "integer"
+          },
+          "creationDate": {
+            "type": "string"
+          },
+          "approvedDate": {
+            "type": "string"
+          },
+          "closedDate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "encodedKey"
+        ]
+      },
+      "DepositAccount": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "encodedKey": {
+            "type": "string"
+          },
+          "accountState": {
+            "type": "string",
+            "enum": [
+              "PENDING_APPROVAL",
+              "APPROVED",
+              "ACTIVE",
+              "ACTIVE_IN_ARREARS",
+              "MATURED",
+              "LOCKED",
+              "DORMANT",
+              "CLOSED",
+              "CLOSED_WRITTEN_OFF",
+              "WITHDRAWN",
+              "CLOSED_REJECTED"
+            ]
+          },
+          "accountHolderType": {
+            "type": "string",
+            "enum": [
+              "CLIENT",
+              "GROUP"
+            ]
+          },
+          "accountHolderKey": {
+            "type": "string"
+          },
+          "creationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "approvedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DepositAccountCreate": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "encodedKey": {
+            "type": "string"
+          },
+          "accountState": {
+            "type": "string",
+            "enum": [
+              "PENDING_APPROVAL",
+              "APPROVED",
+              "ACTIVE",
+              "ACTIVE_IN_ARREARS",
+              "MATURED",
+              "LOCKED",
+              "DORMANT",
+              "CLOSED",
+              "CLOSED_WRITTEN_OFF",
+              "WITHDRAWN",
+              "CLOSED_REJECTED"
+            ]
+          },
+          "accountHolderType": {
+            "type": "string",
+            "enum": [
+              "CLIENT",
+              "GROUP"
+            ]
+          },
+          "accountHolderKey": {
+            "type": "string"
+          },
+          "creationDate": {
+            "type": "string"
+          },
+          "approvedDate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "encodedKey"
+        ]
+      },
+      "Client": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "encodedKey": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "PENDING_APPROVAL",
+              "INACTIVE",
+              "ACTIVE",
+              "EXITED",
+              "BLACKLISTED",
+              "REJECTED"
+            ]
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "emailAddress": {
+            "type": "string"
+          },
+          "mobilePhone": {
+            "type": "string"
+          },
+          "creationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ClientCreate": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "encodedKey": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "PENDING_APPROVAL",
+              "INACTIVE",
+              "ACTIVE",
+              "EXITED",
+              "BLACKLISTED",
+              "REJECTED"
+            ]
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "emailAddress": {
+            "type": "string"
+          },
+          "mobilePhone": {
+            "type": "string"
+          },
+          "creationDate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "encodedKey"
+        ]
+      },
+      "Group": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "encodedKey": {
+            "type": "string"
+          },
+          "groupName": {
+            "type": "string"
+          },
+          "assignedBranchKey": {
+            "type": "string"
+          },
+          "creationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "GroupCreate": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "encodedKey": {
+            "type": "string"
+          },
+          "groupName": {
+            "type": "string"
+          },
+          "assignedBranchKey": {
+            "type": "string"
+          },
+          "creationDate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "encodedKey"
+        ]
+      },
+      "LoanTransaction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "encodedKey": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "IMPORT",
+              "DISBURSEMENT",
+              "DISBURSEMENT_ADJUSTMENT",
+              "WRITE_OFF",
+              "WRITE_OFF_ADJUSTMENT",
+              "REPAYMENT",
+              "ADVANCE_REPAYMENT",
+              "PAYMENT_MADE",
+              "WITHDRAWAL_REDRAW",
+              "WITHDRAWAL_REDRAW_ADJUSTMENT",
+              "FEE_APPLIED",
+              "FEE_CHARGED",
+              "FEE_CAPITALISED",
+              "SCHEDULE_FIX_APPLIED",
+              "FEES_DUE_REDUCED",
+              "FEE_REFUND",
+              "FEE_REFUND_ADJUSTMENT",
+              "FEE_ADJUSTMENT",
+              "PENALTY_APPLIED",
+              "PENALTY_ADJUSTMENT",
+              "PENALTIES_DUE_REDUCED",
+              "REPAYMENT_ADJUSTMENT",
+              "ADVANCE_REPAYMENT_ADJUSTMENT",
+              "FEE_CAPITALISED_ADJUSTMENT",
+              "PAYMENT_MADE_ADJUSTMENT",
+              "INTEREST_RATE_CHANGED",
+              "FEE_RATE_CHANGED",
+              "TAX_RATE_CHANGED",
+              "PENALTY_RATE_CHANGED",
+              "INTEREST_APPLIED",
+              "IBF_INTEREST_APPLIED",
+              "IBF_INTEREST_APPLIED_ADJUSTMENT",
+              "INTEREST_APPLIED_ADJUSTMENT",
+              "INTEREST_DUE_REDUCED",
+              "PENALTY_REDUCTION_ADJUSTMENT",
+              "FEE_REDUCTION_ADJUSTMENT",
+              "INTEREST_REDUCTION_ADJUSTMENT",
+              "DEFERRED_INTEREST_APPLIED",
+              "DEFERRED_INTEREST_APPLIED_ADJUSTMENT",
+              "DEFERRED_INTEREST_PAID",
+              "DEFERRED_INTEREST_PAID_ADJUSTMENT",
+              "INTEREST_LOCKED",
+              "FEE_LOCKED",
+              "PENALTY_LOCKED",
+              "INTEREST_UNLOCKED",
+              "FEE_UNLOCKED",
+              "PENALTY_UNLOCKED",
+              "REDRAW_TRANSFER",
+              "REDRAW_REPAYMENT",
+              "REDRAW_TRANSFER_ADJUSTMENT",
+              "REDRAW_REPAYMENT_ADJUSTMENT",
+              "TRANSFER",
+              "TRANSFER_ADJUSTMENT",
+              "BRANCH_CHANGED",
+              "TERMS_CHANGED",
+              "CARD_TRANSACTION_REVERSAL",
+              "CARD_TRANSACTION_REVERSAL_ADJUSTMENT",
+              "DUE_DATE_CHANGED",
+              "DUE_DATE_CHANGED_ADJUSTMENT",
+              "ACCOUNT_TERMINATED",
+              "ACCOUNT_TERMINATED_ADJUSTMENT",
+              "REFUND",
+              "REFUND_ADJUSTMENT",
+              "REDUCE_BALANCE",
+              "REDUCE_BALANCE_ADJUSTMENT",
+              "PRINCIPAL_OVERPAYMENT",
+              "PRINCIPAL_OVERPAYMENT_ADJUSTMENT",
+              "CREDIT_BALANCE_DEPOSIT",
+              "CREDIT_BALANCE_DEPOSIT_ADJUSTMENT",
+              "CREDIT_BALANCE_WITHDRAWAL",
+              "CREDIT_BALANCE_WITHDRAWAL_ADJUSTMENT",
+              "PAYMENT_HOLIDAYS_INTEREST_CAPITALISED",
+              "PAYMENT_HOLIDAYS_INTEREST_CAPITALISED_ADJUSTMENT"
+            ]
+          },
+          "amount": {
+            "type": "number"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "creationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "bookingDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "valueDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "LoanTransactionCreate": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "encodedKey": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "IMPORT",
+              "DISBURSEMENT",
+              "DISBURSEMENT_ADJUSTMENT",
+              "WRITE_OFF",
+              "WRITE_OFF_ADJUSTMENT",
+              "REPAYMENT",
+              "ADVANCE_REPAYMENT",
+              "PAYMENT_MADE",
+              "WITHDRAWAL_REDRAW",
+              "WITHDRAWAL_REDRAW_ADJUSTMENT",
+              "FEE_APPLIED",
+              "FEE_CHARGED",
+              "FEE_CAPITALISED",
+              "SCHEDULE_FIX_APPLIED",
+              "FEES_DUE_REDUCED",
+              "FEE_REFUND",
+              "FEE_REFUND_ADJUSTMENT",
+              "FEE_ADJUSTMENT",
+              "PENALTY_APPLIED",
+              "PENALTY_ADJUSTMENT",
+              "PENALTIES_DUE_REDUCED",
+              "REPAYMENT_ADJUSTMENT",
+              "ADVANCE_REPAYMENT_ADJUSTMENT",
+              "FEE_CAPITALISED_ADJUSTMENT",
+              "PAYMENT_MADE_ADJUSTMENT",
+              "INTEREST_RATE_CHANGED",
+              "FEE_RATE_CHANGED",
+              "TAX_RATE_CHANGED",
+              "PENALTY_RATE_CHANGED",
+              "INTEREST_APPLIED",
+              "IBF_INTEREST_APPLIED",
+              "IBF_INTEREST_APPLIED_ADJUSTMENT",
+              "INTEREST_APPLIED_ADJUSTMENT",
+              "INTEREST_DUE_REDUCED",
+              "PENALTY_REDUCTION_ADJUSTMENT",
+              "FEE_REDUCTION_ADJUSTMENT",
+              "INTEREST_REDUCTION_ADJUSTMENT",
+              "DEFERRED_INTEREST_APPLIED",
+              "DEFERRED_INTEREST_APPLIED_ADJUSTMENT",
+              "DEFERRED_INTEREST_PAID",
+              "DEFERRED_INTEREST_PAID_ADJUSTMENT",
+              "INTEREST_LOCKED",
+              "FEE_LOCKED",
+              "PENALTY_LOCKED",
+              "INTEREST_UNLOCKED",
+              "FEE_UNLOCKED",
+              "PENALTY_UNLOCKED",
+              "REDRAW_TRANSFER",
+              "REDRAW_REPAYMENT",
+              "REDRAW_TRANSFER_ADJUSTMENT",
+              "REDRAW_REPAYMENT_ADJUSTMENT",
+              "TRANSFER",
+              "TRANSFER_ADJUSTMENT",
+              "BRANCH_CHANGED",
+              "TERMS_CHANGED",
+              "CARD_TRANSACTION_REVERSAL",
+              "CARD_TRANSACTION_REVERSAL_ADJUSTMENT",
+              "DUE_DATE_CHANGED",
+              "DUE_DATE_CHANGED_ADJUSTMENT",
+              "ACCOUNT_TERMINATED",
+              "ACCOUNT_TERMINATED_ADJUSTMENT",
+              "REFUND",
+              "REFUND_ADJUSTMENT",
+              "REDUCE_BALANCE",
+              "REDUCE_BALANCE_ADJUSTMENT",
+              "PRINCIPAL_OVERPAYMENT",
+              "PRINCIPAL_OVERPAYMENT_ADJUSTMENT",
+              "CREDIT_BALANCE_DEPOSIT",
+              "CREDIT_BALANCE_DEPOSIT_ADJUSTMENT",
+              "CREDIT_BALANCE_WITHDRAWAL",
+              "CREDIT_BALANCE_WITHDRAWAL_ADJUSTMENT",
+              "PAYMENT_HOLIDAYS_INTEREST_CAPITALISED",
+              "PAYMENT_HOLIDAYS_INTEREST_CAPITALISED_ADJUSTMENT"
+            ]
+          },
+          "amount": {
+            "type": "number"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "creationDate": {
+            "type": "string"
+          },
+          "bookingDate": {
+            "type": "string"
+          },
+          "valueDate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "encodedKey"
+        ]
+      }
+    }
+  }
+}

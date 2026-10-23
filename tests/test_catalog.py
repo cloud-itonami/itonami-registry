@@ -1,5 +1,6 @@
 import hashlib
 import json
+import os
 import shutil
 import sys
 import tempfile
@@ -17,7 +18,14 @@ class IntegrityTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name) / 'registry'
-        shutil.copytree(ROOT, self.root, ignore=shutil.ignore_patterns('.git', '__pycache__', '.venv'))
+        # compat/ is 100+ MB of read-only imports: hard-link it instead of copying.
+        def link_compat(src, dst):
+            if Path(src).is_relative_to(ROOT / 'compat'):
+                os.link(src, dst)
+            else:
+                shutil.copy2(src, dst)
+        shutil.copytree(ROOT, self.root, ignore=shutil.ignore_patterns('.git', '__pycache__', '.venv'),
+                        copy_function=link_compat)
 
     def mutate(self, path, change):
         p = self.root / path

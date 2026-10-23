@@ -231,6 +231,7 @@ def validate(root=ROOT):
         if review['decision'] == 'registered' and not any(s['repository'] == review['repository'] and s['commit'] == review['commit'] for s in refs.values()):
             raise ValueError('Registered candidate lacks matching source provenance')
     validate_datasets(root)
+    validate_compat(root)
     validate_apis(root, catalog, identities, {r['id']: r for r in external['registries']})
     return len(catalog), len(tools['tools'])
 
@@ -305,6 +306,32 @@ def validate_apis(root, catalog, identities, external):
         pin = read(root / 'apis' / name / 'manifest.json')['pin']
         if (pin['repository'], pin['commit'], pin['archived']) != (r['repository'], r['commit'], r['archived']):
             raise ValueError(f'API entry pin differs from its classification row: {name}')
+
+
+def validate_compat(root):
+    """Compat monorepo (ADR 0006): every compat/<slug>/ is a pinned import of one
+    kotoba-lang repository; the index is generated; nothing runs or is granted."""
+    from build_compat_index import build as build_compat
+    doc = read(root / 'catalogs/compat-sources.json')
+    if doc.get('schemaVersion') != 'itonami.compat-sources.v1' or doc['count'] != len(doc['sources']):
+        raise ValueError('Malformed compat sources catalog')
+    slugs = [s['slug'] for s in doc['sources']]
+    if len(set(slugs)) != len(slugs):
+        raise ValueError('Duplicate compat slug')
+    folders = sorted(p.name for p in (root / 'compat').iterdir() if p.is_dir())
+    if folders != sorted(slugs):
+        raise ValueError('compat/ folders differ from catalogs/compat-sources.json')
+    for s in doc['sources']:
+        if not re.fullmatch(r'[0-9a-f]{40}', s['commit']):
+            raise ValueError(f"Compat source commit must be immutable: {s['slug']}")
+        if s['repository'] != f"{doc['organization']}/{s['slug']}" or not s['pushed']:
+            raise ValueError(f"Compat source not a pinned public repository commit: {s['slug']}")
+        folder = root / 'compat' / s['slug']
+        if (folder / '.github').exists() or (folder / '.git').exists():
+            raise ValueError(f"Compat tree carries CI or git metadata: {s['slug']}")
+        if read(folder / 'manifest.json').get('kind') != 'compat':
+            raise ValueError(f"Compat manifest kind differs: {s['slug']}")
+    build_compat(root, check=True)
 
 
 def validate_datasets(root):

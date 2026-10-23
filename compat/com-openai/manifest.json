@@ -1,0 +1,865 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "openai-compat",
+  "did": "did:web:etzhayyim.com:actor:openai-compat",
+  "kind": "compat",
+  "title": "openai clean-room actor",
+  "description": "Clean-room, API-compatible AI / ML inference actor (openai); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreicpmcxfk4hyjyo3vcfwaf4cfzxo6roxl2542zlljxiin66olnrlmy",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreicpmcxfk4hyjyo3vcfwaf4cfzxo6roxl2542zlljxiin66olnrlmy",
+  "schema": "schema/openai.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://github.com/openai/openai-openapi/blob/master/openapi.yaml",
+    "verifiedAt": "2026-06-09",
+    "resources": [
+      "Model",
+      "FineTuningJob",
+      "Batch",
+      "File",
+      "Embedding",
+      "ChatCompletion"
+    ],
+    "enums": {
+      "FineTuningJob": {
+        "status": [
+          "validating_files",
+          "queued",
+          "running",
+          "succeeded",
+          "failed",
+          "cancelled"
+        ]
+      },
+      "Batch": {
+        "status": [
+          "validating",
+          "failed",
+          "in_progress",
+          "finalizing",
+          "completed",
+          "expired",
+          "cancelling",
+          "cancelled"
+        ]
+      },
+      "File": {
+        "purpose": [
+          "assistants",
+          "assistants_output",
+          "batch",
+          "batch_output",
+          "fine-tune",
+          "fine-tune-results",
+          "vision",
+          "user_data"
+        ],
+        "status": [
+          "uploaded",
+          "processed",
+          "error"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Model",
+    "FineTuningJob",
+    "Batch",
+    "File",
+    "Embedding",
+    "ChatCompletion"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 30,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/models",
+          "op": "create Model"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/models",
+          "op": "list Model"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/models/{id}",
+          "op": "get Model"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/models/{id}",
+          "op": "update Model"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/models/{id}",
+          "op": "delete Model"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/finetuningjobs",
+          "op": "create FineTuningJob"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/finetuningjobs",
+          "op": "list FineTuningJob"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/finetuningjobs/{id}",
+          "op": "get FineTuningJob"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/finetuningjobs/{id}",
+          "op": "update FineTuningJob"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/finetuningjobs/{id}",
+          "op": "delete FineTuningJob"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/batches",
+          "op": "create Batch"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/batches",
+          "op": "list Batch"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/batches/{id}",
+          "op": "get Batch"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/batches/{id}",
+          "op": "update Batch"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/batches/{id}",
+          "op": "delete Batch"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/files",
+          "op": "create File"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/files",
+          "op": "list File"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/files/{id}",
+          "op": "get File"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/files/{id}",
+          "op": "update File"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/files/{id}",
+          "op": "delete File"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/embeddings",
+          "op": "create Embedding"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/embeddings",
+          "op": "list Embedding"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/embeddings/{id}",
+          "op": "get Embedding"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/embeddings/{id}",
+          "op": "update Embedding"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/embeddings/{id}",
+          "op": "delete Embedding"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/chatcompletions",
+          "op": "create ChatCompletion"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/chatcompletions",
+          "op": "list ChatCompletion"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/chatcompletions/{id}",
+          "op": "get ChatCompletion"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/chatcompletions/{id}",
+          "op": "update ChatCompletion"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/chatcompletions/{id}",
+          "op": "delete ChatCompletion"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "openai-compat",
+            "purl": "pkg:etzhayyim/openai-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "openai.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 30,
+      "tools": [
+        {
+          "name": "create_model",
+          "description": "Create a Model.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "object": {
+                "type": "string"
+              },
+              "created": {
+                "type": "integer"
+              },
+              "ownedBy": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "object"
+            ]
+          }
+        },
+        {
+          "name": "list_models",
+          "description": "List Models.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_model",
+          "description": "Get a Model by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_model",
+          "description": "Update a Model.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "object": {
+                "type": "string"
+              },
+              "created": {
+                "type": "integer"
+              },
+              "ownedBy": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_model",
+          "description": "Delete a Model.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_fine_tuning_job",
+          "description": "Create a FineTuningJob.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "fineTunedModel": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "integer"
+              },
+              "finishedAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "model"
+            ]
+          }
+        },
+        {
+          "name": "list_fine_tuning_jobs",
+          "description": "List FineTuningJobs.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_fine_tuning_job",
+          "description": "Get a FineTuningJob by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_fine_tuning_job",
+          "description": "Update a FineTuningJob.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "fineTunedModel": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "integer"
+              },
+              "finishedAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_fine_tuning_job",
+          "description": "Delete a FineTuningJob.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_batch",
+          "description": "Create a Batch.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "object": {
+                "type": "string"
+              },
+              "endpoint": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "inputFileId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "object"
+            ]
+          }
+        },
+        {
+          "name": "list_batches",
+          "description": "List Batches.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_batch",
+          "description": "Get a Batch by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_batch",
+          "description": "Update a Batch.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "object": {
+                "type": "string"
+              },
+              "endpoint": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "inputFileId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_batch",
+          "description": "Delete a Batch.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_file",
+          "description": "Create a File.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "bytes": {
+                "type": "integer"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "object": {
+                "type": "string"
+              },
+              "purpose": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "bytes"
+            ]
+          }
+        },
+        {
+          "name": "list_files",
+          "description": "List Files.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_file",
+          "description": "Get a File by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_file",
+          "description": "Update a File.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "bytes": {
+                "type": "integer"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "object": {
+                "type": "string"
+              },
+              "purpose": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_file",
+          "description": "Delete a File.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_embedding",
+          "description": "Create a Embedding.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "integer"
+              },
+              "object": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "index",
+              "object"
+            ]
+          }
+        },
+        {
+          "name": "list_embeddings",
+          "description": "List Embeddings.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_embedding",
+          "description": "Get a Embedding by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_embedding",
+          "description": "Update a Embedding.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "index": {
+                "type": "integer"
+              },
+              "object": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_embedding",
+          "description": "Delete a Embedding.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_chat_completion",
+          "description": "Create a ChatCompletion.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              },
+              "object": {
+                "type": "string"
+              },
+              "created": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "model"
+            ]
+          }
+        },
+        {
+          "name": "list_chat_completions",
+          "description": "List ChatCompletions.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_chat_completion",
+          "description": "Get a ChatCompletion by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_chat_completion",
+          "description": "Update a ChatCompletion.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              },
+              "object": {
+                "type": "string"
+              },
+              "created": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_chat_completion",
+          "description": "Delete a ChatCompletion.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

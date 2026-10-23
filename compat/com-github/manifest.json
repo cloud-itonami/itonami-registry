@@ -1,0 +1,989 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "github-compat",
+  "did": "did:web:etzhayyim.com:actor:github-compat",
+  "kind": "compat",
+  "title": "github clean-room actor",
+  "description": "Clean-room, API-compatible DevOps / CI-CD actor (github); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreiazcxsk43tdp5ac4y2rkb6rdgo3gjqwa4sdsu4ry7uxlflcocucgu",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreiazcxsk43tdp5ac4y2rkb6rdgo3gjqwa4sdsu4ry7uxlflcocucgu",
+  "schema": "schema/github.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://docs.github.com/en/rest",
+    "verifiedAt": "2026-06-08",
+    "resources": [
+      "Repository",
+      "Issue",
+      "PullRequest",
+      "WorkflowRun",
+      "Release",
+      "Commit",
+      "Workflow"
+    ],
+    "enums": {
+      "Issue": {
+        "state": [
+          "open",
+          "closed"
+        ]
+      },
+      "PullRequest": {
+        "state": [
+          "open",
+          "closed"
+        ]
+      },
+      "WorkflowRun": {
+        "status": [
+          "completed",
+          "action_required",
+          "cancelled",
+          "failure",
+          "neutral",
+          "skipped",
+          "stale",
+          "success",
+          "timed_out",
+          "in_progress",
+          "queued",
+          "requested",
+          "waiting",
+          "pending"
+        ],
+        "conclusion": [
+          "success",
+          "failure",
+          "neutral",
+          "cancelled",
+          "skipped",
+          "timed_out",
+          "action_required",
+          "stale"
+        ]
+      },
+      "Workflow": {
+        "state": [
+          "active",
+          "deleted",
+          "disabled_fork",
+          "disabled_inactivity",
+          "disabled_manually"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Repository",
+    "Issue",
+    "PullRequest",
+    "Commit",
+    "Workflow",
+    "WorkflowRun",
+    "Release"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 35,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/repositories",
+          "op": "create Repository"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/repositories",
+          "op": "list Repository"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/repositories/{id}",
+          "op": "get Repository"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/repositories/{id}",
+          "op": "update Repository"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/repositories/{id}",
+          "op": "delete Repository"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/issues",
+          "op": "create Issue"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/issues",
+          "op": "list Issue"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/issues/{id}",
+          "op": "get Issue"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/issues/{id}",
+          "op": "update Issue"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/issues/{id}",
+          "op": "delete Issue"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/pullrequests",
+          "op": "create PullRequest"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/pullrequests",
+          "op": "list PullRequest"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/pullrequests/{id}",
+          "op": "get PullRequest"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/pullrequests/{id}",
+          "op": "update PullRequest"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/pullrequests/{id}",
+          "op": "delete PullRequest"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/commits",
+          "op": "create Commit"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/commits",
+          "op": "list Commit"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/commits/{id}",
+          "op": "get Commit"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/commits/{id}",
+          "op": "update Commit"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/commits/{id}",
+          "op": "delete Commit"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/workflows",
+          "op": "create Workflow"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/workflows",
+          "op": "list Workflow"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/workflows/{id}",
+          "op": "get Workflow"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/workflows/{id}",
+          "op": "update Workflow"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/workflows/{id}",
+          "op": "delete Workflow"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/workflowruns",
+          "op": "create WorkflowRun"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/workflowruns",
+          "op": "list WorkflowRun"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/workflowruns/{id}",
+          "op": "get WorkflowRun"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/workflowruns/{id}",
+          "op": "update WorkflowRun"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/workflowruns/{id}",
+          "op": "delete WorkflowRun"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/releases",
+          "op": "create Release"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/releases",
+          "op": "list Release"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/releases/{id}",
+          "op": "get Release"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/releases/{id}",
+          "op": "update Release"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/releases/{id}",
+          "op": "delete Release"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "github-compat",
+            "purl": "pkg:etzhayyim/github-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "github.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 35,
+      "tools": [
+        {
+          "name": "create_repository",
+          "description": "Create a Repository.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "owner": {
+                "type": "string"
+              },
+              "defaultBranch": {
+                "type": "string"
+              },
+              "private": {
+                "type": "boolean"
+              },
+              "stars": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "name",
+              "owner"
+            ]
+          }
+        },
+        {
+          "name": "list_repositories",
+          "description": "List Repositories.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_repository",
+          "description": "Get a Repository by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_repository",
+          "description": "Update a Repository.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "owner": {
+                "type": "string"
+              },
+              "defaultBranch": {
+                "type": "string"
+              },
+              "private": {
+                "type": "boolean"
+              },
+              "stars": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_repository",
+          "description": "Delete a Repository.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_issue",
+          "description": "Create a Issue.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "repoId": {
+                "type": "string"
+              },
+              "number": {
+                "type": "integer"
+              },
+              "title": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "authorId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "number",
+              "title"
+            ]
+          }
+        },
+        {
+          "name": "list_issues",
+          "description": "List Issues.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_issue",
+          "description": "Get a Issue by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_issue",
+          "description": "Update a Issue.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "repoId": {
+                "type": "string"
+              },
+              "number": {
+                "type": "integer"
+              },
+              "title": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "authorId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_issue",
+          "description": "Delete a Issue.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_pull_request",
+          "description": "Create a PullRequest.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "repoId": {
+                "type": "string"
+              },
+              "number": {
+                "type": "integer"
+              },
+              "title": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "headRef": {
+                "type": "string"
+              },
+              "baseRef": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "number",
+              "title"
+            ]
+          }
+        },
+        {
+          "name": "list_pull_requests",
+          "description": "List PullRequests.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_pull_request",
+          "description": "Get a PullRequest by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_pull_request",
+          "description": "Update a PullRequest.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "repoId": {
+                "type": "string"
+              },
+              "number": {
+                "type": "integer"
+              },
+              "title": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "headRef": {
+                "type": "string"
+              },
+              "baseRef": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_pull_request",
+          "description": "Delete a PullRequest.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_commit",
+          "description": "Create a Commit.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "repoId": {
+                "type": "string"
+              },
+              "sha": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "authorId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "sha",
+              "message"
+            ]
+          }
+        },
+        {
+          "name": "list_commits",
+          "description": "List Commits.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_commit",
+          "description": "Get a Commit by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_commit",
+          "description": "Update a Commit.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "repoId": {
+                "type": "string"
+              },
+              "sha": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "authorId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_commit",
+          "description": "Delete a Commit.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_workflow",
+          "description": "Create a Workflow.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "repoId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "state"
+            ]
+          }
+        },
+        {
+          "name": "list_workflows",
+          "description": "List Workflows.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_workflow",
+          "description": "Get a Workflow by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_workflow",
+          "description": "Update a Workflow.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "repoId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_workflow",
+          "description": "Delete a Workflow.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_workflow_run",
+          "description": "Create a WorkflowRun.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "workflowId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "conclusion": {
+                "type": "string"
+              },
+              "commitSha": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "status",
+              "conclusion"
+            ]
+          }
+        },
+        {
+          "name": "list_workflow_runs",
+          "description": "List WorkflowRuns.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_workflow_run",
+          "description": "Get a WorkflowRun by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_workflow_run",
+          "description": "Update a WorkflowRun.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "workflowId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "conclusion": {
+                "type": "string"
+              },
+              "commitSha": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_workflow_run",
+          "description": "Delete a WorkflowRun.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_release",
+          "description": "Create a Release.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "repoId": {
+                "type": "string"
+              },
+              "tag": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "draft": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "tag",
+              "name"
+            ]
+          }
+        },
+        {
+          "name": "list_releases",
+          "description": "List Releases.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_release",
+          "description": "Get a Release by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_release",
+          "description": "Update a Release.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "repoId": {
+                "type": "string"
+              },
+              "tag": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "draft": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_release",
+          "description": "Delete a Release.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

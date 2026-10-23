@@ -1,0 +1,75 @@
+// Reddit clean-room schema -> Datomic EAVT mapping
+// Entities model Reddit's real domain: Subreddit/User/Post/Comment/Vote.
+// id-prefix follows Reddit's own `fullname` convention where one exists
+// (t5=subreddit, t2=account, t3=link, t1=comment —
+// https://www.reddit.com/dev/api#fullnames); Vote has no real Reddit
+// `thing` type (voting is a verb, not a stored resource) so it uses a
+// made-up prefix.
+
+namespace reddit {
+
+    entity Subreddit {
+        id: string @unique
+        name: string
+        title: string
+        description: string
+        subscriberCount: integer
+        over18: boolean
+        createdAt: datetime
+        updatedAt: datetime
+    }
+
+    entity User {
+        id: string @unique
+        username: string
+        karma: integer
+        verified: boolean
+        createdAt: datetime
+        updatedAt: datetime
+    }
+
+    entity Post {
+        id: string @unique
+        subredditId: string
+        authorId: string
+        title: string
+        selftext: string
+        url: string
+        score: integer
+        numComments: integer
+        isSelf: boolean
+        createdAt: datetime
+        updatedAt: datetime
+    }
+
+    entity Comment {
+        id: string @unique
+        postId: string
+        parentId: string
+        authorId: string
+        body: string
+        score: integer
+        createdAt: datetime
+        updatedAt: datetime
+    }
+
+    entity Vote {
+        id: string @unique
+        userId: string
+        targetType: string
+        targetId: string
+        direction: string
+        createdAt: datetime
+        updatedAt: datetime
+    }
+
+}
+
+    // Auto-injected Cognitive Schema
+    entity CognitiveRecord {
+        id: string @unique
+        originalPayload: string
+        aiStatus: string
+        aiInsights: json
+        computedAt: datetime
+    }

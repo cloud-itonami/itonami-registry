@@ -1,0 +1,967 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "supabase-compat",
+  "did": "did:web:etzhayyim.com:actor:supabase-compat",
+  "kind": "compat",
+  "title": "supabase clean-room actor",
+  "description": "Clean-room, API-compatible DevSecOps / serverless actor (supabase); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreia3wgn4oqn54bsastmganksmxsgx2z4l7257cqp35xhpotcn7ykt4",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreia3wgn4oqn54bsastmganksmxsgx2z4l7257cqp35xhpotcn7ykt4",
+  "schema": "schema/supabase.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://api.supabase.com/api/v1-json",
+    "verifiedAt": "2026-06-09",
+    "resources": [
+      "Project",
+      "Organization",
+      "EdgeFunction",
+      "ApiKey",
+      "Branch",
+      "Backup"
+    ],
+    "enums": {
+      "Project": {
+        "status": [
+          "INACTIVE",
+          "ACTIVE_HEALTHY",
+          "ACTIVE_UNHEALTHY",
+          "COMING_UP",
+          "UNKNOWN",
+          "GOING_DOWN",
+          "INIT_FAILED",
+          "REMOVED",
+          "RESTORING",
+          "UPGRADING",
+          "PAUSING",
+          "RESTORE_FAILED",
+          "RESTARTING",
+          "PAUSE_FAILED",
+          "RESIZING"
+        ],
+        "region": [
+          "us-east-1",
+          "us-east-2",
+          "us-west-1",
+          "us-west-2",
+          "ap-southeast-1",
+          "ap-northeast-1",
+          "ap-northeast-2",
+          "ap-east-1",
+          "ap-southeast-2",
+          "eu-west-1",
+          "eu-west-2",
+          "eu-west-3",
+          "eu-north-1",
+          "eu-central-1",
+          "eu-central-2",
+          "ca-central-1",
+          "ap-south-1",
+          "sa-east-1"
+        ]
+      },
+      "EdgeFunction": {
+        "status": [
+          "ACTIVE",
+          "REMOVED",
+          "THROTTLED"
+        ]
+      },
+      "ApiKey": {
+        "type": [
+          "legacy",
+          "publishable",
+          "secret"
+        ]
+      },
+      "Branch": {
+        "status": [
+          "CREATING_PROJECT",
+          "RUNNING_MIGRATIONS",
+          "MIGRATIONS_PASSED",
+          "MIGRATIONS_FAILED",
+          "FUNCTIONS_DEPLOYED",
+          "FUNCTIONS_FAILED"
+        ],
+        "previewProjectStatus": [
+          "INACTIVE",
+          "ACTIVE_HEALTHY",
+          "ACTIVE_UNHEALTHY",
+          "COMING_UP",
+          "UNKNOWN",
+          "GOING_DOWN",
+          "INIT_FAILED",
+          "REMOVED",
+          "RESTORING",
+          "UPGRADING",
+          "PAUSING",
+          "RESTORE_FAILED",
+          "RESTARTING",
+          "PAUSE_FAILED",
+          "RESIZING"
+        ]
+      },
+      "Backup": {
+        "status": [
+          "COMPLETED",
+          "FAILED",
+          "PENDING",
+          "REMOVED",
+          "ARCHIVED",
+          "CANCELLED"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Project",
+    "Organization",
+    "EdgeFunction",
+    "ApiKey",
+    "Branch",
+    "Backup"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 30,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/projects",
+          "op": "create Project"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/projects",
+          "op": "list Project"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/projects/{id}",
+          "op": "get Project"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/projects/{id}",
+          "op": "update Project"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/projects/{id}",
+          "op": "delete Project"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/organizations",
+          "op": "create Organization"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/organizations",
+          "op": "list Organization"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/organizations/{id}",
+          "op": "get Organization"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/organizations/{id}",
+          "op": "update Organization"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/organizations/{id}",
+          "op": "delete Organization"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/edgefunctions",
+          "op": "create EdgeFunction"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/edgefunctions",
+          "op": "list EdgeFunction"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/edgefunctions/{id}",
+          "op": "get EdgeFunction"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/edgefunctions/{id}",
+          "op": "update EdgeFunction"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/edgefunctions/{id}",
+          "op": "delete EdgeFunction"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/apikeys",
+          "op": "create ApiKey"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/apikeys",
+          "op": "list ApiKey"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/apikeys/{id}",
+          "op": "get ApiKey"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/apikeys/{id}",
+          "op": "update ApiKey"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/apikeys/{id}",
+          "op": "delete ApiKey"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/branches",
+          "op": "create Branch"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/branches",
+          "op": "list Branch"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/branches/{id}",
+          "op": "get Branch"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/branches/{id}",
+          "op": "update Branch"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/branches/{id}",
+          "op": "delete Branch"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/backups",
+          "op": "create Backup"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/backups",
+          "op": "list Backup"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/backups/{id}",
+          "op": "get Backup"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/backups/{id}",
+          "op": "update Backup"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/backups/{id}",
+          "op": "delete Backup"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "supabase-compat",
+            "purl": "pkg:etzhayyim/supabase-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "supabase.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 30,
+      "tools": [
+        {
+          "name": "create_project",
+          "description": "Create a Project.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "ref": {
+                "type": "string"
+              },
+              "organizationSlug": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "region": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "ref"
+            ]
+          }
+        },
+        {
+          "name": "list_projects",
+          "description": "List Projects.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_project",
+          "description": "Get a Project by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_project",
+          "description": "Update a Project.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "ref": {
+                "type": "string"
+              },
+              "organizationSlug": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "region": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_project",
+          "description": "Delete a Project.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_organization",
+          "description": "Create a Organization.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "slug"
+            ]
+          }
+        },
+        {
+          "name": "list_organizations",
+          "description": "List Organizations.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_organization",
+          "description": "Get a Organization by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_organization",
+          "description": "Update a Organization.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_organization",
+          "description": "Delete a Organization.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_edge_function",
+          "description": "Create a EdgeFunction.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              },
+              "verifyJwt": {
+                "type": "boolean"
+              },
+              "entrypointPath": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "integer"
+              },
+              "updatedAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "slug"
+            ]
+          }
+        },
+        {
+          "name": "list_edge_functions",
+          "description": "List EdgeFunctions.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_edge_function",
+          "description": "Get a EdgeFunction by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_edge_function",
+          "description": "Update a EdgeFunction.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              },
+              "verifyJwt": {
+                "type": "boolean"
+              },
+              "entrypointPath": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "integer"
+              },
+              "updatedAt": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_edge_function",
+          "description": "Delete a EdgeFunction.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_api_key",
+          "description": "Create a ApiKey.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "prefix": {
+                "type": "string"
+              },
+              "insertedAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "type"
+            ]
+          }
+        },
+        {
+          "name": "list_api_keys",
+          "description": "List ApiKeys.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_api_key",
+          "description": "Get a ApiKey by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_api_key",
+          "description": "Update a ApiKey.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "prefix": {
+                "type": "string"
+              },
+              "insertedAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_api_key",
+          "description": "Delete a ApiKey.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_branch",
+          "description": "Create a Branch.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "projectRef": {
+                "type": "string"
+              },
+              "parentProjectRef": {
+                "type": "string"
+              },
+              "isDefault": {
+                "type": "boolean"
+              },
+              "persistent": {
+                "type": "boolean"
+              },
+              "status": {
+                "type": "string"
+              },
+              "previewProjectStatus": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          }
+        },
+        {
+          "name": "list_branches",
+          "description": "List Branches.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_branch",
+          "description": "Get a Branch by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_branch",
+          "description": "Update a Branch.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "projectRef": {
+                "type": "string"
+              },
+              "parentProjectRef": {
+                "type": "string"
+              },
+              "isDefault": {
+                "type": "boolean"
+              },
+              "persistent": {
+                "type": "boolean"
+              },
+              "status": {
+                "type": "string"
+              },
+              "previewProjectStatus": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_branch",
+          "description": "Delete a Branch.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_backup",
+          "description": "Create a Backup.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "isPhysicalBackup": {
+                "type": "boolean"
+              },
+              "insertedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "status"
+            ]
+          }
+        },
+        {
+          "name": "list_backups",
+          "description": "List Backups.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_backup",
+          "description": "Get a Backup by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_backup",
+          "description": "Update a Backup.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "isPhysicalBackup": {
+                "type": "boolean"
+              },
+              "insertedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_backup",
+          "description": "Delete a Backup.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
