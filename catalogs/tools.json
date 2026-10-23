@@ -974,10 +974,10 @@
       "provider": {
         "kind": "mcp",
         "entry": "mcp/kaikei",
-        "sourceRef": "kaikei-02dc9e75",
+        "sourceRef": "kaikei-8e128c83",
         "path": "bin/kaikei-mcp"
       },
-      "description": "Read a journal export (MoneyForward 仕訳帳 CSV, freee 仕訳 CSV, 弥生インポート形式, QuickBooks Online Account/JournalEntry JSON or journal CSV, Xero Accounts/Journals/ManualJournals JSON or manual journal CSV, or a kaikei ledger), an invoice file, a bank/card statement the user downloaded (OFX/QFX/QBO, 全銀 fixed-length or CSV, freee・MF・Xero・QuickBooks statement CSV, a bank or card CSV with a preset), or an expense/AP export (Ramp or Brex API JSON, Expensify CSV from kaikei's template, BILL v3 bills) into a kaikei ledger with checks. Pure: nothing is sent, stored or fetched; it does not call any accounting API.",
+      "description": "Read a journal export (MoneyForward 仕訳帳 CSV, freee 仕訳 CSV, 弥生インポート形式, QuickBooks Online Account/JournalEntry JSON or journal CSV, Xero Accounts/Journals/ManualJournals JSON or manual journal CSV, or a kaikei ledger), an invoice file, a bank/card statement the user downloaded (OFX/QFX/QBO, 全銀 fixed-length or CSV, freee・MF・Xero・QuickBooks statement CSV, a bank or card CSV with a preset), or an expense/AP export (Ramp or Brex API JSON, Expensify CSV from kaikei's template, BILL v3 bills) into a kaikei ledger with checks. Pass ledger to add the file to that ledger instead of a new one, as the app's append import does: duplicates (same entry, invoice, or statement line by FITID/uid or content) are skipped and counted in added; a file in another currency is an error. Pure: nothing is sent, stored or fetched; it does not call any accounting API.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1086,8 +1086,7 @@
               "WST",
               "ZAR"
             ],
-            "default": "JPY",
-            "description": "Ledger currency when the file does not say (Xero responses, QBO without CurrencyRef, Xero/QBO CSV)."
+            "description": "Currency when the file does not say (Xero responses, QBO without CurrencyRef, Xero/QBO CSV, Ramp, Brex). Default: the ledger's currency when ledger is given, else JPY."
           },
           "date_order": {
             "type": "string",
@@ -1096,6 +1095,14 @@
               "dmy"
             ],
             "description": "Numeric date order in QBO/Xero CSV; guessed when omitted."
+          },
+          "ledger": {
+            "type": "object",
+            "description": "A kaikei.ledger.v1 object to add the file to (default: a new, empty ledger)."
+          },
+          "statement_account": {
+            "type": "string",
+            "description": "Statement account for statement lines: auto (default; the account with the same bank/account key, else a new one), new, or an existing account id in ledger."
           }
         },
         "additionalProperties": false
@@ -1103,7 +1110,7 @@
       "outputContract": "MCP content[0].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
       "effects": [],
       "authority": "caller-bound; tools/list grants nothing",
-      "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input (2026-10-23); live-agent-turn-not-tested"
+      "validation": "protocol-discovered and called through the itonami-agent MCP client on synthetic input, including ledger (2026-10-23); live-agent-turn-not-tested"
     },
     {
       "id": "kaikei/kaikei_validate",
@@ -1111,7 +1118,7 @@
       "provider": {
         "kind": "mcp",
         "entry": "mcp/kaikei",
-        "sourceRef": "kaikei-02dc9e75",
+        "sourceRef": "kaikei-8e128c83",
         "path": "bin/kaikei-mcp"
       },
       "description": "Check a kaikei ledger: whether the balance sheet balances, which accounts have no class (they are left out of P/L and B/S, never guessed), and which entries are invalid (unbalanced, negative, missing account, bad date).",
@@ -1139,7 +1146,7 @@
       "provider": {
         "kind": "mcp",
         "entry": "mcp/kaikei",
-        "sourceRef": "kaikei-02dc9e75",
+        "sourceRef": "kaikei-8e128c83",
         "path": "bin/kaikei-mcp"
       },
       "description": "Trial balance, profit and loss or balance sheet for a period, as kaikei JSON or shaped like the QuickBooks Online Report or Xero Reports API responses. Class mapping and the staged-profit and retained-earnings rules are kaikei's, not a vendor's internal calculation.",
@@ -1195,7 +1202,7 @@
       "provider": {
         "kind": "mcp",
         "entry": "mcp/kaikei",
-        "sourceRef": "kaikei-02dc9e75",
+        "sourceRef": "kaikei-8e128c83",
         "path": "bin/kaikei-mcp"
       },
       "description": "Write a kaikei ledger in one of the import formats. Shift_JIS output comes back as bytes_base64, UTF-8 as text. Fields the format cannot hold are listed in notes. Pure: writes no file.",
@@ -1272,7 +1279,7 @@
       "provider": {
         "kind": "mcp",
         "entry": "mcp/kaikei",
-        "sourceRef": "kaikei-02dc9e75",
+        "sourceRef": "kaikei-8e128c83",
         "path": "bin/kaikei-mcp"
       },
       "description": "kaikei_import followed by kaikei_export in one call: convert a journal file from one format to another.",
@@ -1456,7 +1463,7 @@
       "provider": {
         "kind": "mcp",
         "entry": "mcp/kaikei",
-        "sourceRef": "kaikei-02dc9e75",
+        "sourceRef": "kaikei-8e128c83",
         "path": "bin/kaikei-mcp"
       },
       "description": "Per-rate totals of an invoice: for each tax rate, the consideration, the consumption tax rounded once per invoice per rate (as a Japanese qualified invoice requires, 消費税法施行令 70 条の 10) and the total, plus each line's share of the tax. No ledger needed; use it to draft an invoice.",
@@ -1594,7 +1601,7 @@
       "provider": {
         "kind": "mcp",
         "entry": "mcp/kaikei",
-        "sourceRef": "kaikei-02dc9e75",
+        "sourceRef": "kaikei-8e128c83",
         "path": "bin/kaikei-mcp"
       },
       "description": "Check the invoices in a kaikei ledger: missing qualified-invoice contents (issuer name and registration number form, date, description, tax rate, per-rate tax, recipient), differences between the stated tax and one rounding per rate, the transitional deduction percent for purchases from unregistered sellers, and whether each invoice can be posted. Does not query the NTA or certify anything.",
@@ -1622,7 +1629,7 @@
       "provider": {
         "kind": "mcp",
         "entry": "mcp/kaikei",
-        "sourceRef": "kaikei-02dc9e75",
+        "sourceRef": "kaikei-8e128c83",
         "path": "bin/kaikei-mcp"
       },
       "description": "Post invoices in a kaikei ledger as journal entries (accounts receivable / sales / output tax, or the purchase side) and return the updated ledger. Posts every issued or paid invoice not yet posted, or only invoice_ids. Skips drafts, voids, invoices with withholding, and invoices already in the ledger (e.g. from Xero Journals). Pure: returns a new ledger; nothing is stored.",
@@ -1664,7 +1671,7 @@
       "provider": {
         "kind": "mcp",
         "entry": "mcp/kaikei",
-        "sourceRef": "kaikei-02dc9e75",
+        "sourceRef": "kaikei-8e128c83",
         "path": "bin/kaikei-mcp"
       },
       "description": "Reconcile the bank, card and expense statements in a kaikei ledger: for each statement account, line counts by status (open, posted, matched, excluded), the statement's last balance against the ledger account's balance on that date, and the first line where the running balance breaks. Also an accounts receivable and payable aging (30-day buckets from the due date). Pure; nothing is fetched from any bank.",
@@ -1696,7 +1703,7 @@
       "provider": {
         "kind": "mcp",
         "entry": "mcp/kaikei",
-        "sourceRef": "kaikei-02dc9e75",
+        "sourceRef": "kaikei-8e128c83",
         "path": "bin/kaikei-mcp"
       },
       "description": "Suggestions for statement lines, without changing the ledger: invoices the payment settles (exact amount, short by a bank fee, partial, or several invoices of one customer), existing journal entries to match, transfers between statement accounts, and journal suggestions from the user's rules and from rules learned deterministically from the user's own past journals. Each candidate has a strength (3 strong, 2 medium, 1 weak), the reasons, and a choice to pass to kaikei_statement_post after the user approves it.",
@@ -1741,7 +1748,7 @@
       "provider": {
         "kind": "mcp",
         "entry": "mcp/kaikei",
-        "sourceRef": "kaikei-02dc9e75",
+        "sourceRef": "kaikei-8e128c83",
         "path": "bin/kaikei-mcp"
       },
       "description": "Post only the statement lines the user approved, each with its choice: settle invoices (a short payment's difference is booked as a bank fee per the ledger's setting), match an existing journal entry, post a transfer, post to an account with consumption tax split from the date's rate, or mark the line not to post. choice \"preselected\" uses the single strong candidate. Lines without an approval are untouched. Returns the updated ledger; nothing is stored or sent, and no payment is made.",

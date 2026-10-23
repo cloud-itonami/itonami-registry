@@ -1,13 +1,13 @@
 {
   "schemaVersion": "itonami.entry.v1",
   "sourceRefs": [
-    "kaikei-02dc9e75"
+    "kaikei-8e128c83"
   ],
   "useWhen": "Read a journal or invoice export an operator already holds (MoneyForward, freee, Yayoi, QuickBooks Online, Xero, Zoho Invoice or FreshBooks), a bank or card statement file the operator downloaded (OFX/QFX/QBO, 全銀 data, freee, MoneyForward, Xero or QuickBooks statement CSV, a bank or card CSV), or a Ramp, Brex, Expensify or BILL export; check that entries balance and accounts are classified, build a trial balance, P&L or balance sheet, compute an invoice's per-rate consumption tax, check a Japanese qualified invoice's required contents, post invoices as journal entries, reconcile statements against the ledger, suggest invoice settlements, matches and journals for statement lines, post the lines the operator approved, or convert to another of these formats",
   "avoidWhen": "Reading from or writing to a live accounting company, invoicing service, bank, card issuer, expense or AP service, or tax authority; account aggregation or making payments; verifying a registration number with the NTA (only its T + 13 digits form is checked); sending invoices; posting statement lines the operator has not approved; treating kaikei's class mapping, staged profit, retained-earnings, per-line tax allocation, matching or learned-rule logic as a vendor's calculation; passing a real ledger or statement to an agent whose inference rail is remote (the tools are pure, but the agent turn is not local)",
   "inputs": {
     "text": "journal, invoice, statement or expense export as text, or bytes_base64 for Shift_JIS files (<= 5 MiB)",
-    "ledger": "kaikei.ledger.v1 object returned by kaikei_import (carries invoices, statement accounts and lines, rules and settings)",
+    "ledger": "kaikei.ledger.v1 object returned by kaikei_import (carries invoices, statement accounts and lines, rules and settings); kaikei_import also takes one to add the file to it",
     "period": "from / to dates (YYYY-MM-DD) for reports",
     "lines": "invoice lines (amount, tax rate, reduced flag) for kaikei_invoice_totals",
     "approvals": "statement line ids with the choice the operator approved, for kaikei_statement_post"
@@ -32,7 +32,7 @@
   },
   "validation": {
     "catalog": "schema-checked",
-    "runtime": "protocol-tested 2026-10-23: tools/list and tools/call over stdio with the itonami-agent MCP client (kotoba-lang/itonami-agent 0c05574, itonami.agent.mcp discover/call) on synthetic fixtures, 11 tools; no model-driven agent turn, no deployed profile",
+    "runtime": "protocol-tested 2026-10-23: tools/list and tools/call over stdio with the itonami-agent MCP client (kotoba-lang/itonami-agent 0c05574, itonami.agent.mcp discover/call) on synthetic fixtures, 11 tools, kaikei_import with ledger; no model-driven agent turn, no deployed profile",
     "live": false
   },
   "compatibilityNote": "Hermes storage format only. itonami-agent exposes the tools as mcp__kaikei__<tool> and does not start MCP subprocesses on peer runs. Data-format compatibility only; no connection to MoneyForward, freee, Yayoi, QuickBooks Online, Xero, Zoho Invoice, FreshBooks, Ramp, Brex, Expensify, BILL, any bank or card issuer, or the NTA publication site.",

@@ -3,9 +3,9 @@ name: itonami-ledger-statements
 description: Build a trial balance, P&L and balance sheet from accounting exports an operator already holds (MoneyForward, freee, Yayoi, QuickBooks Online, Xero) with the kaikei MCP tools, without connecting to any accounting service.
 metadata:
   hermes:
-    version: 0.1.2
+    version: 0.1.3
     author: cloud-itonami
-    source: https://github.com/cloud-itonami/kaikei/tree/02dc9e75ad6dc82c8a0ff5982fa51ba2da08e269
+    source: https://github.com/cloud-itonami/kaikei/tree/8e128c838a57d6d7a47f359f6d6f2247afcb8b6d
     compatibility:
       hermes: '*'
       desktop: '*'
