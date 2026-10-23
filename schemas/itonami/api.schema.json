@@ -20,7 +20,7 @@
     "author": {"type": "string", "minLength": 1},
     "license": {"type": "string", "minLength": 1},
     "tags": {"type": "array", "items": {"type": "string"}},
-    "source": {"type": "string", "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/tree/[0-9a-f]{40}$"},
+    "source": {"type": "string", "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/tree/[0-9a-f]{40}(/[A-Za-z0-9_.-]+)*$"},
     "compatibility": {
       "type": "object", "required": ["hermes", "itonami"], "additionalProperties": false,
       "properties": {"hermes": {"const": "none"}, "itonami": {"type": "string"}}
@@ -96,6 +96,16 @@
       "properties": {
         "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
         "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "path": {"type": "string", "pattern": "^compat/[a-z0-9][a-z0-9.-]{0,99}$"},
+        "origin": {
+          "type": "object", "required": ["repository", "commit", "archived", "state"], "additionalProperties": false,
+          "properties": {
+            "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+            "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "archived": {"type": "boolean"},
+            "state": {"enum": ["archived", "deleted"]}
+          }
+        },
         "visibility": {"const": "public"},
         "archived": {"type": "boolean"},
         "digestStatus": {"const": "verified"},

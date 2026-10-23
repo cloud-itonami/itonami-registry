@@ -251,11 +251,13 @@ def validate_apis(root, catalog, identities, external):
         m = read(folder / 'manifest.json')
         validator.validate(m)
         pin = m['pin']
-        if m['source'] != f"https://github.com/{pin['repository']}/tree/{pin['commit']}":
+        if m['source'] != f"https://github.com/{pin['repository']}/tree/{pin['commit']}" + (f"/{pin['path']}" if 'path' in pin else ''):
             raise ValueError(f"API source differs from its pin: {e['id']}")
-        if pin['repository'].split('/', 1)[1] != m['id']:
+        if ('path' in pin) != ('origin' in pin):
+            raise ValueError(f"API pin path and origin go together: {e['id']}")
+        if (pin['path'] if 'path' in pin else pin['repository'].split('/', 1)[1]) not in (m['id'], f"compat/{m['id']}"):
             raise ValueError(f"API id differs from its repository name: {e['id']}")
-        if not m['version'].startswith('1.0.0+' + pin['commit'][:12]):
+        if not m['version'].startswith('1.0.0+' + pin.get('origin', pin)['commit'][:12]):
             raise ValueError(f"API version does not carry its pin: {e['id']}")
         if 'manifest.json' not in {f['path'] for f in pin['files']}:
             raise ValueError(f"API entry without a digested source manifest: {e['id']}")
@@ -305,7 +307,14 @@ def validate_apis(root, catalog, identities, external):
         raise ValueError('API classification and api entries disagree')
     for name, r in classified.items():
         pin = read(root / 'apis' / name / 'manifest.json')['pin']
-        if (pin['repository'], pin['commit'], pin['archived']) != (r['repository'], r['commit'], r['archived']):
+        if 'origin' in pin:
+            o = pin['origin']
+            if (o['repository'], o['commit'], o['archived']) != (r['repository'], r['commit'], r['archived']) \
+                    or r.get('retiredTo') != {'repository': pin['repository'], 'commit': pin['commit'], 'path': pin['path']}:
+                raise ValueError(f'API entry pin differs from its classification row: {name}')
+            if not re.fullmatch(r'[0-9a-f]{40}', pin['commit']) or not (root / pin['path']).is_dir():
+                raise ValueError(f'Internalized API pin does not resolve in this registry: {name}')
+        elif (pin['repository'], pin['commit'], pin['archived']) != (r['repository'], r['commit'], r['archived']):
             raise ValueError(f'API entry pin differs from its classification row: {name}')
 
 
@@ -377,7 +386,7 @@ def validate_origin_extract(root, apis):
     for e in doc['entries']:
         if e['api'] in facts:
             raise ValueError(f"Duplicate origin fact: {e['api']}")
-        if e['api'] not in apis or e['repository'] != read(root / 'apis' / e['api'] / 'manifest.json')['pin']['repository']:
+        if e['api'] not in apis or e['repository'] != (lambda pin: pin.get('origin', pin)['repository'])(read(root / 'apis' / e['api'] / 'manifest.json')['pin']):
             raise ValueError(f"Origin fact for no api entry: {e['api']}")
         rev = '.'.join(reversed(e['domain'].split('.')))
         if e['reverseDomain'] != rev:
