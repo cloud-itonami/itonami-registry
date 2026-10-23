@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate compat/index.json from compat/<slug>/ and catalogs/compat-sources.json (ADR 0005)."""
+"""Generate compat/index.json from compat/<slug>/ and catalogs/compat-sources.json (ADR 0006)."""
 import argparse
 import json
 

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Itonami api classification catalog",
+  "description": "Every repository selected for API organization (ADR 0005), pinned and classified as api, skill, profile or bot, or left unclassified with a reason. Private repositories are counted only.",
+  "type": "object",
+  "required": ["schemaVersion", "organization", "observedOn", "method", "selection", "counts", "reasons", "entries"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {"const": "itonami.api-classification.v1"},
+    "organization": {"type": "string", "minLength": 1},
+    "observedOn": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "method": {"type": "string", "minLength": 1},
+    "selection": {"type": "string", "minLength": 1},
+    "counts": {
+      "type": "object",
+      "required": ["total", "public", "privateOmitted", "publicByFamily", "byClass", "unclassifiedByReason"],
+      "additionalProperties": false,
+      "properties": {
+        "total": {"type": "integer", "minimum": 0},
+        "public": {"type": "integer", "minimum": 0},
+        "privateOmitted": {"type": "integer", "minimum": 0},
+        "publicByFamily": {"type": "object", "additionalProperties": {"type": "integer"}},
+        "byClass": {
+          "type": "object", "required": ["api", "skill", "profile", "bot", "unclassified"], "additionalProperties": false,
+          "properties": {"api": {"type": "integer"}, "skill": {"type": "integer"}, "profile": {"type": "integer"}, "bot": {"type": "integer"}, "unclassified": {"type": "integer"}}
+        },
+        "unclassifiedByReason": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 1}}
+      }
+    },
+    "reasons": {"type": "object", "additionalProperties": {"type": "string", "minLength": 1}},
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["repository", "family", "commit", "license", "archived", "class"],
+        "additionalProperties": false,
+        "properties": {
+          "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+          "family": {"enum": ["com", "cloud", "dot"]},
+          "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+          "license": {"type": "string", "minLength": 1},
+          "archived": {"type": "boolean"},
+          "class": {"enum": ["api", "skill", "profile", "bot", "unclassified"]},
+          "entry": {"type": "string", "pattern": "^(api|skill|profile|agent)/[A-Za-z0-9][A-Za-z0-9._-]*$"},
+          "reason": {"type": "string", "minLength": 1},
+          "evidence": {"type": "array", "items": {"type": "string"}}
+        },
+        "allOf": [
+          {"if": {"properties": {"class": {"const": "unclassified"}}}, "then": {"required": ["reason"], "not": {"required": ["entry"]}}, "else": {"required": ["entry"], "not": {"required": ["reason"]}}}
+        ]
+      }
+    }
+  }
+}

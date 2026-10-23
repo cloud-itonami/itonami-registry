@@ -86,6 +86,8 @@ def validate(root=ROOT):
     catalog = entries(root)
     identities = {e['type'] + '/' + e['id'] for e in catalog}
     for e in catalog:
+        if e['type'] == 'api':
+            continue  # self-pinned; validate_apis below (ADR 0005)
         folder = root / e['path']
         side = read(folder / 'itonami.json')
         ext_validator.validate(side)
@@ -201,7 +203,7 @@ def validate(root=ROOT):
             raise ValueError('Inventory coverage count mismatch')
         if summary['scanStatus'] != dict(Counter(r['scanStatus'] for r in rows)) or summary['dispositions'] != dict(Counter(r['disposition'] for r in rows)):
             raise ValueError('Inventory disposition count mismatch')
-    expected_registrations = {(refs[r]['repository'], refs[r]['commit'], e['type'] + '/' + e['id']) for e in catalog for r in read(root / e['path'] / 'itonami.json')['sourceRefs']}
+    expected_registrations = {(refs[r]['repository'], refs[r]['commit'], e['type'] + '/' + e['id']) for e in catalog if e['type'] != 'api' for r in read(root / e['path'] / 'itonami.json')['sourceRefs']}
     observed_registrations = {(r['repository'], e['sourceCommit'], e['entry']) for r in inventory['repositories'] for e in r['registrations']}
     observed_registrations.update((r['repository'], e['sourceCommit'], e['entry']) for r in targeted_rows for e in r['registrations'])
     if expected_registrations != observed_registrations:
@@ -230,11 +232,84 @@ def validate(root=ROOT):
             raise ValueError('Registered candidate lacks matching source provenance')
     validate_datasets(root)
     validate_compat(root)
+    validate_apis(root, catalog, identities, {r['id']: r for r in external['registries']})
     return len(catalog), len(tools['tools'])
 
 
+def validate_apis(root, catalog, identities, external):
+    """API entries and their classification (ADR 0005): self-pinned shapes, honest
+    status, no copied repository files, relations that resolve, counts that agree."""
+    schema = read(root / 'schemas/itonami/api.schema.json')
+    Draft202012Validator.check_schema(schema)
+    validator = Draft202012Validator(schema)
+    apis = {e['id']: e for e in catalog if e['type'] == 'api'}
+    for e in apis.values():
+        folder = root / e['path']
+        extra = sorted(p.name for p in folder.iterdir() if p.name != 'manifest.json')
+        if extra:
+            raise ValueError(f"API entry must not copy repository files: {e['id']} {extra}")
+        m = read(folder / 'manifest.json')
+        validator.validate(m)
+        pin = m['pin']
+        if m['source'] != f"https://github.com/{pin['repository']}/tree/{pin['commit']}":
+            raise ValueError(f"API source differs from its pin: {e['id']}")
+        if pin['repository'].split('/', 1)[1] != m['id']:
+            raise ValueError(f"API id differs from its repository name: {e['id']}")
+        if not m['version'].startswith('1.0.0+' + pin['commit'][:12]):
+            raise ValueError(f"API version does not carry its pin: {e['id']}")
+        if 'manifest.json' not in {f['path'] for f in pin['files']}:
+            raise ValueError(f"API entry without a digested source manifest: {e['id']}")
+        if len({f['path'] for f in pin['files']}) != len(pin['files']):
+            raise ValueError(f"Duplicate API pinned file: {e['id']}")
+        api = m['api']
+        if api['routeCount'] != len(api['routes']):
+            raise ValueError(f"API route count mismatch: {e['id']}")
+        claimed = 'vendorSource' in api or 'upstream' in api
+        if (m['status']['vendorConformance'] == 'claimed-by-source') != claimed:
+            raise ValueError(f"API vendor conformance status disagrees with its source claim: {e['id']}")
+        for target in m['relations']['implementedBy'] + m['relations']['consumedBy']:
+            parts = target.split('/')
+            if len(parts) == 2 and target not in identities:
+                raise ValueError(f"Unresolved API relation: {e['id']} -> {target}")
+            if len(parts) == 3 and parts[0] != 'itonami-registry' and parts[0] not in external:
+                raise ValueError(f"API relation to an unregistered registry: {e['id']} -> {target}")
+    relations = read(root / 'catalogs/api-relations.json')
+    Draft202012Validator(read(root / 'schemas/api-relations.schema.json')).validate(relations)
+    for r in relations['relations']:
+        m = read(root / 'apis' / r['api'] / 'manifest.json') if r['api'] in apis else None
+        if not m or any(sorted(r.get(k, [])) != m['relations'][k] for k in ['implementedBy', 'consumedBy']):
+            raise ValueError(f"API relation not reflected in its entry: {r['api']}")
+    doc = read(root / 'catalogs/api-classification.json')
+    cschema = read(root / 'schemas/api-classification.schema.json')
+    Draft202012Validator.check_schema(cschema)
+    Draft202012Validator(cschema).validate(doc)
+    from collections import Counter
+    rows = doc['entries']
+    repos = [r['repository'] for r in rows]
+    if len(set(repos)) != len(repos):
+        raise ValueError('Duplicate classified repository')
+    c = doc['counts']
+    by_class = Counter(r['class'] for r in rows)
+    by_class['unclassified'] += c['privateOmitted']
+    reasons = Counter(r['reason'] for r in rows if r['class'] == 'unclassified')
+    if c['privateOmitted']:
+        reasons['private-repository'] = c['privateOmitted']
+    if (c['public'] != len(rows) or c['total'] != len(rows) + c['privateOmitted']
+            or c['byClass'] != {k: by_class.get(k, 0) for k in ['api', 'skill', 'profile', 'bot', 'unclassified']}
+            or c['unclassifiedByReason'] != dict(reasons) or c['publicByFamily'] != dict(Counter(r['family'] for r in rows))
+            or set(doc['reasons']) != set(reasons)):
+        raise ValueError('API classification count mismatch')
+    classified = {r['entry'].split('/', 1)[1]: r for r in rows if r['class'] == 'api'}
+    if set(classified) != set(apis):
+        raise ValueError('API classification and api entries disagree')
+    for name, r in classified.items():
+        pin = read(root / 'apis' / name / 'manifest.json')['pin']
+        if (pin['repository'], pin['commit'], pin['archived']) != (r['repository'], r['commit'], r['archived']):
+            raise ValueError(f'API entry pin differs from its classification row: {name}')
+
+
 def validate_compat(root):
-    """Compat monorepo (ADR 0005): every compat/<slug>/ is a pinned import of one
+    """Compat monorepo (ADR 0006): every compat/<slug>/ is a pinned import of one
     kotoba-lang repository; the index is generated; nothing runs or is granted."""
     from build_compat_index import build as build_compat
     doc = read(root / 'catalogs/compat-sources.json')

@@ -26,6 +26,19 @@ Use the Hermes registry shapes (`SKILL.md` frontmatter; `manifest.json` per
 `schemas/hermes/`), add the Itonami side file `itonami.json`, pin every derivation
 source in `catalogs/sources.json`, then rebuild the index.
 
+## API entries
+
+`apis/` and `catalogs/api-classification.json` are generated (ADR 0005). Do not edit them by hand:
+
+```bash
+python scripts/build_api_catalog.py --clones ~/github/kotoba-lang --refresh   # re-observe pins
+python scripts/build_index.py && python scripts/validate.py
+```
+
+To link an API entry to the itonami dapp that implements or consumes the shape, add an item to
+`catalogs/api-relations.json` with its evidence (a pinned URL or PR), then rerun the generator
+without `--refresh`.
+
 ## Federated registries
 
 `catalogs/federated/<id>.json` snapshots another registry's index at one commit

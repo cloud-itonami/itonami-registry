@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Import kind=compat repositories into compat/<slug>/ (ADR 0005).
+"""Import kind=compat repositories into compat/<slug>/ (ADR 0006).
 
     python scripts/import_compat.py --source-root ~/github/kotoba-lang
 

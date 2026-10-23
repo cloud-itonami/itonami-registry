@@ -14,6 +14,7 @@ The Itonami Registry is the Hermes registry's equivalent for Itonami (ADR 0002).
 | MCP | `mcp/` | MCP connection definitions |
 | Workflow | `workflows/` | Itonami recipes |
 | Model | `models/` | Provider model catalogs (murakumo) |
+| **API** | `apis/` | A vendor-compatible API shape (entities, routes, the vendor resources and enums the source cites) declared by a repository's `manifest.json`, pinned to one commit with per-file sha256. Shape only: no execution, not runtime-qualified, grants nothing (ADR 0005) |
 
 **Terms are Hermes's own.**
 - A profile is the persistent home; an Itonami profile is a Hermes profile.
@@ -47,6 +48,26 @@ Skills use SKILL.md frontmatter; MCPs, agents and workflows use Hermes manifest 
 
 [catalogs/tools.json](catalogs/tools.json) indexes eight Murakumo MCP tools, four portable user-test MCP tools, one native fleet catalog tool, two mihari, five dandori and eleven kaikei itonami dapp tools, three plugin-hermes tools and three ZAP plugin tools, with provider identity and input contracts. [catalogs/sources.json](catalogs/sources.json) records pinned derivation inputs and file hashes. Tool discovery is not a successful live invocation.
 
+## API registry
+
+The registry's own API registry ([ADR 0005](docs/adr/0005-api-entries.md)) holds **1,028 `api` entries**. They come from the clean-room compat actors and API clients in kotoba-lang, such as [com-circleci](https://github.com/kotoba-lang/com-circleci): 856 compat L4, 171 compat L5 and 1 client L3. Each entry is `apis/<repository>/manifest.json`, and its qualified identity is `itonami-registry/api/<repository>`.
+
+What an entry records:
+- the declared entities and routes;
+- for L5, the vendor OpenAPI source with its resources and enums, as claimed by the source;
+- the actor's DID and Wasm CID, as asserted by the source;
+- the pinned commit, with sha256 for each of the owner's files.
+
+What it does not claim: the shape is not runtime-qualified, nothing is executed, the CID is not verified, and no authority is granted. A reverse domain (`com.circleci`) is shown only when a public domain record supports it, so today every entry is `unverified`.
+
+[catalogs/api-classification.json](catalogs/api-classification.json) classifies all 1,090 repositories in the AWAI-59 target set (`com-*`, dotted names, `cloud-*`):
+- 1,028 are `api` entries.
+- 62 are `unclassified`, each with a reason: 44 have no API manifest, 9 are dataset snapshots, 5 are connector contracts and 4 are private (counted only).
+
+No repository had a skill, profile or bot marker. [catalogs/api-relations.json](catalogs/api-relations.json) links API entries to the itonami dapps (MCP, skill or profile entries) that implement or consume the same shape. The repositories stay in kotoba-lang, and nothing was moved or renamed.
+
+Regenerate with `python scripts/build_api_catalog.py --clones <dir of kotoba-lang clones> [--refresh] [--check]`.
+
 ## Itonami dapps for agents
 
 | Type | ID | Purpose |
@@ -64,7 +85,7 @@ The three servers are stdio MCP servers whose tools are pure functions over the 
 
 ## Compat actors
 
-`compat/<slug>/` holds the clean-room, API-compatible actors that used to be one kotoba-lang repository each (`com-circleci` and 1,026 others; ADR 0005). `compat/index.json` lists them with origin commit and folder checksum; `catalogs/compat-sources.json` pins the origin. They are not Hermes entries, grant no authority, and publication claims no runtime or vendor-API qualification.
+`compat/<slug>/` holds the clean-room, API-compatible actors that used to be one kotoba-lang repository each (`com-circleci` and 1,026 others; ADR 0006). `compat/index.json` lists them with origin commit and folder checksum; `catalogs/compat-sources.json` pins the origin. They are not Hermes entries, grant no authority, and publication claims no runtime or vendor-API qualification.
 
 ## Ownership and federation
 
@@ -81,6 +102,7 @@ python scripts/validate.py
 python scripts/build_index.py
 python scripts/build_index.py --check
 python -m unittest discover -s tests
+python scripts/build_api_catalog.py --clones /path/to/kotoba-lang --check   # needs local clones
 ```
 
 For release verification with authenticated GitHub CLI, run `python scripts/verify_sources.py`. To reproduce the bounded MCP discovery probe, run `python scripts/probe_mcp.py --checkout /absolute/path/to/kotoba-lang/murakumo`; it reads the pinned script with Git and sends no valid tool invocation. The existing checkout is not modified.

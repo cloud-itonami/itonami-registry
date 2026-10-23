@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://itonami-registry/schemas/itonami/api.schema.json",
+  "title": "Itonami api catalog entry",
+  "description": "A vendor-compatible API shape (entities and routes, plus the vendor resources and enums the source claims) declared by a source repository's manifest.json, pinned to one commit with per-file sha256 (ADR 0005). Shape only: not runtime-qualified, no execution, and registration grants nothing.",
+  "type": "object",
+  "required": ["schemaVersion", "type", "id", "name", "version", "description", "author", "license", "tags", "source", "compatibility", "api", "actor", "pin", "status", "relations"],
+  "additionalProperties": false,
+  "$defs": {
+    "identity": {"type": "string", "pattern": "^([a-z0-9-]+/)?(api|agent|mcp|profile|skill|workflow)/[A-Za-z0-9][A-Za-z0-9._-]*$"},
+    "date": {"type": ["string", "null"]}
+  },
+  "properties": {
+    "schemaVersion": {"const": "1"},
+    "type": {"const": "api"},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{0,99}$"},
+    "name": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "pattern": "^1\\.0\\.0\\+[0-9a-f]{12}(\\.rel[0-9a-f]{8})?$"},
+    "description": {"type": "string", "minLength": 1},
+    "author": {"type": "string", "minLength": 1},
+    "license": {"type": "string", "minLength": 1},
+    "tags": {"type": "array", "items": {"type": "string"}},
+    "source": {"type": "string", "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/tree/[0-9a-f]{40}$"},
+    "compatibility": {
+      "type": "object", "required": ["hermes", "itonami"], "additionalProperties": false,
+      "properties": {"hermes": {"const": "none"}, "itonami": {"type": "string"}}
+    },
+    "api": {
+      "type": "object",
+      "required": ["kind", "entities", "routeCount", "routes", "origin"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {"enum": ["compat", "client"]},
+        "tier": {"type": "string"},
+        "style": {"type": "string"},
+        "entities": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "routeCount": {"type": "integer", "minimum": 1},
+        "declaredEndpointCount": {"type": "integer", "minimum": 0},
+        "routes": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "required": ["method", "path", "op"], "additionalProperties": false,
+            "properties": {
+              "method": {"enum": ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]},
+              "path": {"type": "string", "pattern": "^/"},
+              "op": {"type": "string"}
+            }
+          }
+        },
+        "vendorSource": {
+          "type": "object", "required": ["declared", "resources", "enums", "basis"], "additionalProperties": false,
+          "properties": {
+            "declared": {"type": "string", "minLength": 1, "description": "verified.source as the source manifest states it: usually the vendor OpenAPI URL, sometimes a prose citation."},
+            "verifiedAt": {"$ref": "#/$defs/date"},
+            "resources": {"type": "array", "items": {"type": "string"}},
+            "enums": {"type": "object"},
+            "basis": {"const": "claimed-by-source-manifest"}
+          }
+        },
+        "upstream": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "vendor": {"type": "string"}, "api": {"type": "string"}, "docs": {"type": "string"},
+            "verifiedAt": {"type": "string"}, "verifiedAgainst": {"type": "string"}
+          }
+        },
+        "origin": {
+          "type": "object", "required": ["status"], "additionalProperties": false,
+          "properties": {
+            "status": {"enum": ["unverified", "recorded"]},
+            "domain": {"type": "string", "pattern": "^[a-z0-9.-]+\\.[a-z]+$"},
+            "reverseDomain": {"type": "string", "pattern": "^[a-z]+(\\.[a-z0-9-]+)+$"},
+            "sourceHost": {"type": "string"}
+          },
+          "if": {"properties": {"status": {"const": "recorded"}}},
+          "then": {"required": ["domain", "reverseDomain"]},
+          "else": {"not": {"anyOf": [{"required": ["domain"]}, {"required": ["reverseDomain"]}]}}
+        }
+      }
+    },
+    "actor": {
+      "type": "object", "required": ["basis"], "additionalProperties": false,
+      "properties": {
+        "handle": {"type": "string"}, "did": {"type": "string"}, "runtime": {"type": "string"},
+        "exec": {"type": "string"}, "wasmCid": {"type": "string"}, "wasmProvenance": {"type": "string"},
+        "schema": {"type": "string"},
+        "basis": {"const": "asserted-by-source-manifest"}
+      }
+    },
+    "pin": {
+      "type": "object",
+      "required": ["repository", "commit", "visibility", "archived", "digestStatus", "files"],
+      "additionalProperties": false,
+      "properties": {
+        "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "visibility": {"const": "public"},
+        "archived": {"type": "boolean"},
+        "digestStatus": {"const": "verified"},
+        "files": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "required": ["path", "sha256", "bytes"], "additionalProperties": false,
+            "properties": {
+              "path": {"type": "string", "pattern": "^[A-Za-z0-9_.][A-Za-z0-9_./-]*$", "not": {"pattern": "(^|/)\\.\\.?(/|$)"}},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "bytes": {"type": "integer", "minimum": 0}
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "required": ["shape", "vendorConformance", "runtimeQualified", "artifactVerified", "execution", "authority", "validation"],
+      "additionalProperties": false,
+      "properties": {
+        "shape": {"const": "declared-by-source-manifest"},
+        "vendorConformance": {"enum": ["claimed-by-source", "not-claimed"]},
+        "runtimeQualified": {"const": false},
+        "artifactVerified": {"const": false},
+        "execution": {"const": "none"},
+        "authority": {
+          "type": "object", "required": ["grants", "default"], "additionalProperties": false,
+          "properties": {"grants": {"const": false}, "default": {"const": "blocked"}}
+        },
+        "validation": {
+          "type": "object", "required": ["live", "catalog"], "additionalProperties": false,
+          "properties": {"live": {"const": false}, "catalog": {"const": true}}
+        }
+      }
+    },
+    "relations": {
+      "type": "object", "required": ["implementedBy", "consumedBy"], "additionalProperties": false,
+      "properties": {
+        "implementedBy": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/identity"}},
+        "consumedBy": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/identity"}}
+      }
+    }
+  }
+}
