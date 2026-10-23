@@ -1,0 +1,134 @@
+{:kotoba.lang.q9.migration-record/version 1
+ :repository "orgs/kotoba-lang/com-accela"
+ :as-of "2026-09-10"
+ :wave :wave-1
+ :disposition :partial-and-running
+ :record-author "whole-component port, GENERATED from the oracle's entity-specs table"
+
+ :generated-not-hand-ported
+ "The first two ports in this cohort were written by hand and the third
+  (com-abb-robotics) walked into the failure that made a generator worth
+  writing: com-aadhaar's expand-oracle selectors were carried over asking for a
+  field the new entity does not have, which would have folded over nothing and
+  gone green. Here every entity name, plural, id prefix, field list, required
+  list, coercion pair and ref pair is DERIVED from src/accela/main.cljk's own
+  entity-specs table, so that class cannot be carried.
+
+  The generator is validated against the port that was executed: its tables for
+  com-abb-robotics are byte-identical to the hand-written ones that were run
+  and measured."
+
+ :baseline-paths
+ ["src/accela/main.cljk"
+  "src/accela/page_limit.kotoba"
+  "src/accela/whole_component.kotoba"
+  "policy.edn"]
+
+ :classifications
+ {"src/accela/main.cljk" :retained-oracle
+  "src/accela/page_limit.kotoba" :kotoba-only
+  "src/accela/whole_component.kotoba" :whole-component-entry
+  "policy.edn" :declared-capability-grants}
+
+ :reserved-name-collision
+ {:collides true
+  :name "query"
+  :cleared-by :rename-in-the-migrated-component
+  :detail "main.cljc declares a public `query`, reserved as a head 2026-09-06. The migrated component names it store-query; the .cljc is unchanged. Fourth pilot, same resolution as the first three."}
+
+ :shape
+ {:entities 6
+  :root "Project"
+  :ref-entity "Permit"
+  :refs "projectId:Project -- ONE ref, so the expand fold runs once"
+  :float-coercion :not-reached
+  :note
+  "Unlike com-abb-robotics, no spec here declares a :float coercion, so this
+   component does not reach the blocked float arm at all -- the same position
+   com-aave is in. And Permit carries a single ref, so the two-ref fold
+   com-abb-robotics exercises is NOT exercised here. Both are recorded because
+   a reader comparing green runs across the cohort would otherwise assume every
+   pilot covers the same ground."}
+
+ :builds
+ {:amu-check {:status :ok :exit 0
+              :effects #{[:cap/call :clock/now] [:cap/call :entropy/draw]}}
+  :amu-compile-native {:status :ok :exit 0 :target :aarch64-macos}}
+
+ :executed
+ {:harness "cc -O2 amu/tools/kexe_loader.c, then KEXE_FUEL=100000000 ./kexe-loader <sym>.bin <offset> <arity> aarch64 7,23 [args]"
+  :main {:value 30 :meaning "route-count: five routes over six entities, computed from the table"}
+  :oracle-expand
+  {:values {0 303754089 1 499508843 2 701086944 3 499508843 4 303754089 5 499508843}
+   :reading
+   "Selectors 1, 3 and 5 collapse to 499508843 -- not-a-ref, empty-refs, and no
+    expansion at all -- which is the floor that makes the others mean anything.
+    Selector 0 expands the one ref and differs. Selector 2 points at a Project
+    the store does not hold and lands on the null arm, distinct again.
+
+    Selector 4 asks for ALL refs and equals selector 0. That is CORRECT here
+    and it is the difference from com-abb-robotics: Permit has exactly one ref,
+    so `all` and `the one` are the same request. In com-abb-robotics, where BOM
+    carries two, those two selectors are different values."}}
+
+ :not-claimed
+ ["No consumer cutover. main.cljc remains the oracle."
+  "No value-by-value parity against the CLJC oracle."
+  "wasm32 was not built; only aarch64-macos was compiled and executed."
+  "The float layer is not exercised here, so this pilot says nothing about it."]
+
+ ;; --- added 2026-09-10 by building a parity harness for this component ------
+
+ :parity
+ {:harness "q9-oracle.cljk"
+  :command "kbb --backend sci --classpath src:<kotoba-lang/text>/src q9-oracle.cljk"
+  :measured-against "the SHIPPED component, compiled to aarch64-macos and executed through tools/kexe_loader.c"
+  :agrees {:as-bool "9 of 9" :as-int "5 of 6" :route-count "30 on both sides"}
+  :disagrees
+  {:as-int-trailing-garbage
+   {:input "12abc" :artifact 0 :oracle-under-nbb 12 :oracle-under-jvm 0
+    :reading "The cohort-wide reader-conditional divergence recorded in kotoba-lang/lang/q9-wave1-tranche-1.edn. Not a defect in this port; accela is the fourth independent reproduction."}}}
+
+ :carried-selectors-that-cannot-discriminate
+ {:found "2026-09-10, by running the component's own oracle-expand over every selector"
+  :measured
+  {0 303754089 1 499508843 2 701086944 3 499508843 4 303754089 5 499508843}
+  :finding
+  "Selector 4 is the `expand BOTH refs` case, carried from the abb_robotics
+   sibling whose BOM spec genuinely declares two. No accela spec has two refs,
+   so selector 4 asks for \"projectId,projectId\" and returns EXACTLY selector
+   0's value. It cannot tell a fold that ran twice from one that ran once, and
+   in the sibling that same selector IS distinct (728485347 against 253212778).
+
+   This is the class :generated-not-hand-ported says cannot be carried. The
+   generator does derive the TABLES from entity-specs, and those are right --
+   what it still templates is the oracle SELECTORS, and one of them names a
+   shape this entity table does not have."
+  :also
+  {:cred-row
+   "Emits \"projectId\" twice -- a duplicate JSON key -- and a \"quantity\"
+    field that no accela spec declares. Both survived `amu check :ok true`,
+    because the object is built with `jkv` calls and the compiler has no schema
+    for it. A green check is not evidence that a fixture is well formed."}
+  :not-fixed-here
+  "The file is generated. Hand-patching its output would make the next
+   regeneration silently undo the fix, so the repair belongs in
+   scripts/gen-whole-component.cljs -- derive the expand selectors from the ref
+   arity of the entity being generated, and build cred-row from the spec's own
+   field list."}
+
+ :regenerated-2026-09-10
+ {:generator "kotoba-lang scripts/gen-whole-component.cljs, after the ref-arity fix"
+  :closes "the two defects recorded above under :carried-selectors-that-cannot-discriminate"
+  :cred-row "now id + the one ref field + two of the spec's own required fields. No duplicate key, and no `quantity` -- a field no accela spec declares."
+  :oracle-expand "selector 4 is not generated, and the file says why: one ref means a BOTH case would duplicate selector 0."
+  :measured
+  {:before {0 303754089 4 303754089 :reading "selector 4 duplicated selector 0 and measured nothing"}
+   :after  {0 827109938 1 991960698 2 475448106 3 991960698 4 991960698 5 991960698
+            :reading "selector 4 now falls through to the unexpanded floor it shares with 1, 3 and 5, while 0 and 2 stay distinct -- so the oracle still discriminates. Selector 0 moved because cred-row's fields changed; it is a hash of the rendered record."}}
+  :builds {:amu-check {:status :ok} :amu-compile {:status :ok :bytes 235837 :target "aarch64-macos"}}
+  :parity-unchanged
+  "as-bool 9 of 9, as-int 5 of 6 with the cohort-wide \"12abc\" divergence. The
+   regeneration removed a meaningless selector and a malformed fixture; it did
+   not change what the component does."}
+}

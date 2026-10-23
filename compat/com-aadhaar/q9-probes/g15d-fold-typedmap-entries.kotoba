@@ -1,0 +1,11 @@
+;; Row 15, folding a typed map without `vals`: typed-map-count + typed-map-entry-at
+;; is the entry walk the frontend admits.
+(ns g15d (:export [probe]))
+(defn m [] [:map :keyword :i64] (typed-map-new [:map :keyword :i64] :a 1 :b 2))
+(defn walk [i :i64 n :i64 acc :i64] :i64
+  (if (>= i n)
+    acc
+    (walk (+ i 1) n
+          (+ acc (option-value-of [:option :i64]
+                                  (typed-map-get [:map :keyword :i64] (m) :a) 0)))))
+(defn probe [] :i64 (walk 0 (typed-map-count [:map :keyword :i64] (m)) 0))

@@ -1,0 +1,183 @@
+{:kotoba.lang.q9.migration-record/version 1
+ :repository "orgs/kotoba-lang/com-abb-robotics"
+ :as-of "2026-09-10"
+ :wave :wave-1
+ :disposition :partial-and-running
+ :record-author "whole-component port, third pilot in the cohort"
+
+ :why-this-repository
+ "kotoba-lang lang/q9-migration.edn :current-decision names
+  :requalify-wave-1-pilots-as-whole-component-builds as the next action, and as
+  of 2026-09-10 exactly two of the twenty pilots had a whole-component build:
+  com-aadhaar and com-aave. Two is a pattern only if the third one reproduces
+  it, so this is the third.
+
+  The oracles are the same generated actor template. Measured by diffing
+  src/aave/main.cljc against src/abb_robotics/main.cljk with the repository
+  name normalised away: they differ in the docstring and the entity-specs
+  table, and in nothing else."
+
+ :baseline-paths
+ ["src/abb_robotics/main.cljk"
+  "src/abb_robotics/page_limit.kotoba"
+  "src/abb_robotics/paginate.kotoba"
+  "src/abb_robotics/whole_component.kotoba"
+  "policy.edn"]
+
+ :classifications
+ {"src/abb_robotics/main.cljk" :retained-oracle
+  "src/abb_robotics/page_limit.kotoba" :kotoba-only
+  "src/abb_robotics/paginate.kotoba" :kotoba-only
+  "src/abb_robotics/whole_component.kotoba" :whole-component-entry
+  "policy.edn" :declared-capability-grants}
+
+ :reserved-name-collision
+ {:collides true
+  :name "query"
+  :cleared-by :rename-in-the-migrated-component
+  :detail
+  "src/abb_robotics/main.cljk declares a public `query`, which the pure
+   S-expression core reserved as a head on 2026-09-06. The migrated component
+   names the same operation store-query. The oracle is unchanged -- nothing was
+   renamed in the .cljc -- which is the second of the two options
+   lang/q9-wave1-tranche-1.edn :reserved-name-collision names, and the same one
+   com-aadhaar and com-aave took. Third pilot, same resolution."}
+
+ :what-this-pilot-exercises-that-the-earlier-two-did-not
+ "TWO refs on one spec. `:refs {:parentPartId \"Part\" :childPartId \"Part\"}`
+  on BOM. In com-aave every spec was `:refs {}` and expand folded over nothing;
+  in com-aadhaar five specs carried exactly one ref, and a fold over one is not
+  a fold. Here `refs-of` returns a comma-separated list of two pairs and expand
+  parses it as a LIST on the production path for the first time.
+
+  It is asserted by execution, not by inspection -- see :executed below."
+
+ :the-trap-this-port-walked-into
+ "The oracle-expand selectors were carried over from com-aadhaar asking for
+  `{\"expand\":\"identityId\"}`. BOM has no identityId. Left unchanged, every
+  selector would have named a field that does not exist, expand would have
+  folded over nothing, and all four arms would have returned the unexpanded
+  record -- four green assertions measuring an empty fold, in the very port
+  whose novelty is that the fold now runs twice. The field names were corrected
+  to parentPartId / childPartId and a fifth selector asking for BOTH was added.
+
+  This is the same shape as the reserved-name collision one layer up: the port
+  is mechanical enough that the parts which must NOT be mechanical are the ones
+  to check."
+
+ :builds
+ {:amu-check
+  {:command "amu check <abs>/src/abb_robotics/whole_component.kotoba --jvm-free --policy <abs>/policy.edn"
+   :status :ok :exit 0
+   :effects #{[:cap/call :clock/now] [:cap/call :entropy/draw]}}
+  :amu-compile-native
+  {:command "amu compile <abs>/src/abb_robotics/whole_component.kotoba --target aarch64-macos --policy <abs>/policy.edn --output <abs>/abb_robotics.kexe"
+   :status :ok :exit 0 :bytes 237456
+   :note "com-aadhaar's is 236678 bytes from the same template with a different entity table."}
+  :paths
+  "Absolute. A relative path is refused with :decode / `input could not be read`,
+   which reads like a malformed source rather than a path problem."}
+
+ :executed
+ {:harness "cc -O2 tools/kexe_loader.c, then KEXE_FUEL=100000000 ./kexe-loader <sym>.bin <offset> <arity> aarch64 7,23 [args]"
+  :main {:value 30
+         :meaning "route-count: five routes per entity over six entities, computed from the entity table rather than written down."}
+  :oracle-expand
+  {:values {0 775932512 1 59185124 2 712015981 3 59185124 4 950504319 5 59185124}
+   :reading
+   "Three selectors collapse to one value, 23955074, and that is the point:
+    selector 1 asks for a field that is not a ref, 3 asks against an entity
+    whose refs are empty, and 5 is the record with no expansion at all. All
+    three must be the unexpanded record and all three are.
+
+    Against that floor, selector 0 (one ref) and selector 4 (BOTH refs) are
+    different values, and different from each other. The two-ref fold folds
+    twice. Selector 2 points at a Part the store does not hold and lands on the
+    null arm, distinct again.
+
+    A run that only reported selector 4 would not be able to tell a working
+    fold from a fold over nothing."}
+  :oracle-float-divergence
+  {:values {0 172520021 1 638098242 2 289182519}
+   :reading "Distinct, so the float layer's divergence is measurable here as it is in com-aadhaar."}}
+
+ :blocked-layers
+ {:float-coercion
+  {:status :blocked
+   :reached true
+   :detail
+   "Robot declares `:coerce {:payloadKg :float}`, so this component REACHES the
+    arm com-aadhaar also reaches. `coerce-field`'s float branch preserves the
+    raw token instead of coercing, exactly as in the sibling. Not reduced to a
+    smaller predicate to make anything green: ADR-q9 says an unavailable
+    backend is an implementation gap, and the gap is recorded rather than
+    designed around."}}
+
+ :parity
+ {:harness "q9-oracle.cljk"
+  :command "kbb --backend sci --classpath src:<kotoba-lang/text>/src q9-oracle.cljk"
+  :added "2026-09-10"
+  :closes "the :not-claimed item that said the oracle-* functions were RUN but never compared value-by-value"
+  :agrees
+  {:route-count "30 on both sides, derived from the entity table rather than written down"
+   :as-int "5 of 6 selectors agree"
+   :as-bool "9 of 9 selectors agree"}
+  :disagrees
+  {:as-int-trailing-garbage
+   {:input "12abc"
+    :artifact 0
+    :oracle-under-nbb 12
+    :oracle-under-jvm 0
+    :reading
+    "This is NOT a port defect, and the harness is what made that visible. The
+     oracle's own as-int is a reader conditional whose two branches disagree
+     with each other on this input: the :cljs branch is js/parseInt, which takes
+     the leading digits and yields 12, and the :clj branch is Long/parseLong,
+     which throws and is caught, yielding 0. Both were RUN rather than read --
+     nbb gave 12, `kbb -M -e` gave 0.
+
+     The component matches the :clj branch. So `parity with the oracle` is not
+     well defined for this input until someone says which branch is normative,
+     and a harness run under nbb will report a mismatch while the same harness
+     on the JVM reports a match. Recorded rather than resolved: choosing a
+     branch is a semantic decision about the product, not a migration step."}}
+  :method-note
+  "The expand layer is compared as a COUNT of the keys the fold added, not as a
+   hash. The .kotoba hashes a rendered record, and the rendering is this port's
+   own convention, so a hash comparison there would confound a behaviour
+   difference with a layout difference."}
+
+ :not-claimed
+ ["No consumer cutover. main.cljc remains the oracle and nothing imports the component."
+  "The parity harness covers the i64 layers and the expand fold's arity. It does NOT compare the rendered-JSON hash layers value-by-value, for the reason in :parity :method-note."
+  "wasm32 was not built. Only aarch64-macos was compiled and executed."
+  "The tranche status is unchanged. One more whole-component build does not earn the soak."]
+
+ :regenerated-2026-09-10
+ {:generator "kotoba-lang scripts/gen-whole-component.cljs"
+  :why "This component was hand written. Regenerating it puts it under the same derivation as its siblings, so a future table change cannot leave a fixture behind."
+  :what-moved
+  {:oracle-expand
+   "Every value moved, because the fixtures moved: seeded-row and cred-row now
+    carry generated placeholders rather than the hand-chosen \"Bracket\" and
+    \"Flange\". The STRUCTURE is unchanged and that is what the oracle is for --
+    selectors 1, 3 and 5 still collapse to one floor, and 0, 2 and 4 are each
+    distinct from it and from each other. Selector 4 remains distinct from
+    selector 0, which is the property that matters for a two-ref entity and the
+    one com-accela cannot have."
+   :bytes "237083 -> 237456"}
+  :what-did-not-move
+  {:route-count "30, derived from the entity table rather than the fixtures"
+   :oracle-float-divergence
+   "172520021 638098242 289182519, byte-identical. That oracle calls
+    coerce-field with literal strings, so it does not depend on any fixture. It
+    is the control for this whole regeneration: if these had moved too, the
+    right conclusion would have been that the measurement changed rather than
+    the fixtures."}
+  :gained
+  "fixture-data selector 3 now carries \"payloadKg\":\"1.5\". Robot coerces
+   payloadKg to :float and does not require it, so the generator's earlier
+   :required-only fixture omitted the one field the float arm exists to
+   exercise. The hand-written fixture had it; the generator now derives it."
+  :parity "as-bool 9 of 9, page-limit 8 of 8, as-int 5 of 6 with the cohort-wide \"12abc\" divergence. Unchanged by the regeneration."}
+}

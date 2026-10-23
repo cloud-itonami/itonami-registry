@@ -1,0 +1,10 @@
+;; Row 15, folding EVERY value of a typed map. frontend.cljc: keys and vals
+;; answer a [:list T] "in the map's own entry order -- the order
+;; typed-map-entry-at walks -- so (nth (keys m) i) and (nth (vals m) i) name the
+;; two halves of one entry". `reduce` refuses a [:list T] receiver
+;; (g21a-reduce-list-param.kotoba), so the fold is the indexed walk.
+(ns g15e (:export [probe]))
+(defn m [] [:map :keyword :i64] (typed-map-new [:map :keyword :i64] :a 1 :b 2))
+(defn walk [i :i64 n :i64 acc :i64] :i64
+  (if (>= i n) acc (walk (+ i 1) n (+ acc (nth (vals (m)) i)))))
+(defn probe [] :i64 (walk 0 (count (vals (m))) 0))

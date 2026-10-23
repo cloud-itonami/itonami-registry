@@ -1,0 +1,9 @@
+;; Ordering control. g10a refused naming `big?` rather than `remove`. If the
+;; frontend types arguments BEFORE resolving the head, this probe -- head
+;; definitely unknown, same bare-fn-name argument -- refuses on the ARGUMENT.
+;; If it refuses on the head, then g10a's silence about `remove` means `remove`
+;; resolved, and the refusal there was genuinely about the argument.
+(ns g10e (:export [probe]))
+(def xs [1 2 3])
+(defn big? [a :i64] :bool (> a 1))
+(defn probe [] :i64 (count (definitely-not-a-head big? xs)))
