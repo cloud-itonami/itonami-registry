@@ -15,7 +15,7 @@
     "type": {"const": "api"},
     "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{0,99}$"},
     "name": {"type": "string", "minLength": 1},
-    "version": {"type": "string", "pattern": "^1\\.0\\.0\\+[0-9a-f]{12}(\\.rel[0-9a-f]{8})?$"},
+    "version": {"type": "string", "pattern": "^1\\.0\\.0\\+[0-9a-f]{12}(\\.x[0-9a-f]{8})?$"},
     "description": {"type": "string", "minLength": 1},
     "author": {"type": "string", "minLength": 1},
     "license": {"type": "string", "minLength": 1},
@@ -70,11 +70,13 @@
             "status": {"enum": ["unverified", "recorded"]},
             "domain": {"type": "string", "pattern": "^[a-z0-9.-]+\\.[a-z]+$"},
             "reverseDomain": {"type": "string", "pattern": "^[a-z]+(\\.[a-z0-9-]+)+$"},
-            "sourceHost": {"type": "string"}
+            "sourceHost": {"type": "string"},
+            "record": {"const": "catalogs/origin-domains.json"},
+            "nameMatchesDomain": {"type": "boolean"}
           },
           "if": {"properties": {"status": {"const": "recorded"}}},
-          "then": {"required": ["domain", "reverseDomain"]},
-          "else": {"not": {"anyOf": [{"required": ["domain"]}, {"required": ["reverseDomain"]}]}}
+          "then": {"required": ["domain", "reverseDomain", "record", "nameMatchesDomain"]},
+          "else": {"not": {"anyOf": [{"required": ["domain"]}, {"required": ["reverseDomain"]}, {"required": ["record"]}, {"required": ["nameMatchesDomain"]}]}}
         }
       }
     },

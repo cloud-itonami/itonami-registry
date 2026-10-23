@@ -88,11 +88,10 @@ The generated L4/L5 routes are CRUD over the declared entities. They describe th
   - The naming rule derives names one way only, from domain to prefix. So the registry never reconstructs a domain from a name:
     `com-google-drive` does not say whether the domain is `google.com` or `google-drive.com`.
   - `origin.status` is `recorded` only when a public, pinned domain record supplies `domain`. In that case `reverseDomain` is its
-    labels reversed, for example `com.circleci`.
+    labels reversed, for example `com.stripe`.
   - Otherwise the status is `unverified`, and `domain` and `reverseDomain` are absent.
   - `origin.sourceHost` is the host of the cited vendor URL. It is evidence, not the domain record.
-  - The workspace's origin-domain record is not public today, so every entry is `unverified`. Publishing that record, or an
-    extract of it, is a separate decision.
+  - The public record is `catalogs/origin-domains.json`. See the amendment below.
 
 ### 5. Pinning, generation and federation
 
@@ -145,7 +144,6 @@ first.
 ## Not decided here
 
 - Moving, archiving or renaming any repository. Publication changes nothing in kotoba-lang (AWAI-59 forbids bulk renames).
-- Publishing the origin-domain record, which would fill `origin.domain` and `reverseDomain`.
 - Catalog shapes for the dataset snapshots, the connector contracts, and the `app-*` repositories that AWAI-59 left on hold.
 - Any runtime qualification of a compat actor. That belongs to the actor's repository and its own receipts.
 
@@ -156,3 +154,32 @@ first.
 - `index.json` roughly doubles. Hermes clients that do not know the `api` type should skip it, as they already skip `profile`.
   `compatibility.hermes` is `none`.
 - A refresh is a reviewed diff: run the generator with `--refresh`, then rebuild the index.
+
+## Amendment 1, 2026-10-23: public origin-domain extract
+
+The owner approved publishing the origin-domain record in its least-exposure form.
+
+- **What is published.** `catalogs/origin-domains.json` (`schemas/origin-domains.schema.json`) holds only repository → domain
+  pairs. It covers only repositories that are api entries.
+  - The pairs are taken from the `:anchors` and `:domains` maps of the owner's record.
+  - Everything else in the record stays private: coverage measurements, DNS sweeps, unresolvable notes, migrations and
+    duplicates.
+- **Provenance.** The extract records the source repository (`com-junkawasaki/root`, private), its commit, and the sha256 of both
+  files. `manifest/origin-domains.edn` is the view; `manifest/origin-domains.kotoba` is the authority. Every extracted pair must
+  appear in both.
+  - It also records the record's own evidence labels: the date of its top-level DNS delegation check, and
+    `authorityBindingEvidence: asserted-not-measured`.
+  - Anyone holding the source commit can re-derive the extract with `scripts/extract_origin_domains.py --check`.
+- **What `recorded` means.** The generator sets `origin.status: recorded` exactly where the extract has a fact. `domain`,
+  `reverseDomain` (the domain's labels reversed), `record` and `nameMatchesDomain` come from the extract.
+  - The status is `recorded`, not `verified`. The record's binding of a repository to its authority is the owner's assertion;
+    only the domain's NS delegation was checked.
+  - `nameMatchesDomain: false` marks a repository whose name does not follow its recorded domain, for example `com-b-pipe` →
+    `com.bloomberg`. The id stays the repository name (no bulk rename); the reverse domain is the record's.
+- **Version.** Curated data merged into an entry, from relations or from the origin extract, adds `.x<sha8>` to its version. A
+  change in the overlay therefore changes the version.
+- **Coverage on 2026-10-23.**
+  - 102 of 1,028 api entries are recorded, 9 of them with names that match the domain. The other 926 remain `unverified`.
+  - `com-circleci` is among the unverified entries: the owner's record has no entry for it, and the registry does not derive one.
+  - Coverage grows only when the owner's record grows. Rerun the extractor, then the generator.
+

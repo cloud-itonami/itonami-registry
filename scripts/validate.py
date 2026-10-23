@@ -279,6 +279,7 @@ def validate_apis(root, catalog, identities, external):
         m = read(root / 'apis' / r['api'] / 'manifest.json') if r['api'] in apis else None
         if not m or any(sorted(r.get(k, [])) != m['relations'][k] for k in ['implementedBy', 'consumedBy']):
             raise ValueError(f"API relation not reflected in its entry: {r['api']}")
+    validate_origin_extract(root, apis)
     doc = read(root / 'catalogs/api-classification.json')
     cschema = read(root / 'schemas/api-classification.schema.json')
     Draft202012Validator.check_schema(cschema)
@@ -361,6 +362,38 @@ def validate_datasets(root):
         ids = [e['id'] for e in doc['entries']]
         if len(set(ids)) != len(ids):
             raise ValueError(f'Duplicate dataset id: {path.name}')
+
+
+def validate_origin_extract(root, apis):
+    """The public origin-domain extract (ADR 0005 §4): domain facts for api entries only, each
+    reflected in exactly that entry; every other api entry stays unverified."""
+    doc = read(root / 'catalogs/origin-domains.json')
+    schema = read(root / 'schemas/origin-domains.schema.json')
+    Draft202012Validator.check_schema(schema)
+    Draft202012Validator(schema).validate(doc)
+    if doc['count'] != len(doc['entries']):
+        raise ValueError('Origin extract count mismatch')
+    facts = {}
+    for e in doc['entries']:
+        if e['api'] in facts:
+            raise ValueError(f"Duplicate origin fact: {e['api']}")
+        if e['api'] not in apis or e['repository'] != read(root / 'apis' / e['api'] / 'manifest.json')['pin']['repository']:
+            raise ValueError(f"Origin fact for no api entry: {e['api']}")
+        rev = '.'.join(reversed(e['domain'].split('.')))
+        if e['reverseDomain'] != rev:
+            raise ValueError(f"Reverse domain is not the reversed domain: {e['api']}")
+        prefix = rev.replace('.', '-')
+        if e['nameMatchesDomain'] != (e['api'] == prefix or e['api'].startswith(prefix + '-')):
+            raise ValueError(f"Name match flag is wrong: {e['api']}")
+        facts[e['api']] = e
+    for rid in apis:
+        origin = read(root / 'apis' / rid / 'manifest.json')['api']['origin']
+        fact = facts.get(rid)
+        if fact is None and origin['status'] != 'unverified':
+            raise ValueError(f'Origin recorded without a fact in the extract: {rid}')
+        if fact is not None and (origin['status'], origin.get('domain'), origin.get('reverseDomain'), origin.get('nameMatchesDomain')) != (
+                'recorded', fact['domain'], fact['reverseDomain'], fact['nameMatchesDomain']):
+            raise ValueError(f'Origin differs from the extract: {rid}')
 
 
 if __name__ == '__main__':
