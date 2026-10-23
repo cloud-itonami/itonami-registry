@@ -3,9 +3,9 @@ name: itonami-statement-reconciliation
 description: Reconcile bank, card and expense statements an operator downloaded against a kaikei ledger with the kaikei MCP tools — invoice settlements, matches, transfers and rule-based journal suggestions, posted only after the operator approves each line — without connecting to any bank, card issuer or expense service.
 metadata:
   hermes:
-    version: 0.1.0
+    version: 0.1.1
     author: cloud-itonami
-    source: https://github.com/cloud-itonami/kaikei/tree/02dc9e75ad6dc82c8a0ff5982fa51ba2da08e269
+    source: https://github.com/cloud-itonami/kaikei/tree/8e128c838a57d6d7a47f359f6d6f2247afcb8b6d
     compatibility:
       hermes: '*'
       desktop: '*'
@@ -18,9 +18,11 @@ metadata:
    - Expensify data must be exported with kaikei's own export template; Ramp, Brex and BILL data is the API JSON the operator saved.
    - If the agent's inference rail is remote, ask before handling real statements. They would leave the machine through that rail.
 2. **Import.**
-   - `kaikei_import` reads one file into a new ledger; it does not add a statement to an existing ledger. To reconcile against the operator's books, ask for a kaikei ledger JSON exported from the kaikei app after the statement was imported there: it carries the journals, invoices, statement lines and rules together. A statement imported on its own has no journals or invoices to match, so only balance checks and the operator's rules apply.
-   - Call `mcp__kaikei__kaikei_import` with that ledger or with the statement. Use `bytes_base64` for Shift_JIS files (全銀 data, most Japanese bank CSV).
-   - Report the statement accounts, the line count and every `warnings` entry. A bank or card CSV recognised by an unverified preset says so; pass that on.
+   - To reconcile against the operator's books, first get them into a kaikei ledger: call `mcp__kaikei__kaikei_import` with their journal or invoice export, or use a kaikei ledger JSON they exported from the kaikei app.
+   - Then call `mcp__kaikei__kaikei_import` with the statement and `ledger` set to that ledger. The statement is added to it; duplicates from an overlapping download are skipped and counted in `added`. Pass `statement_account` (an account id, or `new`) only when the operator says which account the lines belong to.
+   - Use `bytes_base64` for Shift_JIS files (全銀 data, most Japanese bank CSV). A file in another currency than the ledger is refused (`currency-mismatch`); one ledger holds one currency.
+   - Report the statement accounts, the lines `added` and skipped as duplicates, and every `warnings` entry. A bank or card CSV recognised by an unverified preset says so; pass that on.
+   - A statement imported without a ledger has no journals or invoices to match, so only balance checks and the operator's rules apply.
 3. **Check.**
    - Call `mcp__kaikei__kaikei_statement_check`. For each account, report the open lines, the `difference` between the statement's last balance and the ledger's, and the first running-balance break if there is one.
    - A break means a download is missing lines or overlaps wrongly; ask the operator for the missing period instead of posting around it.
