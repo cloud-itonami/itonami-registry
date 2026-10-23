@@ -4,17 +4,36 @@
   "id": "kumitate",
   "name": "kumitate (CircleCI-compatible pipeline planning)",
   "version": "0.1.0",
-  "description": "Streamable HTTP MCP server for the kumitate itonami dapp, a native Kotoba program built only with Amu selfhost: checks a CircleCI config.yml (2.1) with named refusals, computes the processed pipeline (parameters, executors, commands, when/unless, matrix, branch/tag and expression filters, the requires DAG with levels and parallelism), writes the config-process YAML and the CircleCI API v2 Pipeline/Workflow/Job shapes, lists each job's steps for running them yourself, and summarizes run records and JUnit reports (failed, flaky and slow jobs and tests). Pure tools over the passed text: no orb or function is fetched, nothing is sent to circleci.com or a VCS, no job is run and nothing is stored.",
+  "description": "Stdio MCP server (also Streamable HTTP) for the kumitate itonami dapp, a native Kotoba program built only with Amu selfhost: checks a CircleCI config.yml (2.1) with named refusals, computes the processed pipeline (parameters, executors, commands, when/unless, matrix, branch/tag and expression filters, the requires DAG with levels and parallelism), writes the config-process YAML and the CircleCI API v2 Pipeline/Workflow/Job shapes, lists each job's steps for running them yourself, and summarizes run records and JUnit reports (failed, flaky and slow jobs and tests). Pure tools over the passed text: no orb or function is fetched, nothing is sent to circleci.com or a VCS, no job is run and nothing is stored.",
   "author": "cloud-itonami",
   "license": "AGPL-3.0-or-later",
-  "source": "https://github.com/cloud-itonami/app-itonami-kumitate/tree/c4331fada15b590bc7489ad42e33e898d206d867",
+  "source": "https://github.com/cloud-itonami/app-itonami-kumitate/tree/05a2b61695de868edf7cf42d144d5adb52af4db3",
   "compatibility": {
     "hermes": "*",
     "desktop": "*"
   },
-  "transport": "http",
-  "url": "http://127.0.0.1:8787/mcp",
+  "transport": "stdio",
+  "command": "${KUMITATE_IMAGE}",
+  "args": [
+    "stdio"
+  ],
+  "env": {
+    "KEXE_ALLOW": "37,38,39,41"
+  },
   "permissions": [
-    "network"
-  ]
+    "process"
+  ],
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "KUMITATE_IMAGE": {
+        "type": "string",
+        "description": "Absolute path to the owner-built kumitate static image (kumitate-aarch64-linux.elf or kumitate-x86_64-linux.elf, README \"Kotoba gate\" at the pinned commit). It runs on arm64 or x86_64 Linux; on macOS, run it inside podman instead (mcp/kumitate/README.md)."
+      }
+    },
+    "required": [
+      "KUMITATE_IMAGE"
+    ],
+    "additionalProperties": false
+  }
 }

@@ -19,25 +19,25 @@
     "summary": "status counts, failed jobs, success rate and mean duration per job, flaky jobs and tests, slowest tests"
   },
   "effects": [
-    "network-loopback-listen"
+    "process"
   ],
   "authority": {
     "grants": false,
     "default": "blocked",
-    "binding": "caller-authorized profile mcp_servers entry pointing at a server the owner started, and an owner-reviewed effective tool allowlist"
+    "binding": "caller-authorized profile mcp_servers entry whose command is an owner-built kumitate image (stdio) or whose url is a server the owner started (HTTP), and an owner-reviewed effective tool allowlist"
   },
   "validation": {
     "catalog": "schema-checked",
-    "runtime": "protocol-tested 2026-10-23: tools/list and tools/call (kumitate_plan) over Streamable HTTP with the itonami-agent HTTP MCP client (kotoba-lang/itonami-agent 0c05574, src/itonami/agent/mcp_http_client.mjs) against the native aarch64-linux image in podman; curl checks of 405, 403, 404 and 202; the Kotoba gate 18/18 and fixture selftest 75/75 on aarch64-linux and x86_64-linux (docs/evidence/kotoba-selfhost-gate-20261023.edn); no model-driven agent turn, no deployed profile",
+    "runtime": "protocol-tested 2026-10-23. Over stdio: Claude Code's MCP client 2.1.309 started the native aarch64-linux image (podman run -i ... kumitate stdio), listed the 8 tools and called kumitate_plan; the stdio session fixture equals the mcp fixtures' answers byte for byte; answers arrive one at a time (FIFO turn test with a negative control); one process answered 200,000 ping, 20,000 tools/list and 3,000 kumitate_plan calls (docs/evidence/kotoba-stdio-mcp-20261023.edn). Over Streamable HTTP: tools/list and tools/call with the itonami-agent HTTP MCP client (kotoba-lang/itonami-agent 0c05574) and curl checks of 405, 403, 404 and 202 (docs/evidence/kotoba-selfhost-gate-20261023.edn). Kotoba gate 19/19 and fixture selftest 75/75 on aarch64-linux and x86_64-linux (qemu-user). The itonami-agent stdio client was not tried; no model-driven itonami agent turn, no deployed profile",
     "live": false
   },
-  "compatibilityNote": "Hermes storage format only. itonami-agent exposes the tools as mcp__kumitate__<tool>. The server is a loaderless static image; the owner starts it with KEXE_ALLOW=37,38,39,43,44,46,47 and KEXE_CAP_RESOURCES_43 naming the one address it may listen on. No stdio transport yet (kotoba-lang/amu#1516). Format and semantics compatibility only; no connection to circleci.com.",
+  "compatibilityNote": "Hermes storage format only. itonami-agent exposes the tools as mcp__kumitate__<tool>. The server is a loaderless static image. Over stdio the client starts it with KEXE_ALLOW=37,38,39,41 (wire 41 is stdin); without wire 41 the runtime stops it at the first read with an unnamed trap. One process keeps the bytes it read, up to the runtime's 256 MiB string pool, then stops with a named budget trap; the client starts a new one. Over HTTP the owner starts it with KEXE_ALLOW=37,38,39,43,44,46,47 and KEXE_CAP_RESOURCES_43 naming the one address it may listen on. Format and semantics compatibility only; no connection to circleci.com.",
   "requires": [
-    "Owner-built kumitate native image (README \"Kotoba gate\", amu selfhost root 1739f52f...) on aarch64-linux or x86_64-linux, or in an arm64/amd64 Linux VM",
-    "The owner starting `kumitate serve 127.0.0.1:8787` with the listen grant"
+    "Owner-built kumitate native image (README \"Kotoba gate\", amu selfhost root bd025475...) on aarch64-linux or x86_64-linux, or in an arm64/amd64 Linux VM",
+    "For stdio, a profile mcp_servers entry whose command is that image with args [stdio] and env KEXE_ALLOW=37,38,39,41; for HTTP, the owner starting `kumitate serve 127.0.0.1:8787` with the listen grant"
   ],
   "launchResolution": {
-    "placeholder": "http://127.0.0.1:8787/mcp",
-    "behavior": "The server is not launched by the client. The owner starts it on a loopback address of their choice and writes that address as the url of the profile's mcp_servers entry; only POST /mcp is served, and a non-localhost Origin is refused."
+    "placeholder": "${KUMITATE_IMAGE}",
+    "behavior": "The client starts the image as a stdio server: command ${KUMITATE_IMAGE}, args [stdio], env KEXE_ALLOW=37,38,39,41. On macOS the command is podman run -i with the image mounted read-only (mcp/kumitate/README.md). Alternatively the owner starts kumitate serve on a loopback address and the profile names its url (http://127.0.0.1:8787/mcp); only POST /mcp is served and a non-localhost Origin is refused."
   }
 }
