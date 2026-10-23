@@ -11,6 +11,7 @@ from GitHub Pages (or any static host) and verified against git.
     site/api/v1/index.json                            every entry, all registries
     site/api/v1/categories.json, models.json          Hermes registry shapes
     site/api/v1/registries.json                       which registries, which commits
+    site/api/v1/api-classification.json               ADR 0005 classification of API repositories
     site/api/v1/entries/<registry>/<type>/<id>.json   one entry with its manifest
 
 Entries keep registry-qualified identities (`itonami-registry/profile/itonami-eng`,
@@ -69,6 +70,11 @@ def install_hint(row, detail):
         return {'hermes': f"Copy {row['path']}/SKILL.md into ~/.hermes/skills/{row.get('category', 'misc')}/{row['id']}/"}
     if t == 'agent':
         return {'itonami': 'Cloud Itonami → Marketplace → Bots (inert install).'}
+    if t == 'api':
+        pin = detail['manifest']['pin']
+        return {'itonami': (f"Shape reference only; nothing to install or run. Read manifest.json at "
+                            f"https://github.com/{pin['repository']}/blob/{pin['commit']}/manifest.json and "
+                            f"verify its sha256 against this entry.")}
     return {}
 
 
@@ -96,6 +102,7 @@ def build(root, out):
     (api / 'registries.json').write_text(json.dumps({'registries': registries}, ensure_ascii=False, indent=2) + '\n')
     for name in ['categories.json', 'models.json']:
         shutil.copy(root / name, api / name)
+    shutil.copy(root / 'catalogs/api-classification.json', api / 'api-classification.json')
     shutil.copy(root / 'web/index.html', out / 'index.html')
     (out / '.nojekyll').write_text('')
     return len(rows)
