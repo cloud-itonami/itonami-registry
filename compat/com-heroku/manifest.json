@@ -1,0 +1,858 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "heroku-compat",
+  "did": "did:web:etzhayyim.com:actor:heroku-compat",
+  "kind": "compat",
+  "title": "heroku clean-room actor",
+  "description": "Clean-room, API-compatible cloud infrastructure (IaaS) actor (heroku); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreicsxf7kslscffsdfy6kdif5fioqnsryu3km7axvh7jhw6i72lryna",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreicsxf7kslscffsdfy6kdif5fioqnsryu3km7axvh7jhw6i72lryna",
+  "schema": "schema/heroku.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://api.heroku.com/schema",
+    "verifiedAt": "2026-06-09",
+    "resources": [
+      "App",
+      "Dyno",
+      "Release",
+      "Addon",
+      "Build",
+      "Formation"
+    ],
+    "enums": {
+      "Dyno": {
+        "state": [
+          "crashed",
+          "down",
+          "idle",
+          "starting",
+          "up"
+        ]
+      },
+      "Addon": {
+        "state": [
+          "provisioning",
+          "provisioned",
+          "deprovisioned"
+        ]
+      },
+      "Build": {
+        "status": [
+          "failed",
+          "pending",
+          "succeeded"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "App",
+    "Dyno",
+    "Release",
+    "Addon",
+    "Build",
+    "Formation"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 30,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/apps",
+          "op": "create App"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/apps",
+          "op": "list App"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/apps/{id}",
+          "op": "get App"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/apps/{id}",
+          "op": "update App"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/apps/{id}",
+          "op": "delete App"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/dynos",
+          "op": "create Dyno"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/dynos",
+          "op": "list Dyno"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/dynos/{id}",
+          "op": "get Dyno"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/dynos/{id}",
+          "op": "update Dyno"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/dynos/{id}",
+          "op": "delete Dyno"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/releases",
+          "op": "create Release"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/releases",
+          "op": "list Release"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/releases/{id}",
+          "op": "get Release"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/releases/{id}",
+          "op": "update Release"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/releases/{id}",
+          "op": "delete Release"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/addons",
+          "op": "create Addon"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/addons",
+          "op": "list Addon"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/addons/{id}",
+          "op": "get Addon"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/addons/{id}",
+          "op": "update Addon"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/addons/{id}",
+          "op": "delete Addon"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/builds",
+          "op": "create Build"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/builds",
+          "op": "list Build"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/builds/{id}",
+          "op": "get Build"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/builds/{id}",
+          "op": "update Build"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/builds/{id}",
+          "op": "delete Build"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/formations",
+          "op": "create Formation"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/formations",
+          "op": "list Formation"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/formations/{id}",
+          "op": "get Formation"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/formations/{id}",
+          "op": "update Formation"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/formations/{id}",
+          "op": "delete Formation"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "heroku-compat",
+            "purl": "pkg:etzhayyim/heroku-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "heroku.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 30,
+      "tools": [
+        {
+          "name": "create_app",
+          "description": "Create a App.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "webUrl": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          }
+        },
+        {
+          "name": "list_apps",
+          "description": "List Apps.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_app",
+          "description": "Get a App by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_app",
+          "description": "Update a App.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "webUrl": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_app",
+          "description": "Delete a App.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_dyno",
+          "description": "Create a Dyno.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "command": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          }
+        },
+        {
+          "name": "list_dynos",
+          "description": "List Dynos.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_dyno",
+          "description": "Get a Dyno by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_dyno",
+          "description": "Update a Dyno.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "command": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_dyno",
+          "description": "Delete a Dyno.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_release",
+          "description": "Create a Release.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              },
+              "description": {
+                "type": "string"
+              },
+              "current": {
+                "type": "boolean"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "version"
+            ]
+          }
+        },
+        {
+          "name": "list_releases",
+          "description": "List Releases.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_release",
+          "description": "Get a Release by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_release",
+          "description": "Update a Release.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              },
+              "description": {
+                "type": "string"
+              },
+              "current": {
+                "type": "boolean"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_release",
+          "description": "Delete a Release.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_addon",
+          "description": "Create a Addon.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "plan": {
+                "type": "string"
+              },
+              "app": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          }
+        },
+        {
+          "name": "list_addons",
+          "description": "List Addons.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_addon",
+          "description": "Get a Addon by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_addon",
+          "description": "Update a Addon.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "plan": {
+                "type": "string"
+              },
+              "app": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_addon",
+          "description": "Delete a Addon.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_build",
+          "description": "Create a Build.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "app": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "status"
+            ]
+          }
+        },
+        {
+          "name": "list_builds",
+          "description": "List Builds.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_build",
+          "description": "Get a Build by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_build",
+          "description": "Update a Build.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "app": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_build",
+          "description": "Delete a Build.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_formation",
+          "description": "Create a Formation.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": "integer"
+              },
+              "size": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "quantity"
+            ]
+          }
+        },
+        {
+          "name": "list_formations",
+          "description": "List Formations.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_formation",
+          "description": "Get a Formation by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_formation",
+          "description": "Update a Formation.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": "integer"
+              },
+              "size": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_formation",
+          "description": "Delete a Formation.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

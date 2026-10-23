@@ -1,0 +1,769 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "jenkins-compat",
+  "did": "did:web:etzhayyim.com:actor:jenkins-compat",
+  "kind": "compat",
+  "title": "jenkins clean-room actor",
+  "description": "Clean-room, API-compatible DevOps / CI-CD actor (jenkins); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreig42y3biwtawqubltmsra2mykfehix44eppjx7lp3nu2rqwmhiu3a",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreig42y3biwtawqubltmsra2mykfehix44eppjx7lp3nu2rqwmhiu3a",
+  "schema": "schema/jenkins.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://github.com/jenkinsci/jenkins",
+    "verifiedAt": "2026-06-09",
+    "resources": [
+      "Build",
+      "Job",
+      "QueueItem",
+      "Computer",
+      "View"
+    ],
+    "enums": {
+      "Build": {
+        "result": [
+          "SUCCESS",
+          "UNSTABLE",
+          "FAILURE",
+          "NOT_BUILT",
+          "ABORTED"
+        ]
+      },
+      "Job": {
+        "color": [
+          "red",
+          "red_anime",
+          "yellow",
+          "yellow_anime",
+          "blue",
+          "blue_anime",
+          "grey",
+          "grey_anime",
+          "disabled",
+          "disabled_anime",
+          "aborted",
+          "aborted_anime",
+          "notbuilt",
+          "notbuilt_anime"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Build",
+    "Job",
+    "QueueItem",
+    "Computer",
+    "View"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 25,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/builds",
+          "op": "create Build"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/builds",
+          "op": "list Build"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/builds/{id}",
+          "op": "get Build"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/builds/{id}",
+          "op": "update Build"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/builds/{id}",
+          "op": "delete Build"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/jobs",
+          "op": "create Job"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/jobs",
+          "op": "list Job"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/jobs/{id}",
+          "op": "get Job"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/jobs/{id}",
+          "op": "update Job"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/jobs/{id}",
+          "op": "delete Job"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/queueitems",
+          "op": "create QueueItem"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/queueitems",
+          "op": "list QueueItem"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/queueitems/{id}",
+          "op": "get QueueItem"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/queueitems/{id}",
+          "op": "update QueueItem"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/queueitems/{id}",
+          "op": "delete QueueItem"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/computers",
+          "op": "create Computer"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/computers",
+          "op": "list Computer"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/computers/{id}",
+          "op": "get Computer"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/computers/{id}",
+          "op": "update Computer"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/computers/{id}",
+          "op": "delete Computer"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/views",
+          "op": "create View"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/views",
+          "op": "list View"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/views/{id}",
+          "op": "get View"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/views/{id}",
+          "op": "update View"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/views/{id}",
+          "op": "delete View"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "jenkins-compat",
+            "purl": "pkg:etzhayyim/jenkins-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "jenkins.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 25,
+      "tools": [
+        {
+          "name": "create_build",
+          "description": "Create a Build.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "number": {
+                "type": "integer"
+              },
+              "result": {
+                "type": "string"
+              },
+              "building": {
+                "type": "boolean"
+              },
+              "duration": {
+                "type": "integer"
+              },
+              "timestamp": {
+                "type": "integer"
+              },
+              "displayName": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "queueId": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "number",
+              "result"
+            ]
+          }
+        },
+        {
+          "name": "list_builds",
+          "description": "List Builds.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_build",
+          "description": "Get a Build by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_build",
+          "description": "Update a Build.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "number": {
+                "type": "integer"
+              },
+              "result": {
+                "type": "string"
+              },
+              "building": {
+                "type": "boolean"
+              },
+              "duration": {
+                "type": "integer"
+              },
+              "timestamp": {
+                "type": "integer"
+              },
+              "displayName": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "queueId": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_build",
+          "description": "Delete a Build.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_job",
+          "description": "Create a Job.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "displayName": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "color": {
+                "type": "string"
+              },
+              "nextBuildNumber": {
+                "type": "integer"
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "displayName"
+            ]
+          }
+        },
+        {
+          "name": "list_jobs",
+          "description": "List Jobs.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_job",
+          "description": "Get a Job by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_job",
+          "description": "Update a Job.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "displayName": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "color": {
+                "type": "string"
+              },
+              "nextBuildNumber": {
+                "type": "integer"
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_job",
+          "description": "Delete a Job.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_queue_item",
+          "description": "Create a QueueItem.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "inQueueSince": {
+                "type": "integer"
+              },
+              "why": {
+                "type": "string"
+              },
+              "blocked": {
+                "type": "boolean"
+              },
+              "buildable": {
+                "type": "boolean"
+              },
+              "stuck": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "inQueueSince"
+            ]
+          }
+        },
+        {
+          "name": "list_queue_items",
+          "description": "List QueueItems.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_queue_item",
+          "description": "Get a QueueItem by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_queue_item",
+          "description": "Update a QueueItem.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "inQueueSince": {
+                "type": "integer"
+              },
+              "why": {
+                "type": "string"
+              },
+              "blocked": {
+                "type": "boolean"
+              },
+              "buildable": {
+                "type": "boolean"
+              },
+              "stuck": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_queue_item",
+          "description": "Delete a QueueItem.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_computer",
+          "description": "Create a Computer.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "displayName": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "offline": {
+                "type": "boolean"
+              },
+              "offlineCauseReason": {
+                "type": "string"
+              },
+              "numExecutors": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "displayName",
+              "name"
+            ]
+          }
+        },
+        {
+          "name": "list_computers",
+          "description": "List Computers.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_computer",
+          "description": "Get a Computer by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_computer",
+          "description": "Update a Computer.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "displayName": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "offline": {
+                "type": "boolean"
+              },
+              "offlineCauseReason": {
+                "type": "string"
+              },
+              "numExecutors": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_computer",
+          "description": "Delete a Computer.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_view",
+          "description": "Create a View.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "url"
+            ]
+          }
+        },
+        {
+          "name": "list_views",
+          "description": "List Views.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_view",
+          "description": "Get a View by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_view",
+          "description": "Update a View.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_view",
+          "description": "Delete a View.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
