@@ -1,0 +1,13 @@
+{:paths ["src" "test"]
+ :deps {
+        ;; kotoba replaced JVM interop here (2026-09-24). An explicit
+        ;; floor: tools.deps takes the NEWEST sha it is shown.
+        io.github.kotoba-lang/coll {:git/sha "f74e248f0a07e8ae572885f50fab6bdb39dc24be"}
+        ;; kotoba replaced JVM interop here (2026-09-24). An explicit
+        ;; floor: tools.deps takes the NEWEST sha it is shown.
+        io.github.kotoba-lang/time {:git/sha "f40e72fc28e0d9a0b202ed8147ead8f7e8fbd759"}}
+ :tasks {test {:doc "Run the cljc contract + behavioral test under babashka"
+               :extra-paths ["test"]
+               :requires ([unity-ads.main-test])
+               :task (let [{:keys [fail error]} (clojure.test/run-tests 'unity-ads.main-test)]
+                       (System/exit (if (pos? (+ fail error)) 1 0)))}}}
