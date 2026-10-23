@@ -3,9 +3,9 @@ name: itonami-invoices
 description: Draft, import, check and post invoices with the kaikei MCP tools — per-rate consumption tax rounded once per invoice per rate, the contents a Japanese qualified invoice must state, and receivable or payable journal entries — without connecting to any invoicing service or the NTA.
 metadata:
   hermes:
-    version: 0.1.0
+    version: 0.1.1
     author: cloud-itonami
-    source: https://github.com/cloud-itonami/kaikei/tree/723f853078639a2360120d1a2c4db4a871dee70f
+    source: https://github.com/cloud-itonami/kaikei/tree/02dc9e75ad6dc82c8a0ff5982fa51ba2da08e269
     compatibility:
       hermes: '*'
       desktop: '*'

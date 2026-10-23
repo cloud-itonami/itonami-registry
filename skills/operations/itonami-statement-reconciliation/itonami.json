@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "itonami.entry.v1",
+  "sourceRefs": [
+    "kaikei-02dc9e75"
+  ],
+  "useWhen": "An operator hands over a bank or card statement they downloaded (OFX/QFX/QBO, 全銀 data, freee, MoneyForward, Xero or QuickBooks Online statement CSV, a bank or card CSV) or a Ramp, Brex, Expensify or BILL export, with or without a kaikei ledger, and asks whether the books agree with the bank, which invoices were paid, what each line should be posted as, or to post the lines they approve",
+  "avoidWhen": "Connecting to a bank, card issuer or expense or AP service, account aggregation, making or scheduling payments, posting lines the operator has not approved, choosing a consumption-tax rate kaikei reports as unknown, claiming 電子帳簿保存法 compliance or filing taxes; handling real statements on a remote inference rail without the operator's consent",
+  "inputs": {
+    "text": "statement or expense export the operator provided",
+    "ledger": "the operator's kaikei ledger, when the statement belongs to one",
+    "approvals": "the lines the operator approved, each with the choice they accepted"
+  },
+  "outputs": {
+    "checks": "per-account open lines, statement against ledger balance and the first running-balance break",
+    "candidates": "invoice settlements, matches, transfers and rule suggestions with strength and reasons",
+    "ledger": "the ledger with the approved lines posted, and the skipped lines with reasons",
+    "aging": "receivable and payable aging in 30-day buckets"
+  },
+  "effects": [
+    "process"
+  ],
+  "authority": {
+    "grants": false,
+    "default": "blocked",
+    "binding": "caller authorization; the mcp server must be enabled in the profile by its owner"
+  },
+  "validation": {
+    "catalog": "schema-checked",
+    "runtime": "protocol-tested 2026-10-23: tools/list and tools/call over stdio with the itonami-agent MCP client (kotoba-lang/itonami-agent 0c05574, itonami.agent.mcp discover/call) on synthetic fixtures; no model-driven agent turn, no deployed profile",
+    "live": false
+  },
+  "compatibilityNote": "Hermes storage format only. The steps call MCP tools by their itonami-agent names (mcp__<server>__<tool>) and assume the server key in mcp_servers matches the entry id.",
+  "dependsOn": [
+    "mcp/kaikei"
+  ]
+}
