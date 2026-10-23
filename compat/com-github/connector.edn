@@ -1,0 +1,47 @@
+{:schema "kotoba.connector.repository.v1",
+ :connector/docs-url "https://docs.github.com/rest",
+ :connector/origin-domain "github.com",
+ :connector/base-scopes [],
+ :connector/id "com.github",
+ :connector/var "provider",
+ :connector/scopes ["read:org" "read:user" "repo"],
+ :authority
+ "90-docs/adr/2608097000-connector-plane-one-repo-per-connector.edn",
+ :connector/namespace "github.connector",
+ :connector/auth-kind :oauth2,
+ :connector/auth-pkce? false,
+ :connector/summary
+ "Repositories, issues and pull requests on GitHub.",
+ :connector/name "GitHub",
+ :connector/client-id-env "GITHUB_CLIENT_ID",
+ :connector/tools
+ [{:connector/name "github_create_issue",
+   :connector/effect :write,
+   :connector/scopes ["repo"],
+   :connector/description "Open an issue on a repository."}
+  {:connector/name "github_get_authenticated_user",
+   :connector/effect :read,
+   :connector/scopes ["read:user"],
+   :connector/description "The account this grant belongs to."}
+  {:connector/name "github_get_repository",
+   :connector/effect :read,
+   :connector/scopes ["repo"],
+   :connector/description "One repository's metadata."}
+  {:connector/name "github_list_issues",
+   :connector/effect :read,
+   :connector/scopes ["repo"],
+   :connector/description
+   "Issues on a repository. Pull requests are excluded — GitHub returns them from this endpoint too, and a caller asking for issues does not mean PRs."}
+  {:connector/name "github_list_organizations",
+   :connector/effect :read,
+   :connector/scopes ["read:org"],
+   :connector/description "Organizations this grant can see."}
+  {:connector/name "github_list_pull_requests",
+   :connector/effect :read,
+   :connector/scopes ["repo"],
+   :connector/description "Pull requests on a repository."}
+  {:connector/name "github_list_repositories",
+   :connector/effect :read,
+   :connector/scopes ["repo"],
+   :connector/description
+   "Repositories this grant can see, most recently pushed first."}]}
