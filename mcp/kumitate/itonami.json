@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "itonami.entry.v1",
+  "sourceRefs": [
+    "app-kumitate"
+  ],
+  "useWhen": "Check or explain a CircleCI config.yml the operator holds, show which jobs a branch or tag would run and in what order, produce the processed config or API v2 shapes, or summarize CircleCI run records and JUnit reports the operator downloaded",
+  "avoidWhen": "Running a job, triggering a pipeline, reading from circleci.com or a VCS, resolving orbs, or presenting kumitate's plan as CircleCI's own result",
+  "inputs": {
+    "config": ".circleci/config.yml text, version 2.1 (<= 5 MiB)",
+    "branch_tag": "the branch or tag the pipeline is for, and pipeline parameter values",
+    "text": "run records: CircleCI API v2 items pages or kumitate.runs.v1 JSON",
+    "reports": "JUnit XML texts, one a run"
+  },
+  "outputs": {
+    "check": "valid, errors and warnings with named codes (yaml/, config/, plan/, expr/, regex/)",
+    "plan": "workflows that run, job levels, parallel jobs and containers, skipped jobs with reasons",
+    "yaml": "the processed config (config-process shape)",
+    "api": "Pipeline, Workflow and Job objects in the API v2 shape",
+    "summary": "status counts, failed jobs, success rate and mean duration per job, flaky jobs and tests, slowest tests"
+  },
+  "effects": [
+    "network-loopback-listen"
+  ],
+  "authority": {
+    "grants": false,
+    "default": "blocked",
+    "binding": "caller-authorized profile mcp_servers entry pointing at a server the owner started, and an owner-reviewed effective tool allowlist"
+  },
+  "validation": {
+    "catalog": "schema-checked",
+    "runtime": "protocol-tested 2026-10-23: tools/list and tools/call (kumitate_plan) over Streamable HTTP with the itonami-agent HTTP MCP client (kotoba-lang/itonami-agent 0c05574, src/itonami/agent/mcp_http_client.mjs) against the native aarch64-linux image in podman; curl checks of 405, 403, 404 and 202; the Kotoba gate 18/18 and fixture selftest 75/75 on aarch64-linux and x86_64-linux (docs/evidence/kotoba-selfhost-gate-20261023.edn); no model-driven agent turn, no deployed profile",
+    "live": false
+  },
+  "compatibilityNote": "Hermes storage format only. itonami-agent exposes the tools as mcp__kumitate__<tool>. The server is a loaderless static image; the owner starts it with KEXE_ALLOW=37,38,39,43,44,46,47 and KEXE_CAP_RESOURCES_43 naming the one address it may listen on. No stdio transport yet (kotoba-lang/amu#1516). Format and semantics compatibility only; no connection to circleci.com.",
+  "requires": [
+    "Owner-built kumitate native image (README \"Kotoba gate\", amu selfhost root 1739f52f...) on aarch64-linux or x86_64-linux, or in an arm64/amd64 Linux VM",
+    "The owner starting `kumitate serve 127.0.0.1:8787` with the listen grant"
+  ],
+  "launchResolution": {
+    "placeholder": "http://127.0.0.1:8787/mcp",
+    "behavior": "The server is not launched by the client. The owner starts it on a loopback address of their choice and writes that address as the url of the profile's mcp_servers entry; only POST /mcp is served, and a non-localhost Origin is refused."
+  }
+}
