@@ -35,6 +35,9 @@ python scripts/build_api_catalog.py --clones ~/github/kotoba-lang --refresh   # 
 python scripts/build_index.py && python scripts/validate.py
 ```
 
+Origin domains come from the owner's record. Run `python scripts/extract_origin_domains.py --checkout <com-junkawasaki/root clone> --commit <sha>`,
+then rerun the generator. Never add a domain by hand or derive one from a name.
+
 To link an API entry to the itonami dapp that implements or consumes the shape, add an item to
 `catalogs/api-relations.json` with its evidence (a pinned URL or PR), then rerun the generator
 without `--refresh`.

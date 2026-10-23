@@ -35,6 +35,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ORG = 'kotoba-lang'
 CLASSIFICATION = 'catalogs/api-classification.json'
 RELATIONS = 'catalogs/api-relations.json'
+ORIGINS = 'catalogs/origin-domains.json'
 SCHEMA_VERSION = 'itonami.api-classification.v1'
 METHOD = ('GitHub GraphQL default-branch commit, visibility, archive state and license (read-only), '
           'recorded as the pin; manifest.json and the digested files are read from the pinned commit '
@@ -155,7 +156,7 @@ def strings(value):
     return isinstance(value, list) and all(isinstance(v, str) and v for v in value)
 
 
-def api_entry(name, pin, manifest, files, relations):
+def api_entry(name, pin, manifest, files, relations, origins=None):
     api = (manifest.get('capabilities') or {}).get('api') or {}
     routes = routes_of(api)
     kind = manifest['kind']
@@ -163,7 +164,13 @@ def api_entry(name, pin, manifest, files, relations):
                  'entities': manifest['entities'], 'routeCount': len(routes), 'routes': routes}
     if isinstance(api.get('endpointCount'), int):
         entry_api['declaredEndpointCount'] = api['endpointCount']
-    origin = {'status': 'unverified'}
+    recorded_origin = (origins or {}).get(name)
+    if recorded_origin:
+        origin = {'status': 'recorded', 'domain': recorded_origin['domain'],
+                  'reverseDomain': recorded_origin['reverseDomain'], 'record': ORIGINS,
+                  'nameMatchesDomain': recorded_origin['nameMatchesDomain']}
+    else:
+        origin = {'status': 'unverified'}
     vendor = manifest.get('verified') or {}
     if kind == 'compat' and vendor.get('source'):
         entry_api['vendorSource'] = {'declared': vendor['source'], 'verifiedAt': vendor.get('verifiedAt'),
@@ -174,7 +181,7 @@ def api_entry(name, pin, manifest, files, relations):
     if kind == 'client' and upstream:
         entry_api['upstream'] = {k: upstream[k] for k in ['vendor', 'api', 'docs', 'verifiedAt', 'verifiedAgainst'] if isinstance(upstream.get(k), str)}
         origin['sourceHost'] = host(upstream.get('api'))
-    origin = {k: v for k, v in origin.items() if v}
+    origin = {k: v for k, v in origin.items() if v is not None}
     entry_api['origin'] = origin
     entry_api = {k: v for k, v in entry_api.items() if v is not None}
     actor = {k: manifest[k] for k in ['handle', 'did', 'runtime', 'exec', 'wasmCid', 'wasmProvenance', 'schema']
@@ -182,8 +189,9 @@ def api_entry(name, pin, manifest, files, relations):
     actor['basis'] = 'asserted-by-source-manifest'
     rel = relations.get(name, {})
     version = '1.0.0+' + pin['commit'][:12]
-    if rel:
-        version += '.rel' + hashlib.sha256(json.dumps(rel, sort_keys=True).encode()).hexdigest()[:8]
+    overlay = {k: v for k, v in [('relations', rel), ('origin', recorded_origin)] if v}
+    if overlay:  # curated data merged into the entry changes its version too
+        version += '.x' + hashlib.sha256(json.dumps(overlay, sort_keys=True).encode()).hexdigest()[:8]
     tags = [kind] + ([manifest['tier']] if isinstance(manifest.get('tier'), str) else [])
     entry = {
         'schemaVersion': '1', 'type': 'api', 'id': name,
@@ -207,7 +215,7 @@ def api_entry(name, pin, manifest, files, relations):
     return entry
 
 
-def classify(name, pin, clones, relations):
+def classify(name, pin, clones, relations, origins=None):
     """(row, entry-or-None) for one public repository at its pinned commit."""
     row = {'repository': f'{ORG}/{name}', 'family': family(name), 'commit': pin['commit'],
            'license': pin['license'], 'archived': pin['archived']}
@@ -253,8 +261,16 @@ def classify(name, pin, clones, relations):
         data = blob(clone, pin['commit'], path)
         if data is not None:
             digested.append({'path': path, 'sha256': hashlib.sha256(data).hexdigest(), 'bytes': len(data)})
-    entry = api_entry(name, pin, manifest, digested, relations)
+    entry = api_entry(name, pin, manifest, digested, relations, origins)
     return dict(row, **{'class': 'api', 'entry': f'api/{name}'}), entry
+
+
+def load_origins(root):
+    """{api id: origin fact} from the public origin-domain extract (scripts/extract_origin_domains.py)."""
+    path = root / ORIGINS
+    if not path.exists():
+        return {}
+    return {e['api']: e for e in json.loads(path.read_text())['entries']}
 
 
 def load_relations(root):
@@ -269,6 +285,7 @@ def load_relations(root):
 
 def build(root, clones, refresh, observed_on):
     relations = load_relations(root)
+    origins = load_origins(root)
     if refresh:
         public, private, no_branch = observe()
         private_count = len(private)
@@ -278,13 +295,16 @@ def build(root, clones, refresh, observed_on):
         public, private_count, observed_on = recorded(root)
     rows, entries = [], {}
     for name in sorted(public):
-        row, entry = classify(name, public[name], clones, relations)
+        row, entry = classify(name, public[name], clones, relations, origins)
         rows.append(row)
         if entry:
             entries[name] = entry
     unknown = sorted(set(relations) - set(entries))
     if unknown:
         raise ValueError(f'Relations name no api entry: {unknown}')
+    orphan = sorted(set(origins) - set(entries))
+    if orphan:
+        raise ValueError(f'Origin extract names no api entry: {orphan}')
     by_class = {c: 0 for c in ['api', 'skill', 'profile', 'bot', 'unclassified']}
     by_reason, by_family = {}, {}
     for r in rows:

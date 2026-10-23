@@ -102,6 +102,34 @@ class ApiCatalogTests(unittest.TestCase):
     def test_counts_must_agree(self):
         self.refused('catalogs/api-classification.json', lambda d: d['counts']['byClass'].update(api=1), 'count mismatch')
 
+    def test_recorded_origin_comes_from_the_extract(self):
+        m = json.loads((self.root / 'apis/com-stripe/manifest.json').read_text())
+        self.assertEqual((m['api']['origin']['status'], m['api']['origin']['reverseDomain']), ('recorded', 'com.stripe'))
+        self.assertTrue(m['version'].split('+')[1].startswith(m['pin']['commit'][:12] + '.x'))
+
+    def test_origin_without_extract_fact_refused(self):
+        def change(m):
+            m['api']['origin'] = {'status': 'recorded', 'domain': 'circleci.com', 'reverseDomain': 'com.circleci',
+                                  'record': 'catalogs/origin-domains.json', 'nameMatchesDomain': True}
+        self.refused('apis/com-circleci/manifest.json', change, 'without a fact')
+
+    def test_origin_must_match_extract(self):
+        self.refused('catalogs/origin-domains.json',
+                     lambda d: next(e for e in d['entries'] if e['api'] == 'com-stripe').update(domain='stripe.net', reverseDomain='net.stripe', nameMatchesDomain=False),
+                     'differs from the extract')
+
+    def test_reverse_domain_must_reverse_domain(self):
+        self.refused('catalogs/origin-domains.json',
+                     lambda d: next(e for e in d['entries'] if e['api'] == 'com-stripe').update(reverseDomain='com.stripe.api'),
+                     'reversed domain')
+
+    def test_extract_only_names_api_entries(self):
+        def change(d):
+            d['entries'].append({'api': 'org-ietf-x509', 'repository': 'kotoba-lang/org-ietf-x509', 'domain': 'ietf.org',
+                                 'reverseDomain': 'org.ietf', 'nameMatchesDomain': True})
+            d['count'] += 1
+        self.refused('catalogs/origin-domains.json', change, 'no api entry')
+
     def test_relation_must_resolve(self):
         self.refused('apis/com-circleci/manifest.json', lambda m: m['relations'].update(implementedBy=['mcp/does-not-exist']), 'Unresolved API relation')
 
@@ -129,6 +157,10 @@ class GeneratorUnitTests(unittest.TestCase):
         pin = {'commit': 'a' * 40, 'license': 'MIT', 'archived': False}
         e = api_entry('com-example', pin, manifest, [{'path': 'manifest.json', 'sha256': 'b' * 64, 'bytes': 1}], {})
         self.assertEqual(e['api']['origin'], {'status': 'unverified'})
+        fact = {'domain': 'example.com', 'reverseDomain': 'com.example', 'nameMatchesDomain': True}
+        e2 = api_entry('com-example', pin, manifest, [{'path': 'manifest.json', 'sha256': 'b' * 64, 'bytes': 1}], {}, {'com-example': fact})
+        self.assertEqual(e2['api']['origin']['status'], 'recorded')
+        self.assertNotEqual(e2['version'], e['version'])
         self.assertEqual(e['status']['vendorConformance'], 'not-claimed')
 
 

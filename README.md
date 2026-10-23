@@ -58,7 +58,7 @@ What an entry records:
 - the actor's DID and Wasm CID, as asserted by the source;
 - the pinned commit, with sha256 for each of the owner's files.
 
-What it does not claim: the shape is not runtime-qualified, nothing is executed, the CID is not verified, and no authority is granted. A reverse domain (`com.circleci`) is shown only when a public domain record supports it, so today every entry is `unverified`.
+What it does not claim: the shape is not runtime-qualified, nothing is executed, the CID is not verified, and no authority is granted. A reverse domain (for example `com.stripe`) is shown only when the public origin-domain extract ([catalogs/origin-domains.json](catalogs/origin-domains.json), ADR 0005 amendment 1) records it: 102 entries are `recorded` and 926 remain `unverified`.
 
 [catalogs/api-classification.json](catalogs/api-classification.json) classifies all 1,090 repositories in the AWAI-59 target set (`com-*`, dotted names, `cloud-*`):
 - 1,028 are `api` entries.
