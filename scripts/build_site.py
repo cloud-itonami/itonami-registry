@@ -73,7 +73,7 @@ def install_hint(row, detail):
     if t == 'api':
         pin = detail['manifest']['pin']
         return {'itonami': (f"Shape reference only; nothing to install or run. Read manifest.json at "
-                            f"https://github.com/{pin['repository']}/blob/{pin['commit']}/manifest.json and "
+                            f"https://github.com/{pin['repository']}/blob/{pin['commit']}/{pin.get('path', '').rstrip('/') + '/' if pin.get('path') else ''}manifest.json and "
                             f"verify its sha256 against this entry.")}
     return {}
 

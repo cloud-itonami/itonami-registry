@@ -36,6 +36,8 @@ ORG = 'kotoba-lang'
 CLASSIFICATION = 'catalogs/api-classification.json'
 RELATIONS = 'catalogs/api-relations.json'
 ORIGINS = 'catalogs/origin-domains.json'
+COMPAT_SOURCES = 'catalogs/compat-sources.json'
+REGISTRY = 'cloud-itonami/itonami-registry'
 SCHEMA_VERSION = 'itonami.api-classification.v1'
 METHOD = ('GitHub GraphQL default-branch commit, visibility, archive state and license (read-only), '
           'recorded as the pin; manifest.json and the digested files are read from the pinned commit '
@@ -156,7 +158,19 @@ def strings(value):
     return isinstance(value, list) and all(isinstance(v, str) and v for v in value)
 
 
-def api_entry(name, pin, manifest, files, relations, origins=None):
+def load_internalized(root):
+    """{name: origin commit} and the registry commit for compat actors whose origin repository was
+    retired into compat/<name>/ (ADR 0006); their pins point at that registry commit."""
+    path = root / COMPAT_SOURCES
+    if not path.exists():
+        return {}, None
+    doc = json.loads(path.read_text())
+    if not doc.get('originRetired'):
+        return {}, None
+    return {s['slug']: s['commit'] for s in doc['sources']}, doc['registryCommit']
+
+
+def api_entry(name, pin, manifest, files, relations, origins=None, internal=None):
     api = (manifest.get('capabilities') or {}).get('api') or {}
     routes = routes_of(api)
     kind = manifest['kind']
@@ -188,7 +202,7 @@ def api_entry(name, pin, manifest, files, relations, origins=None):
              if isinstance(manifest.get(k), str)}
     actor['basis'] = 'asserted-by-source-manifest'
     rel = relations.get(name, {})
-    version = '1.0.0+' + pin['commit'][:12]
+    version = '1.0.0+' + pin['commit'][:12]  # always the origin commit, also once internalized
     overlay = {k: v for k, v in [('relations', rel), ('origin', recorded_origin)] if v}
     if overlay:  # curated data merged into the entry changes its version too
         version += '.x' + hashlib.sha256(json.dumps(overlay, sort_keys=True).encode()).hexdigest()[:8]
@@ -199,12 +213,17 @@ def api_entry(name, pin, manifest, files, relations, origins=None):
         'version': version,
         'description': manifest.get('description') if isinstance(manifest.get('description'), str) and manifest['description'] else f'{kind} API shape declared by {ORG}/{name}',
         'author': ORG, 'license': pin['license'], 'tags': tags,
-        'source': f"https://github.com/{ORG}/{name}/tree/{pin['commit']}",
+        'source': (f"https://github.com/{REGISTRY}/tree/{internal}/compat/{name}" if internal
+                   else f"https://github.com/{ORG}/{name}/tree/{pin['commit']}"),
         'compatibility': {'hermes': 'none', 'itonami': '*'},
         'api': entry_api,
         'actor': actor,
-        'pin': {'repository': f'{ORG}/{name}', 'commit': pin['commit'], 'visibility': 'public',
-                'archived': pin['archived'], 'digestStatus': 'verified', 'files': files},
+        'pin': ({'repository': REGISTRY, 'commit': internal, 'path': f'compat/{name}', 'visibility': 'public',
+                 'archived': False, 'digestStatus': 'verified', 'files': files,
+                 'origin': {'repository': f'{ORG}/{name}', 'commit': pin['commit'], 'archived': True, 'state': 'deleted'}}
+                if internal else
+                {'repository': f'{ORG}/{name}', 'commit': pin['commit'], 'visibility': 'public',
+                 'archived': pin['archived'], 'digestStatus': 'verified', 'files': files}),
         'status': {'shape': 'declared-by-source-manifest',
                    'vendorConformance': 'claimed-by-source' if 'vendorSource' in entry_api or 'upstream' in entry_api else 'not-claimed',
                    'runtimeQualified': False, 'artifactVerified': False, 'execution': 'none',
@@ -215,17 +234,20 @@ def api_entry(name, pin, manifest, files, relations, origins=None):
     return entry
 
 
-def classify(name, pin, clones, relations, origins=None):
+def classify(name, pin, clones, relations, origins=None, internal=None, root=ROOT):
     """(row, entry-or-None) for one public repository at its pinned commit."""
     row = {'repository': f'{ORG}/{name}', 'family': family(name), 'commit': pin['commit'],
            'license': pin['license'], 'archived': pin['archived']}
-    clone = clones / name
-    if not has_commit(clone, pin['commit']):
+    clone, rev, prefix = clones / name, pin['commit'], ''
+    if internal:  # retired origin: read the same files from compat/<name>/ at the registry commit
+        clone, rev, prefix = root, internal, f'compat/{name}/'
+        row['retiredTo'] = {'repository': REGISTRY, 'commit': internal, 'path': f'compat/{name}'}
+    if not has_commit(clone, rev):
         return dict(row, **{'class': 'unclassified', 'reason': 'commit-not-available-locally'}), None
-    files = tree(clone, pin['commit']) or []
+    files = tree(clone, f'{rev}:{prefix.rstrip("/")}' if prefix else rev) or []
     markers = sorted(p for p in files if re.search(r'(^|/)SKILL\.md$', p) or re.search(r'(^|/)hermes/profiles/[^/]+/SOUL\.md$', p)
                      or p.endswith('.itonami/profile.edn'))
-    raw = blob(clone, pin['commit'], 'manifest.json')
+    raw = blob(clone, rev, prefix + 'manifest.json')
     if raw is None:
         if markers:
             return dict(row, **{'class': 'unclassified', 'reason': 'registry-marker-needs-review', 'evidence': markers[:5]}), None
@@ -258,10 +280,10 @@ def classify(name, pin, clones, relations, origins=None):
     if safe_path(manifest.get('schema')):
         wanted.append(manifest['schema'])
     for path in sorted(set(wanted)):
-        data = blob(clone, pin['commit'], path)
+        data = blob(clone, rev, prefix + path)
         if data is not None:
             digested.append({'path': path, 'sha256': hashlib.sha256(data).hexdigest(), 'bytes': len(data)})
-    entry = api_entry(name, pin, manifest, digested, relations, origins)
+    entry = api_entry(name, pin, manifest, digested, relations, origins, internal)
     return dict(row, **{'class': 'api', 'entry': f'api/{name}'}), entry
 
 
@@ -293,9 +315,14 @@ def build(root, clones, refresh, observed_on):
             print(f'not classified (no default branch, unreadable): {no_branch}', file=sys.stderr)
     else:
         public, private_count, observed_on = recorded(root)
+    retired, registry_commit = load_internalized(root)
+    prior = {e['repository'].split('/', 1)[1]: e for e in json.loads((root / CLASSIFICATION).read_text())['entries']}
+    for name, commit in retired.items():  # origin repositories no longer exist (or are about to): pin from the record
+        public[name] = {'commit': commit, 'license': prior[name]['license'], 'archived': True, 'private': False}
     rows, entries = [], {}
     for name in sorted(public):
-        row, entry = classify(name, public[name], clones, relations, origins)
+        row, entry = classify(name, public[name], clones, relations, origins,
+                              registry_commit if name in retired else None, root)
         rows.append(row)
         if entry:
             entries[name] = entry

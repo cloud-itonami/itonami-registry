@@ -71,6 +71,20 @@ class ApiCatalogTests(unittest.TestCase):
     def test_source_must_match_pin(self):
         self.refused('apis/com-circleci/manifest.json', lambda m: m['pin'].update(commit='0' * 40), 'differs from its pin')
 
+    def test_compat_pin_resolves_inside_this_registry(self):
+        m = json.loads((self.root / 'apis/com-circleci/manifest.json').read_text())
+        self.assertEqual((m['pin']['repository'], m['pin']['path']), ('cloud-itonami/itonami-registry', 'compat/com-circleci'))
+        self.assertEqual(m['pin']['origin']['repository'], 'kotoba-lang/com-circleci')
+        self.assertTrue(m['version'].startswith('1.0.0+' + m['pin']['origin']['commit'][:12]))
+
+    def test_internalized_pin_needs_its_origin(self):
+        self.refused('apis/com-circleci/manifest.json', lambda m: m['pin'].pop('origin'), 'path and origin')
+
+    def test_internalized_pin_must_match_classification(self):
+        self.refused('catalogs/api-classification.json',
+                     lambda d: [r.update(retiredTo=dict(r['retiredTo'], commit='0' * 40)) for r in d['entries'] if r['repository'] == 'kotoba-lang/com-circleci'],
+                     'differs from its classification row')
+
     def test_conformance_claim_must_follow_source(self):
         self.refused('apis/com-circleci/manifest.json', lambda m: m['status'].update(vendorConformance='not-claimed'), 'vendor conformance')
 
@@ -105,7 +119,7 @@ class ApiCatalogTests(unittest.TestCase):
     def test_recorded_origin_comes_from_the_extract(self):
         m = json.loads((self.root / 'apis/com-stripe/manifest.json').read_text())
         self.assertEqual((m['api']['origin']['status'], m['api']['origin']['reverseDomain']), ('recorded', 'com.stripe'))
-        self.assertTrue(m['version'].split('+')[1].startswith(m['pin']['commit'][:12] + '.x'))
+        self.assertTrue(m['version'].split('+')[1].startswith(m['pin'].get('origin', m['pin'])['commit'][:12] + '.x'))
 
     def test_origin_without_extract_fact_refused(self):
         def change(m):
