@@ -1,0 +1,767 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "circleci-compat",
+  "did": "did:web:etzhayyim.com:actor:circleci-compat",
+  "kind": "compat",
+  "title": "circleci clean-room actor",
+  "description": "Clean-room, API-compatible DevOps / CI-CD actor (circleci); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreihjjy5csbczgic3uyy5h2mftvrar6bsbljzvz2uuksp3f7ocqx4ve",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreihjjy5csbczgic3uyy5h2mftvrar6bsbljzvz2uuksp3f7ocqx4ve",
+  "schema": "schema/circleci.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://circleci.com/api/v2/openapi.json",
+    "verifiedAt": "2026-06-09",
+    "resources": [
+      "Pipeline",
+      "Workflow",
+      "Job",
+      "Project",
+      "User"
+    ],
+    "enums": {
+      "Pipeline": {
+        "state": [
+          "created",
+          "errored",
+          "setup-pending",
+          "setup",
+          "pending"
+        ]
+      },
+      "Workflow": {
+        "status": [
+          "success",
+          "canceled",
+          "error",
+          "failed",
+          "failing",
+          "not_run",
+          "on_hold",
+          "running",
+          "unauthorized"
+        ]
+      },
+      "Job": {
+        "status": [
+          "success",
+          "running",
+          "not_run",
+          "failed",
+          "retried",
+          "queued",
+          "not_running",
+          "infrastructure_fail",
+          "timedout",
+          "on_hold",
+          "terminated-unknown",
+          "blocked",
+          "canceled",
+          "unauthorized"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "Pipeline",
+    "Workflow",
+    "Job",
+    "Project",
+    "User"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 25,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/pipelines",
+          "op": "create Pipeline"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/pipelines",
+          "op": "list Pipeline"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/pipelines/{id}",
+          "op": "get Pipeline"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/pipelines/{id}",
+          "op": "update Pipeline"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/pipelines/{id}",
+          "op": "delete Pipeline"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/workflows",
+          "op": "create Workflow"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/workflows",
+          "op": "list Workflow"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/workflows/{id}",
+          "op": "get Workflow"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/workflows/{id}",
+          "op": "update Workflow"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/workflows/{id}",
+          "op": "delete Workflow"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/jobs",
+          "op": "create Job"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/jobs",
+          "op": "list Job"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/jobs/{id}",
+          "op": "get Job"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/jobs/{id}",
+          "op": "update Job"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/jobs/{id}",
+          "op": "delete Job"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/projects",
+          "op": "create Project"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/projects",
+          "op": "list Project"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/projects/{id}",
+          "op": "get Project"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/projects/{id}",
+          "op": "update Project"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/projects/{id}",
+          "op": "delete Project"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/users",
+          "op": "create User"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/users",
+          "op": "list User"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/users/{id}",
+          "op": "get User"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/users/{id}",
+          "op": "update User"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/users/{id}",
+          "op": "delete User"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "circleci-compat",
+            "purl": "pkg:etzhayyim/circleci-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "circleci.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 25,
+      "tools": [
+        {
+          "name": "create_pipeline",
+          "description": "Create a Pipeline.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "number": {
+                "type": "integer"
+              },
+              "state": {
+                "type": "string"
+              },
+              "projectSlug": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "number"
+            ]
+          }
+        },
+        {
+          "name": "list_pipelines",
+          "description": "List Pipelines.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_pipeline",
+          "description": "Get a Pipeline by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_pipeline",
+          "description": "Update a Pipeline.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "number": {
+                "type": "integer"
+              },
+              "state": {
+                "type": "string"
+              },
+              "projectSlug": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_pipeline",
+          "description": "Delete a Pipeline.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_workflow",
+          "description": "Create a Workflow.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "pipelineId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "startedBy": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "stoppedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          }
+        },
+        {
+          "name": "list_workflows",
+          "description": "List Workflows.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_workflow",
+          "description": "Get a Workflow by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_workflow",
+          "description": "Update a Workflow.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "pipelineId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "startedBy": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "stoppedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_workflow",
+          "description": "Delete a Workflow.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_job",
+          "description": "Create a Job.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "jobNumber": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "duration": {
+                "type": "integer"
+              },
+              "workflowId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "stoppedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "jobNumber"
+            ]
+          }
+        },
+        {
+          "name": "list_jobs",
+          "description": "List Jobs.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_job",
+          "description": "Get a Job by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_job",
+          "description": "Update a Job.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "jobNumber": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "duration": {
+                "type": "integer"
+              },
+              "workflowId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "stoppedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_job",
+          "description": "Delete a Job.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_project",
+          "description": "Create a Project.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "externalUrl": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "slug"
+            ]
+          }
+        },
+        {
+          "name": "list_projects",
+          "description": "List Projects.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_project",
+          "description": "Get a Project by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_project",
+          "description": "Update a Project.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "externalUrl": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_project",
+          "description": "Delete a Project.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_user",
+          "description": "Create a User.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "login": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "avatarUrl": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "login"
+            ]
+          }
+        },
+        {
+          "name": "list_users",
+          "description": "List Users.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_user",
+          "description": "Get a User by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_user",
+          "description": "Update a User.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "login": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "avatarUrl": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_user",
+          "description": "Delete a User.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
