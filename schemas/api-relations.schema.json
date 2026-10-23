@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Itonami api relations",
+  "description": "Curated links from api entries to registry entries that implement or consume the same shape (ADR 0005). A link is a reviewed declaration, not a conformance qualification.",
+  "type": "object",
+  "required": ["schemaVersion", "note", "relations"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {"const": "itonami.api-relations.v1"},
+    "note": {"type": "string"},
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["api", "evidence"],
+        "additionalProperties": false,
+        "properties": {
+          "api": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{0,99}$"},
+          "implementedBy": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^([a-z0-9-]+/)?(agent|mcp|profile|skill|workflow)/[A-Za-z0-9][A-Za-z0-9._-]*$"}},
+          "consumedBy": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^([a-z0-9-]+/)?(agent|mcp|profile|skill|workflow)/[A-Za-z0-9][A-Za-z0-9._-]*$"}},
+          "evidence": {"type": "string", "minLength": 1, "description": "Pinned URL or PR that states the relation."}
+        }
+      }
+    }
+  }
+}

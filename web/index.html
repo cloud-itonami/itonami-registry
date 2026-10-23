@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Itonami Registry</title>
-<meta name="description" content="Itonami profiles, agents, skills, MCP servers and workflows — with the Hermes registry federated in. Every entry pinned to a commit and a checksum.">
+<meta name="description" content="Itonami profiles, agents, skills, MCP servers, workflows and API shapes — with the Hermes registry federated in. Every entry pinned to a commit and a checksum.">
 <style>
 /* Layout: a catalog list on the left, the selected entry on the right (stacked on phones). */
 :root {
@@ -51,7 +51,7 @@ footer { max-width: 1200px; margin: 0 auto; padding: 0 20px 32px; color: var(--m
 <body>
 <header>
   <h1>Itonami Registry</h1>
-  <p>Itonami profile（= Hermes profile）・agent・skill・MCP・workflow のレジストリ。Hermes registry を同じ形で取り込み、すべての項目を commit と checksum に固定しています。登録は権限を与えず、何も起動しません。</p>
+  <p>Itonami profile（= Hermes profile）・agent・skill・MCP・workflow・API のレジストリ。Hermes registry を同じ形で取り込み、すべての項目を commit と checksum に固定しています。登録は権限を与えず、何も起動しません。</p>
 </header>
 <div class="bar">
   <input type="search" id="q" placeholder="検索（名前・説明・タグ）" aria-label="検索">
@@ -64,8 +64,8 @@ footer { max-width: 1200px; margin: 0 auto; padding: 0 20px 32px; color: var(--m
 </main>
 <footer id="foot"></footer>
 <script>
-const TYPES = ['profile', 'agent', 'skill', 'mcp', 'workflow'];
-const LABEL = {profile: 'Itonami profile', agent: 'Agent', skill: 'Skill', mcp: 'MCP', workflow: 'Workflow'};
+const TYPES = ['profile', 'agent', 'skill', 'mcp', 'workflow', 'api'];
+const LABEL = {profile: 'Itonami profile', agent: 'Agent', skill: 'Skill', mcp: 'MCP', workflow: 'Workflow', api: 'API'};
 const state = {q: '', type: 'all', registry: 'all', entries: [], current: null};
 const $ = (s) => document.querySelector(s);
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
@@ -123,6 +123,16 @@ async function show(e) {
   if (prof) {
     add('profile', `${prof.repository}/${prof.path}`); add('commit', prof.commit); add('tree checksum', prof.checksum);
     add('files', prof.files.map((f) => f.path).join(', '));
+  }
+  const api = data.manifest && data.manifest.type === 'api' && data.manifest;
+  if (api) {
+    add('repository', `${api.pin.repository} @ ${api.pin.commit.slice(0, 12)}`);
+    add('shape', `${api.api.kind}${api.api.tier ? ' ' + api.api.tier : ''} · ${api.api.routeCount} routes · ${api.api.entities.join(', ')}`);
+    if (api.api.vendorSource) add('vendor source（source の申告）', api.api.vendorSource.declared);
+    add('status', '形だけの登録。runtime 未検証、実行なし、権限付与なし');
+    const rel = [...api.relations.implementedBy.map((r) => `implemented by ${r}`), ...api.relations.consumedBy.map((r) => `consumed by ${r}`)];
+    if (rel.length) add('relations', rel.join(', '));
+    add('files', api.pin.files.map((f) => f.path).join(', '));
   }
   if (data.resolve) add('upstream', `${data.resolve.repository} @ ${data.resolve.commit.slice(0, 7)}`);
   const link = el('a', null, 'フォルダを開く'); link.href = entry.folder; link.target = '_blank'; link.rel = 'noopener';
