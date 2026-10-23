@@ -46,7 +46,7 @@ Start at [llms.txt](llms.txt), then [llms-full.txt](llms-full.txt). The public d
 
 Skills use SKILL.md frontmatter; MCPs, agents and workflows use Hermes manifest shapes. itonami.json contains supplemental inputs, effects and authority requirements. Wildcard Hermes/desktop version fields express no declared version filter; only catalog format has been checked. Runtime installation compatibility has not been qualified. workflow.json uses an Itonami recipe schema and requires a compatible reader; it is not a proven Hermes executable workflow.
 
-[catalogs/tools.json](catalogs/tools.json) indexes eight Murakumo MCP tools, four portable user-test MCP tools, one native fleet catalog tool, two mihari, five dandori and eleven kaikei itonami dapp tools, three plugin-hermes tools and three ZAP plugin tools, with provider identity and input contracts. [catalogs/sources.json](catalogs/sources.json) records pinned derivation inputs and file hashes. Tool discovery is not a successful live invocation.
+[catalogs/tools.json](catalogs/tools.json) indexes eight Murakumo MCP tools, four portable user-test MCP tools, one native fleet catalog tool, two mihari, five dandori, eleven kaikei and eight kumitate itonami dapp tools, three plugin-hermes tools and three ZAP plugin tools, with provider identity and input contracts. [catalogs/sources.json](catalogs/sources.json) records pinned derivation inputs and file hashes. Tool discovery is not a successful live invocation.
 
 ## API registry
 
@@ -80,8 +80,12 @@ Regenerate with `python scripts/build_api_catalog.py --clones <dir of kotoba-lan
 | skill | itonami-ledger-statements | Build statements from journal exports an operator already holds with the kaikei tools |
 | skill | itonami-invoices | Draft, import, check and post invoices with the kaikei tools, without the NTA or any invoicing service |
 | skill | itonami-statement-reconciliation | Reconcile downloaded bank, card and expense statements and post only approved lines with the kaikei tools, without any bank or expense service |
+| mcp | kumitate | CircleCI-compatible config checks, processed pipeline (matrix, filters, requires DAG), config-process YAML, API v2 shapes, run-record and JUnit summaries ([app-itonami-kumitate](https://github.com/cloud-itonami/app-itonami-kumitate)) |
+| skill | itonami-circleci-pipeline-planning | Check a config.yml an operator holds and explain which jobs a branch or tag runs, with the kumitate tools |
 
-The three servers are stdio MCP servers whose tools are pure functions over the passed text. They contact no vendor (sentry.io, linear.app, MoneyForward, freee, Yayoi, QuickBooks Online, Xero, Zoho, FreshBooks, Ramp, Brex, Expensify or BILL), bank, card issuer or the NTA, make no payment, and store nothing. mihari and dandori are recorded in catalogs/targeted-public-sources.json because those repositories postdate the 2026-10-10 inventory. kaikei's registrations sit on its existing inventory row, with their own source commit. Registration adds none of them to a profile.
+mihari, dandori and kaikei are stdio MCP servers whose tools are pure functions over the passed text. They contact no vendor (sentry.io, linear.app, MoneyForward, freee, Yayoi, QuickBooks Online, Xero, Zoho, FreshBooks, Ramp, Brex, Expensify or BILL), bank, card issuer or the NTA, make no payment, and store nothing. mihari and dandori are recorded in catalogs/targeted-public-sources.json because those repositories postdate the 2026-10-10 inventory. kaikei's registrations sit on its existing inventory row, with their own source commit. Registration adds none of them to a profile.
+
+kumitate is a native Kotoba program built only with the Amu selfhost compiler. Its owner starts it as a Streamable HTTP MCP server on a loopback address (the native runtime has no stdin yet). Its tools are pure functions over the config, run records or JUnit reports the caller passes. It fetches no orb or CircleCI function, contacts no CircleCI or VCS service, runs no job and stores nothing. catalogs/api-relations.json links the com-circleci API entry to mcp/kumitate (ADR 0005). Registration adds it to no profile.
 
 ## Compat actors
 

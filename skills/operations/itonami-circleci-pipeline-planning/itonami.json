@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "itonami.entry.v1",
+  "sourceRefs": [
+    "app-kumitate"
+  ],
+  "useWhen": "An operator hands over a CircleCI config.yml and asks whether it is valid, which jobs a branch or tag runs and in what order, or hands over run records or JUnit reports and asks what fails or flakes",
+  "avoidWhen": "Running jobs, triggering or cancelling pipelines, reading from circleci.com or a VCS, or presenting kumitate's plan as CircleCI's own result",
+  "inputs": {
+    "config": "the config.yml text the operator provided",
+    "pipeline": "branch or tag, and pipeline parameter values the operator agreed to",
+    "runs": "downloaded API v2 JSON or kumitate.runs.v1",
+    "reports": "JUnit XML texts"
+  },
+  "outputs": {
+    "plan": "validity with named reasons, the jobs that run by level, skipped jobs with reasons, and optional processed YAML, API v2 shapes or local steps",
+    "summary": "failed, flaky and slow jobs and tests"
+  },
+  "effects": [
+    "network-loopback"
+  ],
+  "authority": {
+    "grants": false,
+    "default": "blocked",
+    "binding": "caller authorization; the mcp server must be started by its owner and enabled in the profile"
+  },
+  "validation": {
+    "catalog": "schema-checked",
+    "runtime": "protocol-tested 2026-10-23: tools/list and tools/call over Streamable HTTP with the itonami-agent HTTP MCP client (kotoba-lang/itonami-agent 0c05574) on fixture input; no model-driven agent turn, no deployed profile",
+    "live": false
+  },
+  "compatibilityNote": "Hermes storage format only. The steps call MCP tools by their itonami-agent names (mcp__<server>__<tool>) and assume the server key in mcp_servers is kumitate.",
+  "dependsOn": [
+    "mcp/kumitate"
+  ]
+}
