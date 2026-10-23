@@ -1,0 +1,868 @@
+{
+  "schemaVersion": "1.0",
+  "handle": "patreon-compat",
+  "did": "did:web:etzhayyim.com:actor:patreon-compat",
+  "kind": "compat",
+  "title": "patreon clean-room actor",
+  "description": "Clean-room, API-compatible events / NPO / creator actor (patreon); runs browser-local on IPFS + kotoba-WASM.",
+  "wasmCid": "bafkreihcnigw6v4rwxcnaxq76rtu7k7rof4yayxvs47gvmu6bsg72rt3nu",
+  "wasmProvenance": "built-rust-raw",
+  "runtime": "kotoba-wasm",
+  "exec": "browser-local|donated-mesh",
+  "ipfs": "ipfs://bafkreihcnigw6v4rwxcnaxq76rtu7k7rof4yayxvs47gvmu6bsg72rt3nu",
+  "schema": "schema/patreon.kotoba",
+  "tier": "L5",
+  "verified": {
+    "source": "https://docs.patreon.com/",
+    "verifiedAt": "2026-06-09",
+    "resources": [
+      "User",
+      "Member",
+      "Campaign",
+      "Tier",
+      "Benefit"
+    ],
+    "enums": {
+      "Member": {
+        "patronStatus": [
+          "active_patron",
+          "declined_patron",
+          "former_patron"
+        ],
+        "lastChargeStatus": [
+          "Paid",
+          "Declined",
+          "Deleted",
+          "Pending",
+          "Refunded",
+          "Fraud",
+          "Refunded by Patreon",
+          "Other",
+          "Partially Refunded",
+          "Free Trial",
+          "Refund Pending",
+          "Refund Declined"
+        ]
+      }
+    }
+  },
+  "entities": [
+    "User",
+    "Member",
+    "Campaign",
+    "Tier",
+    "Benefit"
+  ],
+  "adr": [
+    "260607",
+    "2606014500",
+    "2606013800",
+    "2606036000"
+  ],
+  "capabilities": {
+    "api": {
+      "type": "rest",
+      "runtime": "kotoba-wasm",
+      "endpointCount": 25,
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/v1/users",
+          "op": "create User"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/users",
+          "op": "list User"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/users/{id}",
+          "op": "get User"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/users/{id}",
+          "op": "update User"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/users/{id}",
+          "op": "delete User"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/members",
+          "op": "create Member"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/members",
+          "op": "list Member"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/members/{id}",
+          "op": "get Member"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/members/{id}",
+          "op": "update Member"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/members/{id}",
+          "op": "delete Member"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/campaigns",
+          "op": "create Campaign"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/campaigns",
+          "op": "list Campaign"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/campaigns/{id}",
+          "op": "get Campaign"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/campaigns/{id}",
+          "op": "update Campaign"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/campaigns/{id}",
+          "op": "delete Campaign"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/tiers",
+          "op": "create Tier"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/tiers",
+          "op": "list Tier"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/tiers/{id}",
+          "op": "get Tier"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/tiers/{id}",
+          "op": "update Tier"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/tiers/{id}",
+          "op": "delete Tier"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/benefits",
+          "op": "create Benefit"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/benefits",
+          "op": "list Benefit"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/benefits/{id}",
+          "op": "get Benefit"
+        },
+        {
+          "method": "PATCH",
+          "path": "/v1/benefits/{id}",
+          "op": "update Benefit"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/benefits/{id}",
+          "op": "delete Benefit"
+        }
+      ],
+      "features": {
+        "pagination": true,
+        "filtering": true,
+        "relationExpansion": true,
+        "strictValidation": true,
+        "contractTest": true
+      },
+      "health": "/healthz"
+    },
+    "supplychain": {
+      "type": "cyclonedx-sbom",
+      "runtime": "kotoba-wasm",
+      "sbom": "manifest:supplychain.sbom",
+      "sbomData": {
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.5",
+        "metadata": {
+          "component": {
+            "type": "application",
+            "name": "patreon-compat",
+            "purl": "pkg:etzhayyim/patreon-compat"
+          }
+        },
+        "components": [
+          {
+            "type": "library",
+            "name": "kotoba",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotoba"
+          },
+          {
+            "type": "library",
+            "name": "kotodama-wasm",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/kotodama-wasm"
+          },
+          {
+            "type": "library",
+            "name": "datomic-client",
+            "scope": "required",
+            "purl": "pkg:etzhayyim/datomic-client"
+          }
+        ]
+      },
+      "adr": [
+        "2606036000"
+      ]
+    },
+    "socialpost": {
+      "type": "datom-event-feed",
+      "runtime": "kotoba-wasm",
+      "lexicon": "app.bsky.feed.post",
+      "source": "patreon.* Datom events",
+      "mode": "dry-run",
+      "gate": "G8"
+    },
+    "mcp": {
+      "type": "model-context-protocol",
+      "runtime": "kotoba-wasm",
+      "transport": "ipfs+kotoba-wasm",
+      "toolCount": 25,
+      "tools": [
+        {
+          "name": "create_user",
+          "description": "Create a User.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "about": {
+                "type": "string"
+              },
+              "fullName": {
+                "type": "string"
+              },
+              "firstName": {
+                "type": "string"
+              },
+              "lastName": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "isCreator": {
+                "type": "boolean"
+              },
+              "isEmailVerified": {
+                "type": "boolean"
+              },
+              "likeCount": {
+                "type": "integer"
+              },
+              "created": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "about"
+            ]
+          }
+        },
+        {
+          "name": "list_users",
+          "description": "List Users.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_user",
+          "description": "Get a User by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_user",
+          "description": "Update a User.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "about": {
+                "type": "string"
+              },
+              "fullName": {
+                "type": "string"
+              },
+              "firstName": {
+                "type": "string"
+              },
+              "lastName": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "isCreator": {
+                "type": "boolean"
+              },
+              "isEmailVerified": {
+                "type": "boolean"
+              },
+              "likeCount": {
+                "type": "integer"
+              },
+              "created": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_user",
+          "description": "Delete a User.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_member",
+          "description": "Create a Member.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "patronStatus": {
+                "type": "string"
+              },
+              "lastChargeStatus": {
+                "type": "string"
+              },
+              "fullName": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "currentlyEntitledAmountCents": {
+                "type": "integer"
+              },
+              "campaignLifetimeSupportCents": {
+                "type": "integer"
+              },
+              "willPayAmountCents": {
+                "type": "integer"
+              },
+              "isFollower": {
+                "type": "boolean"
+              },
+              "isFreeTrial": {
+                "type": "boolean"
+              },
+              "lastChargeDate": {
+                "type": "string"
+              },
+              "nextChargeDate": {
+                "type": "string"
+              },
+              "pledgeRelationshipStart": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "patronStatus"
+            ]
+          }
+        },
+        {
+          "name": "list_members",
+          "description": "List Members.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_member",
+          "description": "Get a Member by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_member",
+          "description": "Update a Member.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "patronStatus": {
+                "type": "string"
+              },
+              "lastChargeStatus": {
+                "type": "string"
+              },
+              "fullName": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "currentlyEntitledAmountCents": {
+                "type": "integer"
+              },
+              "campaignLifetimeSupportCents": {
+                "type": "integer"
+              },
+              "willPayAmountCents": {
+                "type": "integer"
+              },
+              "isFollower": {
+                "type": "boolean"
+              },
+              "isFreeTrial": {
+                "type": "boolean"
+              },
+              "lastChargeDate": {
+                "type": "string"
+              },
+              "nextChargeDate": {
+                "type": "string"
+              },
+              "pledgeRelationshipStart": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_member",
+          "description": "Delete a Member.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_campaign",
+          "description": "Create a Campaign.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "creationName": {
+                "type": "string"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "patronCount": {
+                "type": "integer"
+              },
+              "payPerName": {
+                "type": "string"
+              },
+              "isMonthly": {
+                "type": "boolean"
+              },
+              "isNsfw": {
+                "type": "boolean"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "publishedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "creationName"
+            ]
+          }
+        },
+        {
+          "name": "list_campaigns",
+          "description": "List Campaigns.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_campaign",
+          "description": "Get a Campaign by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_campaign",
+          "description": "Update a Campaign.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "creationName": {
+                "type": "string"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "patronCount": {
+                "type": "integer"
+              },
+              "payPerName": {
+                "type": "string"
+              },
+              "isMonthly": {
+                "type": "boolean"
+              },
+              "isNsfw": {
+                "type": "boolean"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "publishedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_campaign",
+          "description": "Delete a Campaign.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_tier",
+          "description": "Create a Tier.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "amountCents": {
+                "type": "integer"
+              },
+              "description": {
+                "type": "string"
+              },
+              "patronCount": {
+                "type": "integer"
+              },
+              "published": {
+                "type": "boolean"
+              },
+              "requiresShipping": {
+                "type": "boolean"
+              },
+              "title": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "amountCents"
+            ]
+          }
+        },
+        {
+          "name": "list_tiers",
+          "description": "List Tiers.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_tier",
+          "description": "Get a Tier by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_tier",
+          "description": "Update a Tier.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "amountCents": {
+                "type": "integer"
+              },
+              "description": {
+                "type": "string"
+              },
+              "patronCount": {
+                "type": "integer"
+              },
+              "published": {
+                "type": "boolean"
+              },
+              "requiresShipping": {
+                "type": "boolean"
+              },
+              "title": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_tier",
+          "description": "Delete a Tier.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "create_benefit",
+          "description": "Create a Benefit.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "benefitType": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "isDeleted": {
+                "type": "boolean"
+              },
+              "isPublished": {
+                "type": "boolean"
+              },
+              "title": {
+                "type": "string"
+              },
+              "tiersCount": {
+                "type": "integer"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "benefitType"
+            ]
+          }
+        },
+        {
+          "name": "list_benefits",
+          "description": "List Benefits.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_benefit",
+          "description": "Get a Benefit by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "update_benefit",
+          "description": "Update a Benefit.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "benefitType": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "isDeleted": {
+                "type": "boolean"
+              },
+              "isPublished": {
+                "type": "boolean"
+              },
+              "title": {
+                "type": "string"
+              },
+              "tiersCount": {
+                "type": "integer"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "delete_benefit",
+          "description": "Delete a Benefit.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
