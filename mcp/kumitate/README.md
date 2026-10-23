@@ -1,6 +1,6 @@
 # kumitate MCP
 
-MCP server (Streamable HTTP, JSON responses) for [kumitate](https://github.com/cloud-itonami/app-itonami-kumitate), the CircleCI-compatible itonami dapp. kumitate is written in Kotoba and built only with the Amu selfhost compiler, as a loaderless static image for aarch64-linux or x86_64-linux.
+MCP server (stdio, or Streamable HTTP with JSON responses) for [kumitate](https://github.com/cloud-itonami/app-itonami-kumitate), the CircleCI-compatible itonami dapp. kumitate is written in Kotoba and built only with the Amu selfhost compiler, as a loaderless static image for aarch64-linux or x86_64-linux.
 
 The tools are pure functions over the data the caller passes:
 
@@ -17,25 +17,41 @@ The tools are pure functions over the data the caller passes:
 
 Nothing is sent anywhere, nothing is stored, and no job runs.
 
-## Start the server
+## Use from an itonami agent profile (stdio)
 
-The owner builds the image (the repository README, "Kotoba gate") and starts it:
+The owner builds the image (the repository README, "Kotoba gate"). The agent starts it as a stdio server:
+
+```yaml
+mcp_servers:
+  kumitate:
+    command: /abs/kumitate-aarch64-linux.elf
+    args: [stdio]
+    env:
+      KEXE_ALLOW: "37,38,39,41"
+```
+
+- The image runs on arm64 or x86_64 Linux. On macOS, the command is podman, with the image mounted read-only:
+  `podman run --rm -i --platform linux/arm64 --network none -e KEXE_ALLOW=37,38,39,41 -v /abs/g:/abs/g:ro docker.io/library/python:3.12-alpine /abs/g/kumitate-aarch64-linux.elf stdio`.
+- Wire 41 is stdin. Without it the runtime stops the image at its first read, with an unnamed trap.
+- One process keeps the bytes it has read, up to the runtime's 256 MiB string pool. It then stops with a named budget trap, and the client starts a new one.
+- The tools appear as `mcp__kumitate__kumitate_plan` and so on.
+- Tried with Claude Code's MCP client (2.1.309). Not yet tried with the itonami-agent stdio client.
+
+## Or over Streamable HTTP
+
+The owner starts the server:
 
 ```sh
 KEXE_ALLOW=37,38,39,43,44,46,47 KEXE_CAP_RESOURCES_43=127.0.0.1:8787 ./kumitate-aarch64-linux.elf serve 127.0.0.1:8787
 ```
 
-The runtime opens only the granted address. The server answers `POST /mcp`. It refuses an `Origin` that is not localhost with 403, and returns 405 for GET and DELETE.
-
-## Use from an itonami agent profile
+The runtime opens only the granted address. The server answers `POST /mcp`. It refuses an `Origin` that is not localhost with 403, and returns 405 for GET and DELETE. The profile names its url:
 
 ```yaml
 mcp_servers:
   kumitate:
     url: http://127.0.0.1:8787/mcp
 ```
-
-The tools appear as `mcp__kumitate__kumitate_plan` and so on. A stdio transport is not available yet: the native runtime has no stdin (kotoba-lang/amu#1516).
 
 Registering this entry enables nothing. A profile owner adds the `mcp_servers` entry.
 
