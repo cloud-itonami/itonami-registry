@@ -62,6 +62,10 @@ Skills use SKILL.md frontmatter; MCPs, agents and workflows use Hermes manifest 
 
 The three servers are stdio MCP servers whose tools are pure functions over the passed text. They contact no vendor (sentry.io, linear.app, MoneyForward, freee, Yayoi, QuickBooks Online, Xero, Zoho, FreshBooks, Ramp, Brex, Expensify or BILL), bank, card issuer or the NTA, make no payment, and store nothing. mihari and dandori are recorded in catalogs/targeted-public-sources.json because those repositories postdate the 2026-10-10 inventory. kaikei's registrations sit on its existing inventory row, with their own source commit. Registration adds none of them to a profile.
 
+## Compat actors
+
+`compat/<slug>/` holds the clean-room, API-compatible actors that used to be one kotoba-lang repository each (`com-circleci` and 1,026 others; ADR 0005). `compat/index.json` lists them with origin commit and folder checksum; `catalogs/compat-sources.json` pins the origin. They are not Hermes entries, grant no authority, and publication claims no runtime or vendor-API qualification.
+
 ## Ownership and federation
 
 [kotoba-registry](https://github.com/kotoba-lang/kotoba-registry) remains the Kotoba extension catalog. Its github-forest MCP and github-forest-maintenance skill are referenced in catalogs/external-registries.json, not copied. Registry-qualified identities prevent collisions. Federation requires a consumer that understands the external registry descriptor.
