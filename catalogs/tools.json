@@ -2104,6 +2104,70 @@
       "effects": [],
       "authority": "caller-bound; tools/list grants nothing",
       "validation": "listed over stdio by Claude Code's MCP client 2.1.309 against the native image (2026-10-23); protocol-discovered and called over Streamable HTTP through the itonami-agent HTTP MCP client (kotoba-lang/itonami-agent 0c05574, src/itonami/agent/mcp_http_client.mjs) on fixture input (2026-10-23); live-agent-turn-not-tested"
+    },
+    {
+      "id": "dougaka/dougaka_validate",
+      "name": "dougaka_validate",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/dougaka",
+        "sourceRef": "app-dougaka",
+        "path": "bin/dougaka-mcp"
+      },
+      "description": "Validate a dougaka timeline JSON (scenes/assets/lines): scene count 1..24, every scene has a frame, estimated duration within 120s. Pure: returns named errors, sends and stores nothing.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Timeline JSON text, at most 5 MiB of UTF-8."
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "outputContract": "MCP content[].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
+      "effects": [],
+      "authority": "caller-bound; tools/list grants nothing",
+      "validation": "protocol-discovered and called over stdio with raw JSON-RPC on synthetic input (2026-10-24); live-agent-turn-not-tested"
+    },
+    {
+      "id": "dougaka/dougaka_plan",
+      "name": "dougaka_plan",
+      "provider": {
+        "kind": "mcp",
+        "entry": "mcp/dougaka",
+        "sourceRef": "app-dougaka",
+        "path": "bin/dougaka-mcp"
+      },
+      "description": "Build a dougaka render plan from timeline JSON: ordered segments with frame/voice/text, width/height/fps, bgm, plus display-only ffmpeg argv. Pure: no mp4 encoding, no network, nothing stored.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Timeline JSON text, at most 5 MiB of UTF-8."
+          },
+          "aspect": {
+            "type": "string",
+            "enum": [
+              "portrait",
+              "landscape"
+            ],
+            "description": "Override the timeline aspect. Default follows the timeline (portrait)."
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "outputContract": "MCP content[].text is the JSON result and structuredContent the same object; invalid input returns isError with a named reason.",
+      "effects": [],
+      "authority": "caller-bound; tools/list grants nothing",
+      "validation": "protocol-discovered and called over stdio with raw JSON-RPC on synthetic input (2026-10-24); live-agent-turn-not-tested"
     }
   ]
 }

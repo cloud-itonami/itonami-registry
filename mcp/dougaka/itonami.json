@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "itonami.entry.v1",
+  "sourceRefs": [
+    "app-dougaka"
+  ],
+  "useWhen": "Validate a dougaka timeline JSON an operator already holds, or build its ffmpeg render plan with narration cues",
+  "avoidWhen": "Encoding mp4, generating video or audio with AI, or reaching the dougaka production service, B2 or Kotobase",
+  "inputs": {
+    "text": "dougaka timeline JSON text (<= 5 MiB)",
+    "aspect": "portrait or landscape override for the plan"
+  },
+  "outputs": {
+    "validation": "ok flag with named validation errors",
+    "plan": "ordered segments with frame/voice/text, width/height/fps, bgm and display-only ffmpeg script"
+  },
+  "effects": [
+    "process",
+    "filesystem-read",
+    "dependency-fetch-on-first-launch"
+  ],
+  "authority": {
+    "grants": false,
+    "default": "blocked",
+    "binding": "caller-authorized profile mcp_servers entry and owner-reviewed effective tool allowlist"
+  },
+  "validation": {
+    "catalog": "schema-checked",
+    "runtime": "protocol-tested 2026-10-24: tools/list and tools/call over stdio with raw JSON-RPC (initialize/initialized/call) on synthetic fixtures plus a kbb stdio integration test; itonami-agent client model-driven turn and deployed profile not tested",
+    "live": false
+  },
+  "compatibilityNote": "Hermes storage format only. itonami-agent exposes the tools as mcp__dougaka__<tool> and does not start MCP subprocesses on peer runs. Data-format compatibility only; no connection to any video service.",
+  "requires": [
+    "Owner-installed kbb (Node) host",
+    "cloud-itonami/app-itonami-dougaka checkout at the pinned commit"
+  ],
+  "launchResolution": {
+    "placeholder": "DOUGAKA_REPO",
+    "behavior": "Resolve the absolute checkout before writing the client config. The launcher finds nbb.edn from its own path and resolves the pinned kotoba-lang/text git dependency into ~/.gitlibs; no cwd is required."
+  }
+}
