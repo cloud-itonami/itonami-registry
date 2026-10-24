@@ -8,6 +8,7 @@ from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 from build_index import ROOT, entries, frontmatter
 from profile_tree import allowed, tree_checksum
+from profile_status import load_declared
 
 
 def read(path):
@@ -233,6 +234,7 @@ def validate(root=ROOT):
     validate_datasets(root)
     validate_compat(root)
     validate_apis(root, catalog, identities, {r['id']: r for r in external['registries']})
+    load_declared(root)
     return len(catalog), len(tools['tools'])
 
 

@@ -30,6 +30,10 @@ demand) kept in --cache, so a re-run only fetches what changed.
 binding (root manifest/agent-registry :home). When given, each record also says whether
 that binding and this registry name the same repository.
 
+--shared-only reports, offline and from the manifests alone, the repositories that hold
+more than one profile (ADR 0008) against catalogs/shared-profile-repositories.json;
+--findings-out writes them as JSON in either mode.
+
 Needs git and, for the default URL template, ssh access to the repositories.
 """
 import argparse
@@ -46,6 +50,9 @@ from profile_tree import allowed, tree_checksum  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 STATES = ('current', 'behind', 'withdrawn', 'unreachable')
+SHARED_FILE = 'catalogs/shared-profile-repositories.json'
+SHARED_SCHEMA = 'itonami.shared-repositories.v1'
+SHARED_KINDS = ('fleet', 'maintainer')
 
 
 def git(repo, *args, check=False):
@@ -136,6 +143,51 @@ def load_entries(root, only_id=None):
     return entries
 
 
+def load_declared(root):
+    """The declared exceptions to one-profile-one-repository (ADR 0008), validated for shape."""
+    doc = json.loads(Path(root, SHARED_FILE).read_text())
+    if doc.get('schemaVersion') != SHARED_SCHEMA or not isinstance(doc.get('repositories'), list):
+        raise ValueError(f'{SHARED_FILE}: expected schemaVersion {SHARED_SCHEMA} and a repositories list')
+    declared = {}
+    for d in doc['repositories']:
+        if set(d) != {'repository', 'kind', 'reason'}:
+            raise ValueError(f'{SHARED_FILE}: entries need exactly repository, kind, reason: {d}')
+        if d['kind'] not in SHARED_KINDS or not d['reason'].strip() or d['repository'].count('/') != 1:
+            raise ValueError(f'{SHARED_FILE}: bad entry {d}')
+        if d['repository'] in declared:
+            raise ValueError(f"{SHARED_FILE}: duplicate {d['repository']}")
+        declared[d['repository']] = d
+    return declared
+
+
+def shared_findings(entries, declared):
+    """Offline, from the manifests alone (ADR 0008): repositories that hold several profiles."""
+    by_repo = {}
+    for e in entries:
+        by_repo.setdefault(e['repository'], []).append(e['id'])
+    out = []
+    for repo, ids in sorted(by_repo.items()):
+        d = declared.get(repo)
+        if len(ids) > 1:
+            out.append({'code': 'shared-repository' if d is None else 'shared-repository-declared',
+                        'repository': repo, 'profiles': sorted(ids), 'kind': d and d['kind'],
+                        'reason': d and d['reason']})
+        elif d is not None:
+            out.append({'code': 'declaration-without-sharing', 'repository': repo, 'profiles': ids})
+    for repo in sorted(set(declared) - set(by_repo)):
+        out.append({'code': 'declaration-unknown-repository', 'repository': repo, 'profiles': []})
+    return out
+
+
+def findings_summary(findings):
+    c = Counter(f['code'] for f in findings)
+    lines = ['shared-repository findings: ' + (', '.join(f'{k}={v}' for k, v in sorted(c.items())) or 'none')]
+    for f in findings:
+        if f['code'] != 'shared-repository-declared':
+            lines.append(f"  {f['code']:31} {f['repository']} ({len(f['profiles'])} profiles)")
+    return '\n'.join(lines)
+
+
 def run(entries, cache, template, jobs, homes=None):
     repos = sorted({e['repository'] for e in entries})
     with ThreadPoolExecutor(jobs) as ex:
@@ -166,18 +218,31 @@ def summary(recs):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split('\n\n')[0])
     ap.add_argument('--root', default=str(ROOT))
-    ap.add_argument('--cache', required=True)
+    ap.add_argument('--cache')
+    ap.add_argument('--shared-only', action='store_true',
+                    help='only the offline shared-repository findings (ADR 0008); needs no cache or network')
+    ap.add_argument('--findings-out')
     ap.add_argument('--homes')
     ap.add_argument('--out')
     ap.add_argument('--jobs', type=int, default=8)
     ap.add_argument('--only-id')
     ap.add_argument('--url-template', default='git@github.com:{repo}.git')
     a = ap.parse_args(argv)
+    entries = load_entries(a.root, a.only_id)
+    findings = shared_findings(entries, load_declared(a.root))
+    if a.findings_out:
+        Path(a.findings_out).write_text(json.dumps(findings, indent=1, ensure_ascii=False) + '\n')
+    if a.shared_only:
+        print(findings_summary(findings))
+        return 0
+    if not a.cache:
+        ap.error('--cache is required unless --shared-only')
     homes = json.loads(Path(a.homes).read_text()) if a.homes else None
-    recs = run(load_entries(a.root, a.only_id), a.cache, a.url_template, a.jobs, homes)
+    recs = run(entries, a.cache, a.url_template, a.jobs, homes)
     if a.out:
         Path(a.out).write_text(json.dumps(recs, indent=1, ensure_ascii=False) + '\n')
     print(summary(recs))
+    print(findings_summary(findings))
     return 0
 
 
