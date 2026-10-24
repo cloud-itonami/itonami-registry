@@ -1,4 +1,5 @@
 import hashlib
+import json
 import os
 import subprocess
 import sys
@@ -159,6 +160,42 @@ class StatusTests(unittest.TestCase):
         recs = [{'state': s, 'reason': 'r'} for s in ('current', 'current', 'behind', 'withdrawn', 'unreachable')]
         text = profile_status.summary(recs)
         self.assertIn('current=2, behind=1, withdrawn=1, unreachable=1', text)
+
+    def test_shared_repository_findings(self):
+        e = lambda i, r: {'id': i, 'repository': r}
+        entries = [e('a', 'o/solo'), e('b', 'o/fleet'), e('c', 'o/fleet'), e('d', 'o/loose'), e('f', 'o/loose'),
+                   e('g', 'o/decl-solo')]
+        decl = {k: {'repository': k, 'kind': 'fleet', 'reason': 'r'}
+                for k in ('o/fleet', 'o/decl-solo', 'o/gone')}
+        got = {(f['code'], f['repository']): f for f in profile_status.shared_findings(entries, decl)}
+        self.assertEqual({('shared-repository-declared', 'o/fleet'), ('shared-repository', 'o/loose'),
+                          ('declaration-without-sharing', 'o/decl-solo'),
+                          ('declaration-unknown-repository', 'o/gone')}, set(got))
+        self.assertEqual(['d', 'f'], got[('shared-repository', 'o/loose')]['profiles'])
+        self.assertEqual('fleet', got[('shared-repository-declared', 'o/fleet')]['kind'])
+
+    def test_declaration_shape_is_checked(self):
+        def load(doc):
+            d = Path(self.tmp.name) / 'decl'
+            (d / 'catalogs').mkdir(parents=True, exist_ok=True)
+            (d / profile_status.SHARED_FILE).write_text(json.dumps(doc))
+            return profile_status.load_declared(d)
+        sv = profile_status.SHARED_SCHEMA
+        ok = {'repository': 'o/r', 'kind': 'fleet', 'reason': 'ao fleet'}
+        self.assertEqual({'o/r'}, set(load({'schemaVersion': sv, 'repositories': [ok]})))
+        for bad in ({'schemaVersion': 'x', 'repositories': []},
+                    {'schemaVersion': sv, 'repositories': [dict(ok, kind='other')]},
+                    {'schemaVersion': sv, 'repositories': [dict(ok, reason=' ')]},
+                    {'schemaVersion': sv, 'repositories': [ok, ok]},
+                    {'schemaVersion': sv, 'repositories': [dict(ok, extra=1)]}):
+            with self.assertRaises(ValueError):
+                load(bad)
+
+    def test_shared_only_runs_offline_on_the_real_registry(self):
+        out = Path(self.tmp.name) / 'f.json'
+        self.assertEqual(0, profile_status.main(['--shared-only', '--findings-out', str(out)]))
+        found = json.loads(out.read_text())
+        self.assertGreaterEqual(sum(f['code'] == 'shared-repository' for f in found), 20)
 
     def test_the_real_manifests_load(self):
         entries = profile_status.load_entries(ROOT)
