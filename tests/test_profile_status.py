@@ -195,7 +195,9 @@ class StatusTests(unittest.TestCase):
         out = Path(self.tmp.name) / 'f.json'
         self.assertEqual(0, profile_status.main(['--shared-only', '--findings-out', str(out)]))
         found = json.loads(out.read_text())
-        self.assertGreaterEqual(sum(f['code'] == 'shared-repository' for f in found), 20)
+        self.assertGreaterEqual(sum(f['code'] in ('shared-repository', 'shared-repository-declared') for f in found), 20)
+        self.assertFalse([f for f in found if f['code'].startswith('declaration-')],
+                         'the declaration file names a repository that is not shared or not in the registry')
 
     def test_the_real_manifests_load(self):
         entries = profile_status.load_entries(ROOT)
