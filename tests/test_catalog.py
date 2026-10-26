@@ -21,7 +21,10 @@ class IntegrityTests(unittest.TestCase):
         # compat/ is 100+ MB of read-only imports: hard-link it instead of copying.
         def link_compat(src, dst):
             if Path(src).is_relative_to(ROOT / 'compat'):
-                os.link(src, dst)
+                try:
+                    os.link(src, dst)
+                except OSError:      # EXDEV: the checkout and the temp directory can be on different filesystems (CI runners)
+                    shutil.copy2(src, dst)
             else:
                 shutil.copy2(src, dst)
         shutil.copytree(ROOT, self.root, ignore=shutil.ignore_patterns('.git', '__pycache__', '.venv'),
