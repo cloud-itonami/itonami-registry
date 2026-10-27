@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "itonami.entry.v1",
+  "sourceRefs": [
+    "itonami-agent-cli"
+  ],
+  "useWhen": "Registering an itonami bot agent profile (itonami-agent CLI runner) from a Hermes session, or adding an agent to manifest/agent-registry.edn",
+  "avoidWhen": "Hermes cron bots only (see bot-profile-scaffold) or grok-bots DO residents (see itonami-business-bots)",
+  "inputs": {
+    "profileBundle": "SOUL.md / profile.yaml / config.yaml / yakuwari.edn / itonami.edn bundle"
+  },
+  "outputs": {
+    "registryEntry": "manifest/agent-registry.edn index entry via PR; yakuwari.edn remains the authority"
+  },
+  "effects": [
+    "process",
+    "filesystem-read",
+    "optional-authorized-artifact-write"
+  ],
+  "authority": {
+    "grants": false,
+    "default": "blocked",
+    "binding": "caller authorization; registry publication grants no execution authority and yakuwari-less bots stay proposal-only"
+  },
+  "validation": {
+    "catalog": "schema-checked",
+    "runtime": "procedure measured 2026-10-21 (itonami-agent code reading + registry dry-runs); registry install path not tested",
+    "live": false
+  },
+  "compatibilityNote": "Hermes skill shape only; home paths in the body are normalized to ~. Wildcard versions express no runtime compatibility."
+}
