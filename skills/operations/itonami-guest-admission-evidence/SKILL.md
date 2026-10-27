@@ -20,3 +20,6 @@ metadata:
 5. Report admission, execution and deployment evidence independently. Missing physical or production receipts remain unqualified; route any implementation change to its owner.
 
 Source contracts are pinned in itonami.json and catalogs/sources.json. Runtime implementations and existing profiles remain in their owning repositories.
+
+
+> Note (2026-10-27): the pinned source repositories for these skills were integrated into `kotoba-lang/kotoba` `lib/` and retired; the pins are preserved as immutable upstream provenance, and the current copies live in the monorepo.
