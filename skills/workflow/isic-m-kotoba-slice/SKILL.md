@@ -10,7 +10,7 @@ metadata: {"hermes": {"version": "0.1.0", "author": "cloud-itonami", "source": "
 
     orgs/kotoba-lang/amu/bin/amu check <slices>/<code>/advertising/SLICE.kotoba \
       --source-path <slices>/<code> \
-      --source-path orgs/kotoba-lang/kotoba-lang/lang/compat --jvm-free
+      --source-path orgs/kotoba-lang/kotoba-lang/lang/compat
 
   Cross-module `(:require [advertising.phase :as phase])` is resolved as the
   PATH `advertising/phase.kotoba` under each --source-path root (measured
@@ -20,7 +20,7 @@ metadata: {"hermes": {"version": "0.1.0", "author": "cloud-itonami", "source": "
   Keep slice files in `<slices>/<code>/<ns-first-segment>/` and point
   --source-path at the code root.
 
-- A single-file `amu check FILE --jvm-free` refuses any `(:require ...)`: `:kotoba.error/namespace-require-needs-project`. Always use the project route (source-path list).
+- A single-file `amu check FILE` refuses any `(:require ...)`: `:kotoba.error/namespace-require-needs-project`. Always use the project route (source-path list). (The current Amu selfhost `bin/amu` has NO `--jvm-free` flag — that belonged to the retired hosted entry (`docs/retired/legacy-public-entry-20261023` in kotoba-lang/amu). JVM-freeness is a build property of the selfhost artifact now; the receipts are process trace + compiler generation + artifact hash, not a flag.)
 - `kotoba.lang.coll` / `kotoba.lang.text` resolve from `kotoba-lang/kotoba-lang/lang/compat` (guest twins, cross-root rule picks the .kotoba).
 - Run with stdout+stderr redirected to files and read the files: the cron terminal often swallows stdout, and amu writes the CLI-error EDN to stderr. exit 0 = `:kotoba.check/v1` green; nonzero = read the `:message`/`:span` — amu reports ONE error per run, fix and re-run.
 
