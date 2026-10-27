@@ -93,7 +93,7 @@ kumitate is a native Kotoba program built only with the Amu selfhost compiler. I
 
 ## Ownership and federation
 
-[kotoba-registry](https://github.com/kotoba-lang/kotoba-registry) remains the Kotoba extension catalog. Its github-forest MCP and github-forest-maintenance skill are referenced in catalogs/external-registries.json, not copied. Registry-qualified identities prevent collisions. Federation requires a consumer that understands the external registry descriptor.
+[kotoba-registry](https://github.com/kotoba-lang/kotoba/tree/b94158fd48ec541b70d3c455912a06f407537ddc/lib/kotoba.kotobaRegistry) (now `lib/kotoba.kotobaRegistry` in kotoba-lang/kotoba) remains the Kotoba extension catalog. Its github-forest MCP and github-forest-maintenance skill are referenced in catalogs/external-registries.json, not copied. Registry-qualified identities prevent collisions. Federation requires a consumer that understands the external registry descriptor.
 
 Source code, per-bot SOUL/config/cron definitions and domain policies stay in the owning repositories. Sessions, credentials, runtime state and ledgers stay in their application homes. This registry is separate from west pins and from signed CID-pinned language package admission.
 
