@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "itonami.entry.v1",
+  "sourceRefs": [
+    "giemon-sim-loop"
+  ],
+  "useWhen": "Running the itonami-maint maturity iteration against the sim-loop status ledger",
+  "avoidWhen": "Editing the ledger outside the runbook's harness (self-matching greps and empty stdout are known traps)",
+  "inputs": {
+    "ledger": "sim-loop/status/maturity.md + evidence/ in the maint worktree"
+  },
+  "outputs": {
+    "iteration": "one maturity iteration with redirected-output evidence"
+  },
+  "effects": [
+    "process",
+    "filesystem-read",
+    "optional-authorized-artifact-write"
+  ],
+  "authority": {
+    "grants": false,
+    "default": "blocked",
+    "binding": "caller authorization; writes only to the caller-authorized worktree"
+  },
+  "validation": {
+    "catalog": "schema-checked",
+    "runtime": "runbook measured in itonami-maint cron iterations (falsify-56 findings); home paths normalized to ~; registry install path not tested",
+    "live": false
+  },
+  "compatibilityNote": "Hermes skill shape only; home paths in the body are normalized to ~. Wildcard versions express no runtime compatibility."
+}
