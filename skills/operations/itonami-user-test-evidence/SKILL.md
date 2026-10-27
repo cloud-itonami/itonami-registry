@@ -20,3 +20,6 @@ metadata:
 5. Keep personas, screenshots, transcripts and identifiers host-local. Export only permitted opaque references and aggregates; report the executor and evidence limits.
 
 Source contracts are pinned in itonami.json and catalogs/sources.json. Runtime implementations and existing profiles remain in their owning repositories.
+
+
+> Note (2026-10-27): the pinned source repositories for these skills were integrated into `kotoba-lang/kotoba` `lib/` and retired; the pins are preserved as immutable upstream provenance, and the current copies live in the monorepo.

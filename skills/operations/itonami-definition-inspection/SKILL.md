@@ -20,3 +20,6 @@ metadata:
 5. Report definition, actual callers and freshness limits. Structural identical markers do not prove byte-identical artifacts; build and prune write index state and require owner authorization.
 
 Source contracts are pinned in itonami.json and catalogs/sources.json. Runtime implementations and existing profiles remain in their owning repositories.
+
+
+> Note (2026-10-27): the pinned source repositories for these skills were integrated into `kotoba-lang/kotoba` `lib/` and retired; the pins are preserved as immutable upstream provenance, and the current copies live in the monorepo.
